@@ -1,15 +1,15 @@
-import { Space, Table, Tag } from 'antd';
+import { Table } from 'antd';
 import './App.css';
-
-const { Column, ColumnGroup } = Table;
 
 function App() {
     // 固定表头
-    const headers = [
+    const columns = [
         {
             key: 'category',
             dataIndex: 'category',
-            title: '分类'
+            title: '分类',
+            width: 80,
+            // fixed: 'left',
         },
         {
             key: 'target',
@@ -22,17 +22,19 @@ function App() {
             title: '量化'
         },
         {
-            type: 'group',
-            key: 'weekday',
-            dataIndex: 'weekday',
             title: '周完成情况',
-            dataSource: Array.from(Array(7).keys(), (x) => x + 1).map((weekday) => {
+            children: Array.from(Array(7).keys(), (x) => x + 1).map((weekday) => {
                 return {
                     title: `周${weekday}`,
                     key: `${weekday}`,
                     dataIndex: `${weekday}`,
                 }
             })
+        },
+        {
+            key: 'rate',
+            dataIndex: 'rate',
+            title: '完成率'
         },
         {
             key: 'excuse',
@@ -43,12 +45,12 @@ function App() {
     // 模拟数据
     const data = [
         {
-            key: '1',
-            firstName: 'John',
-            lastName: 'Brown',
-            age: 32,
-            address: 'New York No. 1 Lake Park',
-            tags: ['nice', 'developer'],
+            key: 'learning',
+            category: 'John',
+            target: 'Brown',
+            quantify: 32,
+            rate: 'New York No. 1 Lake Park',
+            excuse: '1',
         },
         {
             key: '2',
@@ -79,23 +81,15 @@ function App() {
             <Table
                 dataSource={data}
                 pagination={false}
+                columns={columns}
+                bordered
                 title={() =>
                     // Week 信息
                     <div className='week'>Week 9 复盘</div>
                 }
-                className='table' >
+                className='table'
+            >
                 {/* 分类 + 目标 + 量化 */}
-                {headers.map((header) => {
-                    if (header?.type !== 'group') {
-                        return <Column title={header.title} dataIndex={header.dataIndex} key={header.key} />
-                    } else {
-                        return <ColumnGroup title={header.title}>
-                            {header?.dataSource ? header?.dataSource.map((data) => <Column title={data.title} dataIndex={data.dataIndex} key={data.key} />) : <></>}
-
-
-                        </ColumnGroup>
-                    }
-                })}
             </Table>
             {/* 不可量化目标 */}
 
