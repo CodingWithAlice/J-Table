@@ -1,5 +1,17 @@
-import { Table } from 'antd';
+import { Table, Tag, Progress } from 'antd';
 import './App.css';
+
+// 分类共三类：Learning、Life、Health
+const Category = {
+    learning: 'Learning',
+    life: 'Life',
+    health: 'Health',
+}
+const CategoryColor = {
+    Learning: 'green',
+    Life: 'pink',
+    Health: 'volcano'
+}
 
 function App() {
     // 固定表头
@@ -8,18 +20,28 @@ function App() {
             key: 'category',
             dataIndex: 'category',
             title: '分类',
-            width: 80,
-            // fixed: 'left',
+            render: (_, { category } ) => (
+                <>
+                  {category?.map((c) => {
+                    let color = CategoryColor[c]
+                    return (
+                      <Tag color={color} key={c}>
+                        {c.toUpperCase()}
+                      </Tag>
+                    );
+                  })}
+                </>
+              ),
         },
         {
             key: 'target',
             dataIndex: 'target',
-            title: '目标'
+            title: '目标',
         },
         {
             key: 'quantify',
             dataIndex: 'quantify',
-            title: '量化'
+            title: '量化',
         },
         {
             title: '周完成情况',
@@ -34,39 +56,43 @@ function App() {
         {
             key: 'rate',
             dataIndex: 'rate',
-            title: '完成率'
+            title: '完成率',
+            width: 56,
+            render: (_ ,{ rate }) => {
+                return <Progress percent={Number(rate)} size="small" status={Number(rate)===100 ? 'success': 'active'}/>
+            }
         },
         {
             key: 'excuse',
             dataIndex: 'excuse',
-            title: '解释一下吧'
+            title: '解释一下吧',
         },
     ]
     // 模拟数据
     const data = [
         {
-            key: 'learning',
-            category: 'John',
+            key: 'target1',
+            category: [Category.learning],
             target: 'Brown',
             quantify: 32,
-            rate: 'New York No. 1 Lake Park',
-            excuse: '1',
+            rate: 40,
+            excuse: '描述',
         },
         {
-            key: '2',
-            firstName: 'Jim',
-            lastName: 'Green',
-            age: 42,
-            address: 'London No. 1 Lake Park',
-            tags: ['loser'],
+            key: 'target2',
+            category: [Category.life],
+            target: 'Brown',
+            quantify: 32,
+            rate: 0,
+            excuse: '描述',
         },
         {
-            key: '3',
-            firstName: 'Joe',
-            lastName: 'Black',
-            age: 32,
-            address: 'Sydney No. 1 Lake Park',
-            tags: ['cool', 'teacher'],
+            key: 'target3',
+            category: [Category.health],
+            target: 'Brown',
+            quantify: 32,
+            rate: 100,
+            excuse: '描述',
         },
     ];
 
