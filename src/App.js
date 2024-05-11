@@ -20,18 +20,18 @@ function App() {
             key: 'category',
             dataIndex: 'category',
             title: '分类',
-            render: (_, { category } ) => (
+            render: (_, { category }) => (
                 <>
-                  {category?.map((c) => {
-                    let color = CategoryColor[c]
-                    return (
-                      <Tag color={color} key={c}>
-                        {c.toUpperCase()}
-                      </Tag>
-                    );
-                  })}
+                    {category?.map((c) => {
+                        let color = CategoryColor[c]
+                        return (
+                            <Tag color={color} key={c}>
+                                {c.toUpperCase()}
+                            </Tag>
+                        );
+                    })}
                 </>
-              ),
+            ),
         },
         {
             key: 'target',
@@ -58,8 +58,16 @@ function App() {
             dataIndex: 'rate',
             title: '完成率',
             width: 56,
-            render: (_ ,{ rate }) => {
-                return <Progress percent={Number(rate)} size="small" status={Number(rate)===100 ? 'success': 'active'}/>
+            className: 'rateBox',
+            render: (_, { rate }) => {
+                return <div style={{ 
+                    backgroundColor: 'antiquewhite',
+                    width: `${rate < 40 ? 40 : rate * 0.6 + 40}%`,
+                    height: 56 ,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center' 
+                }} className='rate'>{rate}%</div>
             }
         },
         {
