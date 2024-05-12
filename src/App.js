@@ -1,4 +1,4 @@
-import { Table, Tag, Progress } from 'antd';
+import { Table, Tag } from 'antd';
 import './App.css';
 
 // 分类共三类：Learning、Life、Health
@@ -50,6 +50,11 @@ function App() {
                     title: `周${weekday}`,
                     key: `${weekday}`,
                     dataIndex: `${weekday}`,
+                    render: (_, { weekSituation }) => {
+                        return weekSituation?.[weekday - 1]
+                            ? <i class='iconfont icon-duigou' style={{ color: 'pink' }}></i>
+                            : <i class='iconfont icon-weiwancheng-copy' style={{ color: 'grey' }}></i>
+                    }
                 }
             })
         },
@@ -60,13 +65,13 @@ function App() {
             width: 56,
             className: 'rateBox',
             render: (_, { rate }) => {
-                return <div style={{ 
+                return <div style={{
                     backgroundColor: 'antiquewhite',
                     width: `${rate < 40 ? 40 : rate * 0.6 + 40}%`,
-                    height: 56 ,
+                    height: 56,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center' 
+                    justifyContent: 'center'
                 }} className='rate'>{rate}%</div>
             }
         },
@@ -85,6 +90,7 @@ function App() {
             quantify: 32,
             rate: 40,
             excuse: '描述',
+            weekSituation: [1, 0, 1, 1, 0, 1, 1]
         },
         {
             key: 'target2',
@@ -93,6 +99,7 @@ function App() {
             quantify: 32,
             rate: 0,
             excuse: '描述',
+            weekSituation: [1, 0, 1, 1, 1, 0, 1]
         },
         {
             key: 'target3',
@@ -101,6 +108,7 @@ function App() {
             quantify: 32,
             rate: 100,
             excuse: '描述',
+            weekSituation: [0, 1, 1, 1, 1, 1, 1]
         },
     ];
 
