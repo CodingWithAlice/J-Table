@@ -38,8 +38,8 @@ const EditInput = {
         ]}
     />,
     target: <Input />,
-    quantify: <Input />,
-    excuse: <Input />,
+    quantify: <InputNumber />,
+    // excuse: <Input />,
     weekSituation: <Switch />,
 };
 
@@ -81,25 +81,25 @@ const originData = [
     {
         key: 'target0',
         category: [Category.learning],
-        target: 'Brown',
-        quantify: 32,
-        excuse: '描述',
+        target: '背单词100个',
+        quantify: 7,
+        // excuse: '描述',
         weekSituation: [1, 0, 1, 1, 0, 1, 1]
     },
     {
         key: 'target1',
         category: [Category.life],
-        target: 'Brown',
-        quantify: 32,
-        excuse: '描述',
+        target: '运动1h',
+        quantify: 5,
+        // excuse: '描述',
         weekSituation: [0, 0, 1, 1, 0, 0, 1]
     },
     {
         key: 'target2',
         category: [Category.health],
-        target: 'Brown',
-        quantify: 32,
-        excuse: '描述',
+        target: '阅读30m',
+        quantify: 5,
+        // excuse: '描述',
         weekSituation: [0, 1, 1, 1, 1, 1, 1]
     },
 ];
@@ -124,9 +124,9 @@ function App() {
         const newData = {
             key: `target${data?.length}`,
             category: [Category.learning],
-            target: 'Brown',
-            quantify: 32,
-            excuse: '描述',
+            target: '今天也要更好鸭',
+            quantify: 5,
+            // excuse: '描述',
             weekSituation: Array(7)
         };
         setData([...data, newData]);
@@ -182,16 +182,18 @@ function App() {
         {
             key: 'target',
             dataIndex: 'target',
-            // width: 56,
+            width: '18%',
             title: '目标',
             editable: true,
         },
         {
             key: 'quantify',
             dataIndex: 'quantify',
-            width: '8%',
-            // width: 56,
+            width: '10%',
             title: '量化',
+            render:(_, { quantify }) => {
+                return <>{quantify}次/周</>
+            },
             editable: true,
         },
         {
@@ -229,12 +231,12 @@ function App() {
             },
             editable: false, // 由前面数据计算而得
         },
-        {
-            key: 'excuse',
-            dataIndex: 'excuse',
-            title: '解释一下',
-            editable: true,
-        },
+        // {
+        //     key: 'excuse',
+        //     dataIndex: 'excuse',
+        //     title: '解释一下',
+        //     editable: true,
+        // },
         {
             title: '操作',
             dataIndex: 'operation',
