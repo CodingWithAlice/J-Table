@@ -79,29 +79,26 @@ const EditableCell = ({
 // 模拟数据
 const originData = [
     {
-        key: 'target1',
+        key: 'target0',
         category: [Category.learning],
         target: 'Brown',
         quantify: 32,
-        rate: 40,
         excuse: '描述',
         weekSituation: [1, 0, 1, 1, 0, 1, 1]
     },
     {
-        key: 'target2',
+        key: 'target1',
         category: [Category.life],
         target: 'Brown',
         quantify: 32,
-        rate: 0,
         excuse: '描述',
-        weekSituation: [1, 0, 1, 1, 1, 0, 1]
+        weekSituation: [0, 0, 1, 1, 0, 0, 1]
     },
     {
-        key: 'target3',
+        key: 'target2',
         category: [Category.health],
         target: 'Brown',
         quantify: 32,
-        rate: 100,
         excuse: '描述',
         weekSituation: [0, 1, 1, 1, 1, 1, 1]
     },
@@ -129,7 +126,6 @@ function App() {
             category: [Category.learning],
             target: 'Brown',
             quantify: 32,
-            rate: 40,
             excuse: '描述',
             weekSituation: Array(7)
         };
@@ -220,7 +216,8 @@ function App() {
             title: '完成率',
             width: '6%',
             className: 'rateBox',
-            render: (_, { rate }) => {
+            render: (_, { weekSituation = [] }) => {
+                const rate = (weekSituation?.filter(i => i)?.length)/7 * 100;
                 return <div style={{
                     backgroundColor: 'antiquewhite',
                     width: `${rate < 40 ? 40 : rate * 0.6 + 40}%`,
@@ -228,7 +225,7 @@ function App() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
-                }} className='rate'>{rate}%</div>
+                }} className='rate'>{rate.toFixed(0)}%</div>
             },
             editable: false, // 由前面数据计算而得
         },
