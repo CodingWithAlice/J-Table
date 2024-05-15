@@ -18,9 +18,9 @@ const CategoryColor = {
 const EditInput = {
     category: <Select
         defaultValue={Category.learning}
-        // style={{
-        //     width: 120,
-        // }}
+        style={{
+            width: 100,
+        }}
         // onChange={handleChange}
         options={[
             {
@@ -37,8 +37,8 @@ const EditInput = {
             },
         ]}
     />,
-    target: <Input />,
-    quantify: <InputNumber />,
+    target: <Input placeholder="运动1h" />,
+    quantify: <InputNumber min={1} max={7} style={{width: 56}} defaultValue={1} />,
     // excuse: <Input />,
     weekSituation: <Switch />,
 };
@@ -218,16 +218,17 @@ function App() {
             title: '完成率',
             width: '6%',
             className: 'rateBox',
-            render: (_, { weekSituation = [] }) => {
-                const rate = (weekSituation?.filter(i => i)?.length)/7 * 100;
+            render: (_, { weekSituation = [], quantify }) => {
+                const rate = (weekSituation?.filter(i => i)?.length)/(+quantify || 7) * 100;
+                const show = rate.toFixed(0);
                 return <div style={{
                     backgroundColor: 'antiquewhite',
-                    width: `${rate < 40 ? 40 : rate * 0.6 + 40}%`,
+                    width: `${rate < 40 ? 40 : rate > 100 ? 100 : rate * 0.6 + 40}%`,
                     height: 56,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
-                }} className='rate'>{rate.toFixed(0)}%</div>
+                }} className='rate'>{ show >= 100 ? 100 : show}%</div>
             },
             editable: false, // 由前面数据计算而得
         },
