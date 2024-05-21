@@ -2,18 +2,10 @@ import { Button, Table, Tag, Typography, Form, Popconfirm, InputNumber, Input, S
 import './App.css';
 import { useState } from 'react';
 import { getWeek } from './utils/getWeeks';
+import EditTable from './EdibleTable';
+import { Category, CategoryColor } from './utils/utils';
 
-// 分类共三类：Learning、Life、Health
-const Category = {
-    learning: 'Learning',
-    life: 'Life',
-    health: 'Health',
-}
-const CategoryColor = {
-    Learning: 'green',
-    Life: 'pink',
-    Health: 'volcano'
-}
+
 // 编辑态 - 和 dataIndex 对应的输入框
 const EditInput = {
     category: <Select
@@ -38,7 +30,7 @@ const EditInput = {
         ]}
     />,
     target: <Input placeholder="运动1h" />,
-    quantify: <InputNumber min={1} max={7} style={{width: 56}} defaultValue={1} />,
+    quantify: <InputNumber min={1} max={7} style={{ width: 56 }} defaultValue={1} />,
     // excuse: <Input />,
     weekSituation: <Switch />,
 };
@@ -191,7 +183,7 @@ function App() {
             dataIndex: 'quantify',
             width: '10%',
             title: '量化',
-            render:(_, { quantify }) => {
+            render: (_, { quantify }) => {
                 return <>{quantify}次/周</>
             },
             editable: true,
@@ -219,7 +211,7 @@ function App() {
             width: '6%',
             className: 'rateBox',
             render: (_, { weekSituation = [], quantify }) => {
-                const rate = (weekSituation?.filter(i => i)?.length)/(+quantify || 7) * 100;
+                const rate = (weekSituation?.filter(i => i)?.length) / (+quantify || 7) * 100;
                 const show = rate.toFixed(0);
                 return <div style={{
                     backgroundColor: 'antiquewhite',
@@ -228,7 +220,7 @@ function App() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
-                }} className='rate'>{ show >= 100 ? 100 : show}%</div>
+                }} className='rate'>{show >= 100 ? 100 : show}%</div>
             },
             editable: false, // 由前面数据计算而得
         },
@@ -287,9 +279,10 @@ function App() {
             <h1 className='title'>
                 J人热爱统计的一生
             </h1>
+            {/* 分类 + 目标 + 量化 */}
 
             {/* 可量化目标 */}
-            <Table
+            {/* <Table
                 components={{
                     body: {
                         cell: EditableCell,
@@ -308,11 +301,9 @@ function App() {
                     Add a Target
                 </Button>}
                 className='table'
-            >
-                {/* 分类 + 目标 + 量化 */}
-            </Table>
+            /> */}
+            <EditTable className='table' />
             {/* 不可量化目标 */}
-
         </div>
     );
 }

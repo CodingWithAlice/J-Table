@@ -20,18 +20,18 @@
 }
 
 .week {
+
+    width: 960px;
     color: pink;
     font-weight: 800;
     font-size: 1.2rem;
-    /* 居中 */
-    display: flex;
-    justify-content: center;
+    text-align: center;
 }
 
-.table {
+/* .table {
     width: 75%;
     margin-top: 8px;
-}
+} */
 
 .rateBox {
     padding: 0 !important;
