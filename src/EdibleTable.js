@@ -1,10 +1,8 @@
 import {
     EditableProTable,
-    ProCard,
-    ProFormField,
     ProFormRadio,
 } from '@ant-design/pro-components';
-import { Tag } from 'antd';
+import { InputNumber, Tag } from 'antd';
 import React, { useState } from 'react';
 import { Category, CategoryColor } from './utils/utils';
 import { getWeek } from './utils/getWeeks';
@@ -22,30 +20,27 @@ const waitTime = (time = 100) => {
 const defaultData = [
     {
         key: 'target0',
-        category: [Category.learning],
+        category: Category.learning,
         target: '背单词100个',
         quantify: 7,
-        state: 'open',
         // excuse: '描述',
         weekSituation: [1, 0, 1, 1, 0, 1, 1],
     },
     {
         key: 'target1',
-        category: [Category.life],
+        category: Category.life,
         target: '运动1h',
         quantify: 5,
         // excuse: '描述',
         weekSituation: [0, 0, 1, 1, 0, 0, 1],
-        state: 'open',
     },
     {
         key: 'target2',
-        category: [Category.health],
+        category: Category.health,
         target: '阅读30m',
         quantify: 5,
         // excuse: '描述',
         weekSituation: [0, 1, 1, 1, 1, 1, 1],
-        state: 'open'
     },
 ];
 
@@ -61,7 +56,19 @@ export default function EditTable() {
         {
             title: '分类',
             dataIndex: 'category',
+            valueType: 'select',
             tooltip: '将事项拆分成学习、生活、健康三大类',
+            valueEnum: {
+                [Category.health]: { text: Category.health, status: Category.health },
+                [Category.learning]: {
+                    text: Category.learning,
+                    status: Category.learning,
+                },
+                [Category.life]: {
+                    text: Category.life,
+                    status: Category.life,
+                },
+            },
             formItemProps: (form, { rowIndex }) => {
                 return {
                     rules:
@@ -69,55 +76,33 @@ export default function EditTable() {
                 };
             },
             // 第一行不允许编辑
-            editable: (text, record, index) => {
-                return index !== 0;
-            },
-            width: '9%',
-            render: (category) => (
-                <>
-                    {category?.map((c) => {
-                        let color = CategoryColor[c]
-                        return (
-                            <Tag color={color} key={c}>
-                                {c.toUpperCase()}
-                            </Tag>
-                        );
-                    })}
-                </>
+            // editable: (text, record, index) => {
+            //     return index !== 0;
+            // },
+            width: '11%',
+            render: (c, { category = '', target }) => (
+                <Tag color={CategoryColor[category]} key={target}>
+                    {category.toUpperCase()}
+                </Tag>
             ),
         },
         {
             title: '目标',
             dataIndex: 'target',
             tooltip: '自定义具体目标',
-            readonly: true,
             width: '15%',
         },
         {
             title: '量化',
-            key: 'quantify',
             dataIndex: 'quantify',
+            key: 'quantify',
+            valueType: `digit`,
+            initialValue: 1,
+            width: '10%',
             render: (_, { quantify }) => {
                 return <>{quantify}次/周</>
             },
         },
-        // {
-        //     title: '状态',
-        //     key: 'state',
-        //     dataIndex: 'state',
-        //     valueType: 'select',
-        //     valueEnum: {
-        //       all: { text: '全部', status: 'Default' },
-        //       open: {
-        //         text: '未解决',
-        //         status: 'Error',
-        //       },
-        //       closed: {
-        //         text: '已解决',
-        //         status: 'Success',
-        //       },
-        //     },
-        //   },
         // {
         //     title: '描述',
         //     dataIndex: 'decs',
@@ -143,11 +128,13 @@ export default function EditTable() {
                     key: `${weekday}`,
                     dataIndex: `${weekday}`,
                     render: (_, { weekSituation }) => {
+                        // console.log('weekSituation=', weekSituation);
                         return weekSituation?.[weekday - 1]
                             ? <i className='iconfont icon-duigou' style={{ color: 'pink' }}></i>
                             : <i className='iconfont icon-weiwancheng-copy' style={{ color: 'grey' }}></i>
                     },
-                    editable: true,
+                    valueType: `switch`,
+                    initialValue: false
                 }
             }),
         },
@@ -157,6 +144,7 @@ export default function EditTable() {
             title: '完成率',
             width: '6%',
             className: 'rateBox',
+            readonly: true,
             render: (_, { weekSituation = [], quantify }) => {
                 const rate = (weekSituation?.filter(i => i)?.length) / (+quantify || 7) * 100;
                 const show = rate.toFixed(0);
@@ -169,7 +157,7 @@ export default function EditTable() {
                     justifyContent: 'center'
                 }} className='rate'>{show >= 100 ? 100 : show}%</div>
             },
-            editable: false, // 由前面数据计算而得
+            // editable: false, // 由前面数据计算而得
         },
         {
             title: '操作',
@@ -196,6 +184,12 @@ export default function EditTable() {
         },
     ];
 
+    // 新增数据时处理数据格式
+    const transform = (data) => {
+        const {id: tKey, category: tCategory, quantify: TQuantify, target: TTarget } = data;
+        return {key: tKey, category: tCategory, quantify: TQuantify, target: TTarget, weekSituation: [+data[1], +data[2], +data[3], +data[4], +data[5], +data[6], +data[7]]};
+    }
+
     return (
         <>
             <EditableProTable
@@ -221,20 +215,20 @@ export default function EditTable() {
                             value: position,
                             onChange: (e) => setPosition(e.target.value),
                         }}
-                        // options={[
-                        //     {
-                        //         label: '添加到顶部',
-                        //         value: 'top',
-                        //     },
-                        //     {
-                        //         label: '添加到底部',
-                        //         value: 'bottom',
-                        //     },
-                        //     {
-                        //         label: '隐藏',
-                        //         value: 'hidden',
-                        //     },
-                        // ]}
+                    // options={[
+                    //     {
+                    //         label: '添加到顶部',
+                    //         value: 'top',
+                    //     },
+                    //     {
+                    //         label: '添加到底部',
+                    //         value: 'bottom',
+                    //     },
+                    //     {
+                    //         label: '隐藏',
+                    //         value: 'hidden',
+                    //     },
+                    // ]}
                     />,
                 ]}
                 columns={columns}
@@ -249,7 +243,9 @@ export default function EditTable() {
                     type: 'multiple',
                     editableKeys,
                     onSave: async (rowKey, data, row) => {
-                        console.log(rowKey, data, row);
+                        console.log('🌹',rowKey, data, row);
+                        // 周完成情况需要整合后，再保存数据
+                        setDataSource([...dataSource, transform(data)])
                         await waitTime(2000);
                     },
                     onChange: setEditableRowKeys,
