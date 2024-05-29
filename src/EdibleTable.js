@@ -2,10 +2,11 @@ import {
     EditableProTable,
     ProFormRadio,
 } from '@ant-design/pro-components';
-import { InputNumber, Tag } from 'antd';
-import React, { useState } from 'react';
+import { Tag } from 'antd';
+import React, { useEffect, useState } from 'react';
 import { Category, CategoryColor } from './utils/utils';
 import { getWeek } from './utils/getWeeks';
+import { MainApi } from './apis/main';
 import './App.css';
 
 const waitTime = (time = 100) => {
@@ -23,7 +24,6 @@ const defaultData = [
         category: Category.learning,
         target: '背单词100个',
         quantify: 7,
-        // excuse: '描述',
         weekSituation: [1, 0, 1, 1, 0, 1, 1],
     },
     {
@@ -46,7 +46,7 @@ const defaultData = [
 
 export default function EditTable() {
     const [editableKeys, setEditableRowKeys] = useState([]);
-    const [dataSource, setDataSource] = useState([]);
+    const [dataSource, setDataSource] = useState(defaultData);
     const [position, setPosition] = useState(
         'bottom',
     );
@@ -128,7 +128,6 @@ export default function EditTable() {
                     key: `${weekday}`,
                     dataIndex: `${weekday}`,
                     render: (_, { weekSituation }) => {
-                        // console.log('weekSituation=', weekSituation);
                         return weekSituation?.[weekday - 1]
                             ? <i className='iconfont icon-duigou' style={{ color: 'pink' }}></i>
                             : <i className='iconfont icon-weiwancheng-copy' style={{ color: 'grey' }}></i>
@@ -190,6 +189,11 @@ export default function EditTable() {
         return {key: tKey, category: tCategory, quantify: TQuantify, target: TTarget, weekSituation: [+data[1], +data[2], +data[3], +data[4], +data[5], +data[6], +data[7]]};
     }
 
+
+    useEffect(() => {
+        // MainApi.list();
+    })
+
     return (
         <>
             <EditableProTable
@@ -233,7 +237,7 @@ export default function EditTable() {
                 ]}
                 columns={columns}
                 request={async () => ({
-                    data: defaultData,
+                    data: dataSource,
                     total: 3,
                     success: true,
                 })}
@@ -243,7 +247,6 @@ export default function EditTable() {
                     type: 'multiple',
                     editableKeys,
                     onSave: async (rowKey, data, row) => {
-                        console.log('🌹',rowKey, data, row);
                         // 周完成情况需要整合后，再保存数据
                         setDataSource([...dataSource, transform(data)])
                         await waitTime(2000);
