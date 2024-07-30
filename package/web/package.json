@@ -1,5 +1,5 @@
 {
-  "name": "J-Table",
+  "name": "web",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -16,8 +16,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "web": "npm run start --workspace=web",
-    "server": "npm run start --workspace=server"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -37,8 +39,8 @@
       "last 1 safari version"
     ]
   },
-  "workspaces": [
-    "./package/web",
-    "./package/server"
-  ]
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
