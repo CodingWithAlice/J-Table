@@ -46,7 +46,7 @@ const defaultData = [
 
 export default function EditTable() {
     const [editableKeys, setEditableRowKeys] = useState([]);
-    const [dataSource, setDataSource] = useState(defaultData);
+    const [dataSource, setDataSource] = useState([]);
     const [position, setPosition] = useState(
         'bottom',
     );
@@ -185,75 +185,74 @@ export default function EditTable() {
 
     // 新增数据时处理数据格式
     const transform = (data) => {
-        const {id: tKey, category: tCategory, quantify: TQuantify, target: TTarget } = data;
-        return {key: tKey, category: tCategory, quantify: TQuantify, target: TTarget, weekSituation: [+data[1], +data[2], +data[3], +data[4], +data[5], +data[6], +data[7]]};
+        const { id: tKey, category: tCategory, quantify: TQuantify, target: TTarget } = data;
+        return { key: tKey, category: tCategory, quantify: TQuantify, target: TTarget, weekSituation: [+data[1], +data[2], +data[3], +data[4], +data[5], +data[6], +data[7]] };
     }
 
-
     useEffect(() => {
-        // MainApi.list();
-    })
+        MainApi.list().then((data) => {
+            setDataSource(data?.list || []);
+        });
+    }, [])
 
     return (
-        <>
-            <EditableProTable
-                rowKey="id"
-                headerTitle={<div className='week'>Week {getWeek()} 复盘</div>}
-                maxLength={5}
-                scroll={{
-                    x: 960,
-                }}
-                recordCreatorProps={
-                    position !== 'hidden'
-                        ? {
-                            position: position,
-                            record: () => ({ id: (Math.random() * 1000000).toFixed(0) }),
-                        }
-                        : false
-                }
-                loading={false}
-                toolBarRender={() => [
-                    <ProFormRadio.Group
-                        key="render"
-                        fieldProps={{
-                            value: position,
-                            onChange: (e) => setPosition(e.target.value),
-                        }}
-                    // options={[
-                    //     {
-                    //         label: '添加到顶部',
-                    //         value: 'top',
-                    //     },
-                    //     {
-                    //         label: '添加到底部',
-                    //         value: 'bottom',
-                    //     },
-                    //     {
-                    //         label: '隐藏',
-                    //         value: 'hidden',
-                    //     },
-                    // ]}
-                    />,
-                ]}
-                columns={columns}
-                request={async () => ({
-                    data: dataSource,
-                    total: 3,
-                    success: true,
-                })}
-                value={dataSource}
-                onChange={setDataSource}
-                editable={{
-                    type: 'multiple',
-                    editableKeys,
-                    onSave: async (rowKey, data, row) => {
-                        // 周完成情况需要整合后，再保存数据
-                        setDataSource([...dataSource, transform(data)])
-                        await waitTime(2000);
-                    },
-                    onChange: setEditableRowKeys,
-                }}
-            />
-        </>
+        <EditableProTable
+            rowKey="id"
+            headerTitle={<div className='week'>Week {getWeek()} 复盘</div>}
+            maxLength={5}
+            scroll={{
+                x: 960,
+            }}
+            recordCreatorProps={
+                position !== 'hidden'
+                    ? {
+                        position: position,
+                        record: () => ({ id: (Math.random() * 1000000).toFixed(0) }),
+                    }
+                    : false
+            }
+            loading={false}
+            toolBarRender={() => [
+                <ProFormRadio.Group
+                    key="render"
+                    fieldProps={{
+                        value: position,
+                        onChange: (e) => setPosition(e.target.value),
+                    }}
+                // options={[
+                //     {
+                //         label: '添加到顶部',
+                //         value: 'top',
+                //     },
+                //     {
+                //         label: '添加到底部',
+                //         value: 'bottom',
+                //     },
+                //     {
+                //         label: '隐藏',
+                //         value: 'hidden',
+                //     },
+                // ]}
+                />,
+            ]}
+            columns={columns}
+            request={async () => ({
+                data: dataSource,
+                total: 3,
+                success: true,
+            })}
+            value={dataSource}
+            onChange={setDataSource}
+            editable={{
+                type: 'multiple',
+                editableKeys,
+                onSave: async (rowKey, data, row) => {
+                    // 周完成情况需要整合后，再保存数据
+                    setDataSource([...dataSource, transform(data)])
+                    await waitTime(2000);
+                },
+                onChange: setEditableRowKeys,
+            }}
+        />
     );
 };
