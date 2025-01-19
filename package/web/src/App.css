@@ -1,4 +1,3 @@
-
 .App {
     /* 颜色 */
     background-color: #282c34;
@@ -39,4 +38,75 @@
 
 .ltn {
     font-size: 1.2rem;
+}
+
+.ltn-table {
+    margin: 0 16px;
+}
+
+.box-id {
+    letter-spacing: 0.2rem;
+    font-size: 2.5rem;
+    font-weight: 800;
+    background-image: -webkit-linear-gradient(left, #147B96, #E6D205 25%, #147B96 50%, #E6D205 75%, #147B96);
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    -webkit-background-size: 200% 100%;
+    margin: 0 4px;
+}
+
+.ltn-list {
+    padding: 8px;
+    border-radius: 16px;
+    font-size: 600;
+}
+
+.ltn-list:nth-of-type(1) {
+    background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
+    color: #462f7b;
+}
+
+.ltn-list:nth-of-type(2) {
+    background-image: linear-gradient(-225deg, #5D9FFF 0%, #B8DCFF 48%, #6BBBFF 100%);
+    color: #0c3673;
+}
+
+.ltn-list:nth-of-type(3) {
+    background-image: linear-gradient(to right, #eea2a2 0%, #bbc1bf 19%, #57c6e1 42%, #b49fda 79%, #7ac5d8 100%);
+    color: #462f7b;
+}
+
+.ltn-list:nth-of-type(4) {
+    background-image: linear-gradient(to top, #9890e3 0%, #b1f4cf 100%);
+    color: #0c3673;
+}
+
+.ltn-list:nth-of-type(5) {
+    background-image: linear-gradient(to top, #fddb92 0%, #d1fdff 100%);
+    color: #462f7b;
+}
+
+.avatar {
+    background-color: #fde3cf;
+    color: #f56a00;
+    flex: none;
+    margin-right: 2px;
+}
+
+.ltn-list-item {
+    display: flex;
+    align-items: center;
+}
+
+.ltn-list-item:hover {
+    background-color: #fde3cf;
+    border-radius: 8px;
+}
+
+.ltn-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    width: 80%;
 }
