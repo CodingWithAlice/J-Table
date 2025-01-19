@@ -4,25 +4,35 @@ import { Ltn } from '../models/ltn.model';
 
 @Injectable()
 export class LtnService {
-    constructor(
-        @InjectModel(Ltn)
-        private ltnModel: typeof Ltn
-      ) {}
-    
-      async findAll(): Promise<Ltn[]> {
-        return this.ltnModel.findAll();
+  constructor(
+    @InjectModel(Ltn)
+    private ltnModel: typeof Ltn,
+  ) {}
+
+  // 按照 boxId 分组
+  async findAll(): Promise<any> {
+    const ltns = await this.ltnModel.findAll();
+    const data = ltns.reduce((pre, cur) => {
+      const boxId = cur.boxId;
+      if (!pre[boxId]) {
+        pre[boxId] = [];
       }
-    
-      findOne(id: string): Promise<Ltn> {
-        return this.ltnModel.findOne({
-          where: {
-            id,
-          },
-        });
-      }
-    
-      async remove(id: string): Promise<void> {
-        const ltn = await this.findOne(id);
-        await ltn.destroy();
-      }
+      pre[boxId].push(cur);
+      return pre;
+    }, {});
+    return { data };
+  }
+
+  findOne(id: string): Promise<Ltn> {
+    return this.ltnModel.findOne({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async remove(id: string): Promise<void> {
+    const ltn = await this.findOne(id);
+    await ltn.destroy();
+  }
 }

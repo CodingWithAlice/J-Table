@@ -17,7 +17,7 @@
   },
   "scripts": {
     "web": "npm run start --workspace=web",
-    "server": "npm run start --workspace=server"
+    "server": "npm run start:dev --workspace=server"
   },
   "eslintConfig": {
     "extends": [

@@ -26,7 +26,7 @@ export function request(options) {
         // http 状态码
         if (status >= 200 && status < 300) {
             // 业务响应 code
-            return data;
+            return data.data;
             // if (data && data.code >= 200 && data.code < 300) {
             //     if (data.code === 200) {
             //         return data;
