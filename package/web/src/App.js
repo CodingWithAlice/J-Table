@@ -1,14 +1,16 @@
 import './App.css';
-import EditTable from './components/EdibleTable';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import LtnTable from './components/LtnTable';
+import Main from './components/mainApp';
 
 function App() {
     return (
-        <div className="App">
-            <h1 className='title'>
-                J人热爱统计的一生
-            </h1>
-            <EditTable className='table' />
-        </div>
+        <Router>
+            <Routes>
+                <Route path="/" element={<Main />} />
+                <Route path="/ltn" element={<LtnTable />} />
+            </Routes>
+        </Router >
     );
 }
 
