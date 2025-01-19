@@ -1,0 +1,45 @@
+import { request } from '../utils/request';
+
+// 列表查询 - 所有
+function list() {
+    return request({
+        url: '/ltn',
+    });
+}
+
+// 新增
+function add(data) {
+    return request({
+        method: 'POST',
+        url: '/api/add',
+        data,
+    });
+}
+
+// 删除
+function remove(id) {
+    return request({
+        method: 'POST',
+        url: '/api/remove',
+        params: { id },
+    });
+}
+
+// 更新
+function update(id, data) {
+    return request({
+        method: 'POST',
+        url: '/api/remove',
+        params: { id },
+        data
+    });
+}
+
+function zipTag(strings, ...expressions) {
+    return strings[0]+ expressions.map((e, i) => `${e}${strings[i+1]}`).join(',');
+}
+
+
+export const LtnApi = {
+    list,
+};
