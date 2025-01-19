@@ -4,10 +4,10 @@ import {
 } from '@ant-design/pro-components';
 import { Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { Category, CategoryColor } from './utils/utils';
-import { getWeek } from './utils/getWeeks';
-import { MainApi } from './apis/main';
-import './App.css';
+import { Category, CategoryColor } from '../utils/utils';
+import { getWeek } from '../utils/getWeeks';
+import { MainApi } from '../apis/main';
+import '../App.css';
 
 const waitTime = (time = 100) => {
     return new Promise((resolve) => {
