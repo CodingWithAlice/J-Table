@@ -23,11 +23,7 @@ export class LtnService {
     return { data };
   }
 
-  async updateBoxId(
-    id: string,
-    type: 'update' | 'degrade',
-    time: string,
-  ): Promise<Ltn> {
+  async updateBoxId(id: string, type: 'update' | 'degrade', time: string) {
     const ltn = await this.findOne(id);
     if (type === 'degrade') {
       ltn.boxId = 1; // 1 代表做错了
@@ -35,7 +31,8 @@ export class LtnService {
       ltn.boxId++;
     }
     ltn.solveTime = new Date(time);
-    return ltn.save();
+    const data = await ltn.save();
+    return { data };
   }
 
   findOne(id: string): Promise<Ltn> {

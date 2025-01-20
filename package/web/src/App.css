@@ -40,11 +40,11 @@
     font-size: 1.2rem;
 }
 
-.ltn-table {
+.ltn-wrapper {
     margin: 0 16px;
 }
 
-.box-id {
+.ltn-box {
     letter-spacing: 0.2rem;
     font-size: 2.5rem;
     font-weight: 800;
@@ -61,44 +61,44 @@
     font-size: 600;
 }
 
-.ltn-list:nth-of-type(1) {
-    background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
+.ltn-list:nth-of-type(5n + 1) {
+    background-image: linear-gradient(225deg, #b1f4cf 0%, #57c6e1 42%, #fbc2eb 100%);
     color: #462f7b;
 }
 
-.ltn-list:nth-of-type(2) {
-    background-image: linear-gradient(-225deg, #5D9FFF 0%, #B8DCFF 48%, #6BBBFF 100%);
+.ltn-list:nth-of-type(5n + 2) {
+    background-image: linear-gradient(225deg, #57c6e1 0%, #fbc2eb 42%, #6BBBFF 100%);
     color: #0c3673;
 }
 
-.ltn-list:nth-of-type(3) {
-    background-image: linear-gradient(to right, #eea2a2 0%, #bbc1bf 19%, #57c6e1 42%, #b49fda 79%, #7ac5d8 100%);
+.ltn-list:nth-of-type(5n + 3) {
+    background-image: linear-gradient(225deg, #fbc2eb 0%, #6BBBFF 42%, #9890e3 100%);
     color: #462f7b;
 }
 
-.ltn-list:nth-of-type(4) {
-    background-image: linear-gradient(to top, #9890e3 0%, #b1f4cf 100%);
+.ltn-list:nth-of-type(5n + 4) {
+    background-image: linear-gradient(225deg, #6BBBFF 0%, #9890e3 42%, #b1f4cf 100%);
     color: #0c3673;
 }
 
-.ltn-list:nth-of-type(5) {
-    background-image: linear-gradient(to top, #fddb92 0%, #d1fdff 100%);
+.ltn-list:nth-of-type(5n + 5) {
+    background-image: linear-gradient(225deg, #9890e3 0%, #b1f4cf 42%, #57c6e1 100%);
     color: #462f7b;
 }
 
-.avatar {
+.ltn-avatar {
     background-color: #fde3cf;
     color: #f56a00;
     flex: none;
     margin-right: 2px;
 }
 
-.ltn-list-item {
+.ltn-item {
     display: flex;
     align-items: center;
 }
 
-.ltn-list-item:hover {
+.ltn-item:hover {
     background-color: #fde3cf;
     border-radius: 8px;
 }
@@ -109,4 +109,29 @@
     text-overflow: ellipsis;
     margin: 0;
     width: 80%;
+}
+
+.ltn-grade-box {
+    width: 4rem;
+}
+
+.ltn-grade {
+    border-radius: 20%;
+    width: .1rem;
+    height: 1.2rem;
+    border: 0px;
+}
+
+.ltn-grade-up {
+    background-image: linear-gradient(120deg, #d9fc87 0%, #96e6a1 100%);
+    color: rgb(2, 56, 29, .8);
+}
+
+.ltn-grade-down {
+    background-image: linear-gradient(120deg, #fbc2eb 0%, #da74d3 100%);
+    color: #510c4c;
+}
+
+.ltn-time {
+    color: #510c4c;
 }

@@ -4,15 +4,18 @@ import LtnList from "./LtnList";
 
 export default function LtnTable() {
     let [ltns, setLtns] = useState([]);
-    useEffect(() => {
+    const init = () => {
         LtnApi.list().then((data) => {
             setLtns(data);
         });
+    }
+    useEffect(() => {
+        init();
     }, [])
-    return <div className="ltn-table">
+    return <div className="ltn-wrapper">
         {Object.keys(ltns).map(ltnType => <>
-            <h2 className="box-id">BOX{ltnType}</h2>
-            <LtnList list={ltns[ltnType]} boxId={ltnType} />
+            <h2 className="ltn-box">BOX{ltnType}</h2>
+            <LtnList list={ltns[ltnType]} boxId={ltnType} fresh={init} />
         </>)}
     </div>
 }
