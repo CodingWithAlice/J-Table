@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query } from '@nestjs/common';
 import { LtnService } from './ltns.service';
 
 @Controller('ltn')
@@ -6,8 +6,8 @@ export class LtnController {
   constructor(private readonly ltnService: LtnService) {}
 
   @Get()
-  findAll(): Promise<any[]> {
-    return this.ltnService.findAll();
+  findAll(@Query() query): Promise<any[]> {
+    return this.ltnService.findAll(query);
   }
 
   @Patch('operate')

@@ -1,9 +1,10 @@
 import { request } from '../utils/request';
 
 // 列表查询 - 所有
-function list() {
+function list(params) {
     return request({
         url: '/ltn',
+        params,
     });
 }
 

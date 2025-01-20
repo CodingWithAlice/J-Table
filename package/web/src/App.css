@@ -135,3 +135,7 @@
 .ltn-time {
     color: #510c4c;
 }
+
+.filter-form {
+    display: flex;
+}

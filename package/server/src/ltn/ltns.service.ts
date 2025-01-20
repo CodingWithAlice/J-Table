@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Ltn } from '../models/ltn.model';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class LtnService {
@@ -10,8 +11,19 @@ export class LtnService {
   ) {}
 
   // 按照 boxId 分组
-  async findAll(): Promise<any> {
-    const ltns = await this.ltnModel.findAll();
+  async findAll({ start, end }): Promise<any> {
+    let where;
+    if (start && end) {
+      where = {
+        solveTime: {
+          [Op.gte]: new Date(start),
+          [Op.lt]: new Date(end),
+        },
+      };
+    }
+    const ltns = await this.ltnModel.findAll({
+      where,
+    });
     const data = ltns.reduce((pre, cur) => {
       const boxId = cur.boxId;
       if (!pre[boxId]) {
