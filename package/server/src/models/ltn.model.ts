@@ -1,10 +1,10 @@
 import { Column, Model, Table } from 'sequelize-typescript';
 
-@Table({ 
-    tableName: 'ltn_data',
-    underscored: true,
-    timestamps: true,
- })
+@Table({
+  tableName: 'ltn_data',
+  underscored: true,
+  timestamps: true,
+})
 export class Ltn extends Model<Ltn> {
   @Column
   title: string;

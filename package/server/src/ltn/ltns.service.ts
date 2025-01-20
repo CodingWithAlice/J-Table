@@ -23,6 +23,21 @@ export class LtnService {
     return { data };
   }
 
+  async updateBoxId(
+    id: string,
+    type: 'update' | 'degrade',
+    time: string,
+  ): Promise<Ltn> {
+    const ltn = await this.findOne(id);
+    if (type === 'degrade') {
+      ltn.boxId = 1; // 1 代表做错了
+    } else {
+      ltn.boxId++;
+    }
+    ltn.solveTime = new Date(time);
+    return ltn.save();
+  }
+
   findOne(id: string): Promise<Ltn> {
     return this.ltnModel.findOne({
       where: {
