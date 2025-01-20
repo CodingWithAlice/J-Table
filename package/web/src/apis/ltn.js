@@ -26,20 +26,23 @@ function remove(id) {
 }
 
 // 更新
-function update(id, data) {
+function update(id, type, time) {
     return request({
-        method: 'POST',
-        url: '/api/remove',
-        params: { id },
-        data
+        method: 'PATCH',
+        url: '/ltn/operate',
+        // params: { id },
+        data: {
+            id, type, time
+        }
     });
 }
 
 function zipTag(strings, ...expressions) {
-    return strings[0]+ expressions.map((e, i) => `${e}${strings[i+1]}`).join(',');
+    return strings[0] + expressions.map((e, i) => `${e}${strings[i + 1]}`).join(',');
 }
 
 
 export const LtnApi = {
     list,
+    update
 };

@@ -12,7 +12,7 @@ export default function LtnTable() {
     return <div className="ltn-table">
         {Object.keys(ltns).map(ltnType => <>
             <h2 className="box-id">BOX{ltnType}</h2>
-            <LtnList list={ltns[ltnType]} />
+            <LtnList list={ltns[ltnType]} boxId={ltnType} />
         </>)}
     </div>
 }
