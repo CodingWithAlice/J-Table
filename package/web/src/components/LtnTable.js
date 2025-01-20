@@ -16,10 +16,12 @@ export default function LtnTable() {
         init();
     }, [])
     return <div className="ltn-wrapper">
-        {Object.keys(ltns).map(ltnType => <div key={ltnType}>
-            <h2 className="ltn-box">BOX{ltnType}</h2>
-            <LtnList list={ltns[ltnType]} boxId={ltnType} fresh={init} />
-        </div>)}
+        {Object.keys(ltns).map(ltnType => <>
+            {!!ltns[ltnType].length && <div key={ltnType}>
+                <h2 className="ltn-box">BOX{ltnType}</h2>
+                <LtnList list={ltns[ltnType]} boxId={ltnType} fresh={init} />
+            </div>}
+        </>)}
         <Filter fresh={init} />
     </div>
 }
