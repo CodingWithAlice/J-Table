@@ -9,7 +9,6 @@ export default function LtnTable() {
     const init = (params) => {
         LtnApi.list(params).then((data) => {
             setLtns(data);
-            message.success('数据加载成功');
         });
     }
     useEffect(() => {

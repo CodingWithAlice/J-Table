@@ -14,7 +14,7 @@ export default function LtnList({ list, boxId, fresh }) {
             {/* 默认单行展示 - 过长通过悬浮展示 */}
             <LongPage page={it.title} />
             {/* 升降 */}
-            <Grade boxId={boxId} fresh={fresh} />
+            <Grade boxId={boxId} fresh={fresh} ltnId={it.id} />
             {/* 下次做题时间 */}
             {it.solveTime &&
                 <span className="ltn-time">{getNextTime(it.solveTime)}</span>}
