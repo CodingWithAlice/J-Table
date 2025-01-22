@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { LtnApi } from "../apis/ltn";
 import LtnList from "./LtnList";
 import Filter from "./Filter";
-import { message } from "antd";
 
 export default function LtnTable() {
     let [ltns, setLtns] = useState([]);

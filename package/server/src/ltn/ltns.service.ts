@@ -39,9 +39,13 @@ export class LtnService {
     return { data };
   }
 
-  async updateBoxId(id: string, type: 'update' | 'degrade', time: string) {
+  async updateBoxId(
+    id: string,
+    type: 'update' | 'degrade' | 'fresh',
+    time: string,
+  ) {
     const ltn = await this.findOne(id);
-    if (type === 'degrade') {
+    if (type === 'degrade' || type === 'fresh') {
       ltn.boxId = 1; // 1 代表做错了
     } else {
       ltn.boxId++;
