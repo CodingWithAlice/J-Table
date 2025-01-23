@@ -1,0 +1,19 @@
+/* 时间轴 */
+.time-ltn {
+    vertical-align: center;
+}
+
+.time-ltn-tag {
+    border-radius: 35%;
+    margin-right: 2px;
+}
+
+.time-ltn-time {
+    font-weight: 500;
+    margin-right: 2px;
+    background-color: rgb(238, 238, 233, .6);
+}
+
+.time-ltn-text {
+    padding: 0 2px;
+}

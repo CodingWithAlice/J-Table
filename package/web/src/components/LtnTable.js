@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { LtnApi } from "../apis/ltn";
 import LtnList from "./LtnList";
 import Filter from "./Filter";
+import TimeModal from "./TimeModal";
 
 export default function LtnTable() {
     let [ltns, setLtns] = useState([]);
@@ -21,5 +22,6 @@ export default function LtnTable() {
             </div>}
         </>)}
         <Filter fresh={init} />
+        <TimeModal />
     </div>
 }

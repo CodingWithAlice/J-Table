@@ -23,4 +23,7 @@ export class Time extends Model<Time> {
 
   @Column
   ltnWrong: boolean;
+
+  @Column
+  gap: number;
 }
