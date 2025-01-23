@@ -1,21 +1,23 @@
-import React from 'react';
-import { BellOutlined, ClockCircleOutlined, MediumOutlined, ReadOutlined, YoutubeOutlined } from '@ant-design/icons';
+import React, { useEffect, useState } from 'react';
+import { BellOutlined, MediumOutlined, ReadOutlined, YoutubeOutlined } from '@ant-design/icons';
 import { Timeline, Tooltip } from 'antd';
 import './timeLine.css';
+import { RoutineApi } from '../apis/routine';
+import { TimeApi } from '../apis/time';
 
 const dotList = {
     ltn: {
-        color: 'green',
-    },
-    wrong: {
         color: 'blue',
     },
-    read: {
+    wrong: {
+        color: 'red',
+    },
+    reading: {
         dot: (<ReadOutlined style={{
             fontSize: '16px',
         }} />)
     },
-    ted: {
+    TED: {
         dot: (
             <YoutubeOutlined style={{
                 fontSize: '16px',
@@ -39,69 +41,57 @@ const dotList = {
         )
     }
 }
+const text = (time, type, text) => {
+    return <p>
+        {type.toUpperCase()} &nbsp;
+        {/* <span className='time-ltn-time'>{time}</span> */}
+        &nbsp; {text}
+    </p>
+}
+
+const ltnText = (time, type, ltnId, text, duration) => {
+    const title = type === 'ltn' ? `LTN${ltnId}` : '错题重做';
+    return <Tooltip title={title}>
+        <span className='time-ltn'>
+            {/* <span className='time-ltn-id'>{ltnId}</span> */}
+            {/* <span className='time-ltn-time'>{time}</span> */}
+            {text} &nbsp; {duration}
+        </span>
+    </Tooltip>
+}
 
 export default function TimeLine() {
-    const text = (time, type, text) => {
-        return <p>
-            {type.toUpperCase()} &nbsp;
-            <span className='time-ltn-time'>{time}</span>
-            &nbsp; {text}
-        </p>
+    const [items, setItems] = useState([]);
+    const [line, setLine] = useState(10);
+
+    useEffect(() => {
+        RoutineApi.list().then(routineTypes => {
+            TimeApi.list().then(times => {
+                setItems(transformItems(times, routineTypes))
+            })
+        })
+    }, []);
+
+    const transformItems = (times, routineTypes) => {
+        return times.map(time => {
+            let dotRoutine = routineTypes.filter(routine => time.routineTypeId === routine.id);
+            let dotType = dotRoutine.length > 0 ? dotRoutine[0].type : 'thing';
+
+            let children = text(time.date, dotType, time.des);
+            if (dotType === 'LTN') {
+                dotType = time.ltnWrong ? 'wrong' : 'ltn';
+                children = ltnText(time.date, dotType, time.ltnId, time.des, time.duration);
+            }
+            return {
+                children,
+                ...dotList[dotType],
+                label: time.date,
+            }
+        })
     }
 
-    const ltnText = (time, type, ltnId, text, duration) => {
-        const title = type === 'ltn' ? `LTN${ltnId}` : '错题重做';
-        return <Tooltip title={title}>
-            <p className='time-ltn'>
-                <span className='time-ltn-id'>{ltnId}</span>
-                <span className='time-ltn-time'>{time}</span>
-                {text} &nbsp; {duration}
-            </p>
-        </Tooltip>
-    }
-    const items = [
-        {
-            children: ltnText('2024.9.28', 'ltn', 1, ' 39周 6题/1题'),
-            // label:'22'
-            ...dotList['ltn']
-        },
-        {
-            children: ltnText('2024.9.28', 'wrong', 2, ' 39周 6题/1题'),
-            ...dotList['wrong']
-        },
-        {
-            children: 'read',
-            ...dotList['read']
-        },
-        {
-            children: text('2025.1.20', 'ted', 'Round1'),
-            ...dotList['ted']
-        },
-        {
-            children: ltnText('2025.1.6', 'ltn', 13, '1周 76题/28题', '25h40m'),
-            ...dotList['ltn']
-        },
-        {
-            ...dotList['movie'],
-            children: 'movie',
-        },
-        {
-            ...dotList['thing'],
-            children: 'thing',
-        },
-        {
-            dot: (
-                <ClockCircleOutlined
-                    style={{
-                        fontSize: '16px',
-                    }}
-                />
-            ),
-            children: '66',
-        },
-    ]
     return <Timeline
-        mode="alternate"
+        mode="left"
         items={items}
     />
 }

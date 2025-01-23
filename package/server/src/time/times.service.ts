@@ -9,9 +9,10 @@ export class TimeService {
     private timeModel: typeof Time,
   ) {}
 
-  // 按照 boxId 分组
   async findAll(): Promise<any> {
-    const times = await this.timeModel.findAll();
+    const times = await this.timeModel.findAll({
+      order: [['date', 'DESC']],
+    });
     return { data: times };
   }
 

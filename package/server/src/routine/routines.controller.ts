@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { RoutineService } from './routines.service';
 
-@Controller('routine')
+@Controller('api/routine')
 export class RoutineController {
   constructor(private readonly routineService: RoutineService) {}
 

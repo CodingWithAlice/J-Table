@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Patch, Query } from '@nestjs/common';
 import { LtnService } from './ltns.service';
 
-@Controller('ltn')
+@Controller('api/ltn')
 export class LtnController {
   constructor(private readonly ltnService: LtnService) {}
 
