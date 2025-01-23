@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { LtnsModule } from './ltn/ltns.model';
 import { Ltn } from './models/ltn.model';
-
+import { Routine } from './models/routine.model';
+import { RoutinesModule } from './routine/routines.model';
 
 @Module({
   imports: [
@@ -14,10 +13,11 @@ import { Ltn } from './models/ltn.model';
       port: 3306,
       username: 'root',
       password: 'localhost',
-      database: 'JTable',
-      models: [Ltn],
+      database: 'Daily',
+      models: [Ltn, Routine],
     }),
     LtnsModule,
+    RoutinesModule,
   ],
 })
 export class AppModule {}
