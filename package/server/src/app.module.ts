@@ -4,6 +4,8 @@ import { LtnsModule } from './ltn/ltns.model';
 import { Ltn } from './models/ltn.model';
 import { Routine } from './models/routine.model';
 import { RoutinesModule } from './routine/routines.model';
+import { Time } from './models/time.model';
+import { TimesModule } from './time/times.model';
 
 @Module({
   imports: [
@@ -14,10 +16,11 @@ import { RoutinesModule } from './routine/routines.model';
       username: 'root',
       password: 'localhost',
       database: 'Daily',
-      models: [Ltn, Routine],
+      models: [Ltn, Routine, Time],
     }),
     LtnsModule,
     RoutinesModule,
+    TimesModule,
   ],
 })
 export class AppModule {}
