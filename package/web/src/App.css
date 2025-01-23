@@ -144,3 +144,16 @@
 .filter-form {
     display: flex;
 }
+.time-title {
+    display: flex;
+    align-items: center;
+}
+.show-all {
+    color: #ccc;
+    margin-left: 8px;
+}
+
+.show-all:hover {
+    color: #333;
+    cursor: pointer;
+}

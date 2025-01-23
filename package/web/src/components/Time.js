@@ -2,14 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { BellOutlined, MediumOutlined, ReadOutlined, YoutubeOutlined } from '@ant-design/icons';
 import { Tag, Timeline, Tooltip } from 'antd';
 import './time.css';
-import { RoutineApi } from '../apis/routine';
-import { TimeApi } from '../apis/time';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime'
 dayjs.extend(relativeTime);
 
 const dotList = {
-    ltn: {
+    LTN: {
         color: 'blue',
     },
     wrong: {
@@ -45,15 +43,14 @@ const dotList = {
     }
 }
 const text = (time, type, text) => {
-    return <p>
+    return <span>
         {type.toUpperCase()} &nbsp;
-        {/* <span className='time-ltn-time'>{time}</span> */}
         &nbsp; {text}
-    </p>
+    </span>
 }
 
 const ltnText = (time, type, ltnId, text, duration, gap) => {
-    const title = type === 'ltn' ? `LTN${ltnId}` : '错题重做';
+    const title = type === 'LTN' ? `LTN${ltnId}` : '错题重做';
     return <Tooltip title={title}>
         <span className='time-ltn'>
             {!!gap && <Tag className='time-ltn-tag'>{gap}天</Tag>}
@@ -64,49 +61,59 @@ const ltnText = (time, type, ltnId, text, duration, gap) => {
     </Tooltip>
 }
 
-export default function Time({ params }) {
+export default function Time({ params, timeData }) {
     const [items, setItems] = useState([]);
     const [mode, setMode] = useState('alternate');
 
-    const getItems = (types) => {
-        TimeApi.list().then(times => {
-            const data = transformItems(times, types)
-            setItems(filterFun(params, data))
-        })
-    }
+    useEffect(() => {
+        if (!timeData) return;
+        if (!params?.type) {
+            const res = transformItems(timeData);
+            setItems(addLabel(res));
+        } else {
+            const res = transformItems(filterFun(params, removeLabel(timeData)));
+            setItems(res)
+        }
+    }, [params, timeData])
 
     useEffect(() => {
-        RoutineApi.list().then(routineTypes => {
-            getItems(routineTypes);
-        })
-    }, []);
-
-    const filterFun = (params, arr) => {
-        let res = arr;
-        if (params.type) {
-            res = arr.filter(it => it.type === params.type);
+        if (!params?.type) {
+            setMode('left');
+        } else {
+            setMode('alternate');
         }
-        if(params.count) {
-            res = res.slice(0, params.count);
+    }, [items])
+
+    const addLabel = (arr) => {
+        return arr.map(it => ({ ...it, label: it.date }))
+    }
+    const removeLabel = (arr) => {
+        return arr.map(it => { delete it.label; return it })
+    }
+    const filterFun = (filters, arr) => {
+        let res = arr;
+        if (filters.type) {
+            res = arr.filter(it => it.routineType === filters.type && !it.ltnWrong);
+        }
+        if (filters.count) {
+            res = res.slice(0, filters.count);
         }
         return res;
     }
 
-    const transformItems = (times, types) => {
-        return times.map((time, index) => {
-            let dotRoutine = types.filter(routine => time.routineTypeId === routine.id);
-            let dotType = dotRoutine.length > 0 ? dotRoutine[0].type : 'thing';
-
+    const transformItems = (times) => {
+        return times.map((time) => {
+            let dotType = time.routineType;
             let children = text(time.date, dotType, time.des);
             if (dotType === 'LTN') {
-                dotType = time.ltnWrong ? 'wrong' : 'ltn';
+                dotType = time.ltnWrong ? 'wrong' : 'LTN';
                 children = ltnText(time.date, dotType, time.ltnId, time.des, time.duration, time.gap);
             }
             return {
                 children,
                 ...dotList[dotType],
-                // label: time.date,
                 type: dotType,
+                date: time.date
             }
         })
     }
