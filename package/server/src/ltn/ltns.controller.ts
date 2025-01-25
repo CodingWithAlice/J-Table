@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Query } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query } from '@nestjs/common';
 import { LtnService } from './ltns.service';
 
 @Controller('api/ltn')
@@ -16,5 +16,13 @@ export class LtnController {
       throw new Error('参数错误');
     }
     return this.ltnService.updateBoxId(id, type, time);
+  }
+
+  @Post('add')
+  add(@Body() data) {
+    if (!data) {
+      throw new Error('参数错误');
+    }
+    return this.ltnService.addLtn(data);
   }
 }

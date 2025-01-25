@@ -55,6 +55,11 @@ export class LtnService {
     return { data };
   }
 
+  async addLtn(data) {
+    const newLtn = await this.ltnModel.create(data);
+    return { data: newLtn };
+  }
+
   findOne(id: string): Promise<Ltn> {
     return this.ltnModel.findOne({
       where: {

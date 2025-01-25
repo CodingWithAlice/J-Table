@@ -4,12 +4,14 @@ import LtnList from "./LtnList";
 import Filter from "./Filter";
 import TimeModal from "./TimeModal";
 import AddLtn from "./AddLtn";
+import { message } from "antd";
 
 export default function LtnTable() {
     let [ltns, setLtns] = useState([]);
     const init = (params) => {
         LtnApi.list(params).then((data) => {
             setLtns(data);
+            message.success('刷新成功');
         });
     }
     useEffect(() => {
@@ -24,6 +26,6 @@ export default function LtnTable() {
         </>)}
         <Filter fresh={init} />
         <TimeModal />
-        <AddLtn />
+        <AddLtn fresh={init} />
     </div>
 }

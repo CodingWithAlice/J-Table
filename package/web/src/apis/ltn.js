@@ -20,7 +20,17 @@ function update(id, type, time) {
     });
 }
 
+// 添加新题目
+function add(data) {
+    return request({
+        method: 'POST',
+        url: '/api/ltn/add',
+        data
+    });
+}
+
 export const LtnApi = {
     list,
-    update
+    update,
+    add
 };

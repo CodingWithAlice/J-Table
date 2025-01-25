@@ -2,8 +2,9 @@ import { AppstoreAddOutlined } from "@ant-design/icons";
 import { FloatButton, Input, Modal, Radio } from "antd";
 import dayjs from "dayjs";
 import { useState } from "react";
+import { LtnApi } from "../apis/ltn";
 
-export default function AddLtn() {
+export default function AddLtn({fresh}) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [title, setTitle] = useState('');
     const [source, setSource] = useState(0);
@@ -19,8 +20,9 @@ export default function AddLtn() {
             boxId,
             solveTime: dayjs().format('YYYY-MM-DD')
         }
-        console.log('data=', data);
-        
+        LtnApi.add(data).then(() => {
+            fresh();
+        });
         setIsModalOpen(false);
     };
     const handleCancel = () => {
