@@ -3,6 +3,7 @@ import { LtnApi } from "../apis/ltn";
 import LtnList from "./LtnList";
 import Filter from "./Filter";
 import TimeModal from "./TimeModal";
+import AddLtn from "./AddLtn";
 
 export default function LtnTable() {
     let [ltns, setLtns] = useState([]);
@@ -23,5 +24,6 @@ export default function LtnTable() {
         </>)}
         <Filter fresh={init} />
         <TimeModal />
+        <AddLtn />
     </div>
 }

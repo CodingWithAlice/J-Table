@@ -157,3 +157,7 @@
     color: #333;
     cursor: pointer;
 }
+
+.radio-group {
+    margin: 10px 0;
+}
