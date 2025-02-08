@@ -1,6 +1,7 @@
 import { Button, message, Popconfirm } from "antd"
 import { LtnApi } from "../apis/ltn";
 import { CaretDownFilled, CaretUpFilled } from "@ant-design/icons";
+import dayjs from "dayjs";
 
 const description = {
     update: {
@@ -22,7 +23,7 @@ const description = {
 
 export default function Grade({ boxId, fresh, ltnId }) {
     const confirm = (key, type) => {
-        LtnApi.update(key, type, new Date()).then(res => {
+        LtnApi.update(key, type, dayjs().subtract(0, 'Day').toDate()).then(res => {
             message.success(`更新 ${res.title} 到 box${res.boxId} 成功`);
             fresh();
         })

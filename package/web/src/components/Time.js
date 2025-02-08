@@ -107,7 +107,7 @@ export default function Time({ params, timeData }) {
             let children = text(time.date, dotType, time.des);
             if (dotType === 'LTN') {
                 dotType = time.ltnWrong ? 'wrong' : 'LTN';
-                children = ltnText(time.date, dotType, time.ltnId, time.des, time.duration, time.gap);
+                children = ltnText(time.date, dotType, time.serialNumber, time.des, time.duration, time.gap);
             }
             return {
                 children,

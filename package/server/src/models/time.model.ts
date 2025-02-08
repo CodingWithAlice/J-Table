@@ -1,7 +1,7 @@
 import { Column, Model, Table } from 'sequelize-typescript';
 
 @Table({
-  tableName: 'ltn_time',
+  tableName: 'ltn_cycle_list',
   underscored: true,
   timestamps: true,
 })
@@ -10,7 +10,7 @@ export class Time extends Model<Time> {
   routineTypeId: number;
 
   @Column
-  ltnId: number;
+  serialNumber: number;
 
   @Column
   des: string;
