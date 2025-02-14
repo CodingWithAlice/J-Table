@@ -3,14 +3,14 @@ import { FloatButton, Input, Modal } from "antd";
 import dayjs from "dayjs";
 import { useState } from "react";
 
-export default function Filter({ fresh }) {
+export default function Filter({ fresh, initValue }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [start, setStart] = useState(dayjs().format('YYYY-MM-DD'));
-    const [end, setEnd] = useState(dayjs().add(10, 'day').format('YYYY-MM-DD'));
+    const [start, setStart] = useState(initValue.start);
+    const [end, setEnd] = useState(initValue.end);
 
     const showModal = () => {
-        setStart(dayjs().format('YYYY-MM-DD'));
-        setEnd(dayjs().add(10, 'day').format('YYYY-MM-DD'));
+        setStart(initValue?.start || dayjs().format('YYYY-MM-DD'));
+        setEnd(initValue?.end || dayjs().add(10, 'day').format('YYYY-MM-DD'));
         setIsModalOpen(true);
     };
     const handleOk = () => {
