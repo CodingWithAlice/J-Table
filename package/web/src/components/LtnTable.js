@@ -11,7 +11,7 @@ function getDataByLtns(data) {
     return Object.keys(data).map(it => {
         const ltns = data[it];
         const idDesc = ltns.length ? `
-LTN${it} 【推荐做题时间 ${ltns[0].suggestTime} - ${ltns.length}题】
+LTN${it} 【推荐做题时间 ${ltns[0].suggestTime} - ${ltns.length}题 实际做题时间： ？】
 ` : '';
         return idDesc + ltns.map(ltn => `${ltn.title}
 `).join('');
@@ -30,7 +30,7 @@ function getDataByDate(data) {
                 suggestTime,
             }
             if(!classifyByDate[newOne.suggestTime]) {
-                classifyByDate[newOne.suggestTime] = []; 
+                classifyByDate[newOne.suggestTime] = [];
             }
             // 按照推荐做题时间分类
             classifyByDate[newOne.suggestTime].push(newOne);
@@ -66,15 +66,24 @@ const easyCopy = (data) => {
         return pre;
     }, []);
 
-    const dataByDate = getDataByDate(data); 
+    const dataByDate = getDataByDate(data);
 
     console.log('过滤后的数据data 按时间和 LTN 分类', totalArr, dataByDate);
 }
 
 export default function LtnTable() {
     let [ltns, setLtns] = useState([]);
+    const [tempParams, setTempParams] = useState({
+        start: dayjs().format('YYYY-MM-DD'),
+        end: dayjs().add(10, 'day').format('YYYY-MM-DD')
+    });
+
     const init = (params) => {
-        LtnApi.list(params).then((data) => {
+        setTempParams({
+            start: params?.start || dayjs().format('YYYY-MM-DD'),
+            end: params?.end || dayjs().add(10, 'day').format('YYYY-MM-DD')
+        });
+        LtnApi.list({ ...tempParams, ...params }).then((data) => {
             setLtns(data);
             easyCopy(data);
             message.success('刷新成功');
@@ -90,7 +99,7 @@ export default function LtnTable() {
                 <LtnList list={ltns[ltnType]} boxId={ltnType} fresh={init} />
             </div>}
         </>)}
-        <Filter fresh={init} />
+        <Filter fresh={init} initValue={tempParams} />
         <TimeModal />
         <AddLtn fresh={init} />
     </div>
