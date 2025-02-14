@@ -74,22 +74,23 @@ const easyCopy = (data) => {
 export default function LtnTable() {
     let [ltns, setLtns] = useState([]);
     const [tempParams, setTempParams] = useState({
-        start: dayjs().format('YYYY-MM-DD'),
-        end: dayjs().add(10, 'day').format('YYYY-MM-DD')
+        start: undefined,
+        end: undefined
     });
 
     const init = (params) => {
         setTempParams({
-            start: params?.start || dayjs().format('YYYY-MM-DD'),
-            end: params?.end || dayjs().add(10, 'day').format('YYYY-MM-DD')
+            start: params?.start,
+            end: params?.end
         });
-        LtnApi.list({ ...tempParams, ...params }).then((data) => {
+        let options = { ...tempParams, ...params }
+        LtnApi.list(options).then((data) => {
             setLtns(data);
             easyCopy(data);
             message.success('刷新成功');
         });
     }
-    useEffect(() => {
+    useEffect(() => {        
         init();
     }, [])
     return <div className="ltn-wrapper">
