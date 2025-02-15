@@ -79,11 +79,12 @@ export default function LtnTable() {
     });
 
     const init = (params) => {
-        setTempParams({
-            start: params?.start,
-            end: params?.end
-        });
         let options = { ...tempParams, ...params }
+        setTempParams({
+            start: options?.start,
+            end: options?.end
+        });
+        
         LtnApi.list(options).then((data) => {
             setLtns(data);
             easyCopy(data);
