@@ -4,7 +4,7 @@ import { message } from 'antd';
 
 export function getApiBaseUrl() {
     if (/local/.test(window.location.host)) {
-        return '//localhost:3002';
+        return '//localhost:4002';
     }
     return 'online'
 }
