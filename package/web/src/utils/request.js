@@ -10,6 +10,7 @@ export function getApiBaseUrl() {
 }
 export function request(options) {
     let baseURL = getApiBaseUrl();
+    console.log('baseURL', baseURL)
     const headers = { 'JTable-Test-Host': window.location.host };
     const mergeOpt = {
         ...options,

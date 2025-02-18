@@ -12,6 +12,6 @@ async function bootstrap() {
   };
   app.enableCors(corsOptions);
   // 设置后端项目的端口号为4002
-  await app.listen(process.env.PORT ?? 4002, '0.0.0.0'); // 监听所有可用网络接口
+  await app.listen(4002, '0.0.0.0'); // 监听所有可用网络接口
 }
 bootstrap();
