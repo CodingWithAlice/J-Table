@@ -7,6 +7,8 @@ export class LtnController {
 
   @Get()
   findAll(@Query() query): Promise<any[]> {
+    console.log(1111111, 'api/ltn');
+
     return this.ltnService.findAll(query);
   }
 
