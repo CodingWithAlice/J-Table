@@ -38,5 +38,10 @@ sudo /usr/local/bin/docker-compose ps
 
 - step3: 停止服务 - 会停止并移除所有由 docker-compose up 启动的容器
 ```js
-docker-compose down
+sudo /usr/local/bin/docker-compose down
+sudo /usr/local/bin/docker-compose build
+sudo /usr/local/bin/docker-compose up -d
+```
+```js
+sudo docker logs j-table-react-client-1
 ```

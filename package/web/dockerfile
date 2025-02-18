@@ -24,4 +24,4 @@ EXPOSE 4001
 
 # 使用一个简单的静态服务器来运行 React 构建后的文件
 RUN npm install -g serve
-CMD ["serve", "-s", "build", "-l", "3002"]
+CMD ["serve", "-s", "build", "-l", "4001"]
