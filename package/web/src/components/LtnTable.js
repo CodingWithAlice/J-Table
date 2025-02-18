@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { LtnApi } from "../apis/ltn";
 import LtnList from "./LtnList";
 import Filter from "./Filter";
@@ -29,7 +29,7 @@ function getDataByDate(data) {
                 ...ltn,
                 suggestTime,
             }
-            if(!classifyByDate[newOne.suggestTime]) {
+            if (!classifyByDate[newOne.suggestTime]) {
                 classifyByDate[newOne.suggestTime] = [];
             }
             // 按照推荐做题时间分类
@@ -48,7 +48,7 @@ function getDataByDate(data) {
         let ltnsByBox = {};
         ltns.forEach(ltn => {
             let boxId = ltn.boxId;
-            if(!ltnsByBox[boxId]) {
+            if (!ltnsByBox[boxId]) {
                 ltnsByBox[boxId] = [];
             }
             // 按照BOX分类
@@ -78,22 +78,26 @@ export default function LtnTable() {
         end: undefined
     });
 
-    const init = (params) => {
+    const init = useCallback((params) => {
         let options = { ...tempParams, ...params }
-        setTempParams({
-            start: options?.start,
-            end: options?.end
-        });
-        
+        if (options?.start !== tempParams.start || options?.end !== tempParams.end) {
+            setTempParams({
+                start: options?.start,
+                end: options?.end
+            });
+        }
+
         LtnApi.list(options).then((data) => {
             setLtns(data);
             easyCopy(data);
             message.success('刷新成功');
         });
-    }
-    useEffect(() => {        
+    }, [tempParams])
+
+    useEffect(() => {
         init();
-    }, [])
+    }, [init])
+
     return <div className="ltn-wrapper">
         {Object.keys(ltns).map(ltnType => <>
             {!!ltns[ltnType].length && <div key={ltnType}>
