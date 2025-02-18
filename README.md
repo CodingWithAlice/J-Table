@@ -20,11 +20,23 @@ package/server - 使用 Nestjs 做后端接口
     - web 中修改 request 的 baseUrl
 - 在根目录添加 docker-compose.yml 用于定义和配置服务
 
-- 添加到 gitee 同步:
+- step1: 添加到 gitee 同步
 https://gitee.com/CodingWithAlice/J-Table
 
 - 服务器上已经安装了 docker-compose，但是无权访问
 使用 chmod 命令为文件添加执行权限
 ```shell
 sudo chmod +x /usr/local/bin/docker-compose
+```
+
+- step2: 构建 + 启动 Docker 镜像
+```js
+sudo /usr/local/bin/docker-compose build
+sudo /usr/local/bin/docker-compose up -d
+sudo /usr/local/bin/docker-compose ps
+```
+
+- step3: 停止服务 - 会停止并移除所有由 docker-compose up 启动的容器
+```js
+docker-compose down
 ```
