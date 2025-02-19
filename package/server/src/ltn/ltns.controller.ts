@@ -10,6 +10,11 @@ export class LtnController {
     return this.ltnService.findAll(query);
   }
 
+  @Get('copy')
+  findAllCopy(@Query() query): Promise<any[]> {
+    return this.ltnService.findAllCopy(query);
+  }
+
   @Patch('operate')
   update(@Body() { id, type, time }) {
     if (!id || !type || !time) {

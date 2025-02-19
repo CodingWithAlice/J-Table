@@ -11,4 +11,40 @@
 
 ### 2025.1.18
 
-package/server - 使用 Nextjs 做后端接口
+package/server - 使用 Nestjs 做后端接口
+
+### 2025.2.18 部署到阿里云服务器，前端端口 4001 后端端口 4002
+
+- 给 package/web package/server 添加 dockerfile，分别配置端口
+    - server 中修改 main.ts 的 app.listen(4002) 和 跨域配置 corsOptions
+    - web 中修改 request 的 baseUrl
+- 在根目录添加 docker-compose.yml 用于定义和配置服务
+
+- step1: 添加到 gitee 同步
+https://gitee.com/CodingWithAlice/J-Table
+
+- 服务器上已经安装了 docker-compose，但是无权访问
+使用 chmod 命令为文件添加执行权限
+```shell
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+- step2: 构建 + 启动 Docker 镜像
+```js
+sudo /usr/local/bin/docker-compose build
+sudo /usr/local/bin/docker-compose up -d
+sudo /usr/local/bin/docker-compose ps
+```
+
+- step3: 停止服务 - 会停止并移除所有由 docker-compose up 启动的容器
+```js
+sudo /usr/local/bin/docker-compose down
+sudo /usr/local/bin/docker-compose build
+sudo /usr/local/bin/docker-compose up -d
+```
+```js
+sudo docker logs j-table-react-client-1
+sudo /usr/local/bin/docker-compose logs nestjs-server
+// 实时监听错误
+sudo /usr/local/bin/docker-compose logs -f nestjs-server
+```

@@ -82,7 +82,7 @@ export default function Time({ params, timeData }) {
         } else {
             setMode('alternate');
         }
-    }, [items])
+    }, [items, params?.type])
 
     const addLabel = (arr) => {
         return arr.map(it => ({ ...it, label: it.date }))

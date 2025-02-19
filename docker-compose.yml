@@ -1,0 +1,16 @@
+version: '3'
+services:
+  nestjs-server:
+    build:
+      context: .
+      dockerfile: package/server/dockerfile
+    ports:
+      - "4002:4002"
+    restart: always
+  react-client:
+    build:
+      context: .
+      dockerfile: package/web/dockerfile
+    ports:
+      - "4001:4001"
+    restart: always

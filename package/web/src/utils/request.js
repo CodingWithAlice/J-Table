@@ -4,9 +4,9 @@ import { message } from 'antd';
 
 export function getApiBaseUrl() {
     if (/local/.test(window.location.host)) {
-        return '//localhost:3002';
+        return '//localhost:4002';
     }
-    return 'online'
+    return '//codingwithalice.top:4002'
 }
 export function request(options) {
     let baseURL = getApiBaseUrl();
