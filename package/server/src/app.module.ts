@@ -8,6 +8,8 @@ import { Time } from './models/time.model';
 import { TimesModule } from './time/times.model';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
+console.log(2222, process.env.NODE_ENV);
+
 @Module({
   imports: [
     ConfigModule.forRoot({

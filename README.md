@@ -44,4 +44,7 @@ sudo /usr/local/bin/docker-compose up -d
 ```
 ```js
 sudo docker logs j-table-react-client-1
+sudo /usr/local/bin/docker-compose logs nestjs-server
+// 实时监听错误
+sudo /usr/local/bin/docker-compose logs -f nestjs-server
 ```
