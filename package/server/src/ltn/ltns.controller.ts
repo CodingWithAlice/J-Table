@@ -1,6 +1,15 @@
-import { Body, Controller, Get, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { LtnService } from './ltns.service';
 import { CreateLtnDTO, ListAllEntities } from './create-ltn.dto';
+import { AuthGuard } from 'src/auth.guard';
 
 @Controller('api/ltn')
 export class LtnController {
@@ -25,6 +34,7 @@ export class LtnController {
   }
 
   @Post('add')
+  @UseGuards(AuthGuard)
   add(@Body() data) {
     if (!data) {
       throw new Error('参数错误');

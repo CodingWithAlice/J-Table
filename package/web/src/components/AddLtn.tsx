@@ -1,5 +1,5 @@
 import { AppstoreAddOutlined } from "@ant-design/icons";
-import { FloatButton, Input, Modal, Radio } from "antd";
+import { FloatButton, Input, message, Modal, Radio } from "antd";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { LtnApi } from "../apis/ltn";
@@ -22,6 +22,10 @@ export default function AddLtn({ fresh }: { fresh: () => void }) {
         }
         LtnApi.add(data).then(() => {
             fresh();
+        }).catch(e => {
+            if (e instanceof Error) {
+                message.error(e.message);
+            }
         });
         setIsModalOpen(false);
     };

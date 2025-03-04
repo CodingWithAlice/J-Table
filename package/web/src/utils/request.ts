@@ -8,9 +8,8 @@ export function getApiBaseUrl() {
 }
 export function request(options: AxiosRequestConfig) {
 	let baseURL = getApiBaseUrl()
-	const localStorageType = localStorage.getItem('type')
 	const headers = {
-		Authorization: localStorageType === 'owner-alice' ? 'owner' : '',
+		Authorization: localStorage.getItem('type'),
 	}
 	const mergeOpt: AxiosRequestConfig = {
 		...options,
