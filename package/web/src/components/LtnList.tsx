@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import Grade from "./Grade";
 import LongPage from "./LongPage";
 import { LtnDTO } from "./LtnTable";
-
+import { useMediaQuery } from '@mui/material';
 interface LtnListProps {
     list: LtnDTO[],
     boxId: number, 
@@ -11,8 +11,10 @@ interface LtnListProps {
 }
 
 export default function LtnList({ list, boxId, fresh }: LtnListProps) {
+    const isMobile = useMediaQuery('(max-width: 767px)');
     const getNextTime = (solveTime: string) => {
-        return dayjs(solveTime || '2025-01-20').add(boxId * 7, 'day').format('YYYY-MM-DD');
+        const date = dayjs(solveTime || '2025-01-20').add(boxId * 7, 'day').format('YYYY-MM-DD');
+        return isMobile ? date.slice(5) : date;
     }
     const sortList = list.sort((a, b) => {
         ;

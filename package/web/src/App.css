@@ -112,7 +112,9 @@
 }
 
 .ltn-grade-box {
-    width: 4rem;
+    min-width: 4rem;
+    white-space: nowrap;
+    vertical-align: middle;
 }
 
 .ltn-grade {
@@ -139,6 +141,7 @@
 
 .ltn-time {
     color: #510c4c;
+    white-space: nowrap;
 }
 
 .filter-form {
