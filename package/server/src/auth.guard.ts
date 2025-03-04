@@ -9,12 +9,10 @@ import { Observable } from 'rxjs';
 import dotenv from 'dotenv';
 import path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '../../../../config.env') });
-console.log('🌹🌹🌹', path.resolve(__dirname, '../../../../config.env'));
 
 function validateRequest(request: Request): boolean {
   // 自定义验证函数
   const headers = request.headers;
-  console.log('request 🌹🌹🌹', headers.authorization, process.env.CHECK_AUTH);
 
   if (
     headers?.authorization !== process.env.CHECK_AUTH &&
