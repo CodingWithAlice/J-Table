@@ -21,9 +21,16 @@ const description = {
     }
 }
 
-export default function Grade({ boxId, fresh, ltnId }) {
-    const confirm = (key, type) => {
-        LtnApi.update(key, type, dayjs().subtract(0, 'Day').toDate()).then(res => {
+
+interface GradeProps {
+    boxId: number,
+    fresh: () => void,
+    ltnId: number
+}
+
+export default function Grade({ boxId, fresh, ltnId }: GradeProps) {
+    const confirm = (key: number, type: string) => {
+        LtnApi.update(key, type, dayjs().subtract(0, 'day').toDate()).then(res => {
             message.success(`更新 ${res.title} 到 box${res.boxId} 成功`);
             fresh();
         })
@@ -33,7 +40,7 @@ export default function Grade({ boxId, fresh, ltnId }) {
         message.info('无事发生');
     };
     return <div className="ltn-grade-box">
-        {(+boxId === 1 ? ['update', 'fresh'] : ['update', 'degrade']).map(item => <Popconfirm
+        {(+boxId === 1 ? (['update', 'fresh'] as const) : (['update', 'degrade'] as const)).map((item) => <Popconfirm
             key={item}
             title={`确认${description[item].desc}吗？`}
             onConfirm={() => {
@@ -43,7 +50,7 @@ export default function Grade({ boxId, fresh, ltnId }) {
             okText="Yes"
             cancelText="No"
         >
-            <Button className={[description[item].className, 'ltn-grade']} type="primary">
+            <Button className={`${description[item].className} ltn-grade`} type="primary">
                 {description[item].icon}
             </Button>
         </Popconfirm>

@@ -44,5 +44,11 @@
   "main": "index.js",
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.2"
+  }
 }

@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import { useState } from "react";
 import { LtnApi } from "../apis/ltn";
 
-export default function AddLtn({fresh}) {
+export default function AddLtn({ fresh }: { fresh: () => void }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [title, setTitle] = useState('');
     const [source, setSource] = useState(0);
@@ -54,7 +54,7 @@ export default function AddLtn({fresh}) {
                     <Radio.Button key={it.value} value={it.value}>{it.desc}</Radio.Button>
                 ))}
             </Radio.Group>
-            <Input placeholder="BOX ID" value={boxId} onChange={(e) => { setBoxId(e.target.value) }} type="number" />
+            <Input placeholder="BOX ID" value={boxId} onChange={(e) => { setBoxId(+e.target.value) }} type="number" />
         </Modal>
     </>
 }

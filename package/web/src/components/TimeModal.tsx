@@ -6,10 +6,10 @@ import { TimeApi } from "../apis/time";
 
 export default function TimeModal() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [timeLineType, setTimeLineType] = useState('LTN');
-    const [timeData, setTimeData] = useState([]); 
+    const [timeLineType, setTimeLineType] = useState<'LTN' | 'all'>('LTN');
+    const [timeData, setTimeData] = useState([]);
 
-    const timeLineParams = {
+    const timeLineParams: { [key in 'LTN' | 'all']: { params: { type?: string, count?: number }, text: string } } = {
         LTN: {
             params: { type: 'LTN', count: 8 },
             text: '展示全部',
