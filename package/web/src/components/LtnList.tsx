@@ -2,12 +2,22 @@ import { Avatar } from "antd";
 import dayjs from "dayjs";
 import Grade from "./Grade";
 import LongPage from "./LongPage";
+import { LtnDTO } from "./LtnTable";
+import { useMediaQuery } from '@mui/material';
+interface LtnListProps {
+    list: LtnDTO[],
+    boxId: number, 
+    fresh: () => void
+}
 
-export default function LtnList({ list, boxId, fresh }) {
-    const getNextTime = (solveTime) => {
-        return dayjs(solveTime || '2025-01-20').add(boxId * 7, 'day').format('YYYY-MM-DD');
+export default function LtnList({ list, boxId, fresh }: LtnListProps) {
+    const isMobile = useMediaQuery('(max-width: 767px)');
+    const getNextTime = (solveTime: string) => {
+        const date = dayjs(solveTime || '2025-01-20').add(boxId * 7, 'day').format('YYYY-MM-DD');
+        return isMobile ? date.slice(5) : date;
     }
-    const sortList = list.sort((a, b) => {;
+    const sortList = list.sort((a, b) => {
+        ;
         return dayjs(a.solveTime).isBefore(dayjs(b.solveTime)) ? -1 : 1;
     })
     return <div className="ltn-list">
@@ -15,7 +25,7 @@ export default function LtnList({ list, boxId, fresh }) {
             {/* 序号 */}
             <Avatar className="ltn-avatar" size='small'>{index + 1}</Avatar>
             {/* 默认单行展示 - 过长通过悬浮展示 */}
-            <LongPage page={it.title} />
+            <LongPage title={it.title} />
             {/* 升降 */}
             <Grade boxId={boxId} fresh={fresh} ltnId={it.id} />
             {/* 下次做题时间 */}

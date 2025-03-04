@@ -6,8 +6,8 @@ import { TimeController } from './times.controller';
 import { Routine } from 'src/models/routine.model';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Time, Routine])],
-  providers: [TimeService],
   controllers: [TimeController],
+  providers: [TimeService],
+  imports: [SequelizeModule.forFeature([Time, Routine])],
 })
 export class TimesModule {}

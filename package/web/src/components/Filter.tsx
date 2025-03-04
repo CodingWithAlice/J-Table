@@ -2,8 +2,14 @@ import { BgColorsOutlined } from "@ant-design/icons";
 import { FloatButton, Input, Modal } from "antd";
 import dayjs from "dayjs";
 import { useState } from "react";
+import { TimeProps } from "./LtnTable";
 
-export default function Filter({ fresh, initValue }) {
+interface FilterProps {
+    fresh: (params: TimeProps) => void,
+    initValue: TimeProps
+}
+
+export default function Filter({ fresh, initValue }: FilterProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [start, setStart] = useState(initValue.start);
     const [end, setEnd] = useState(initValue.end);

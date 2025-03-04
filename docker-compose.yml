@@ -7,6 +7,8 @@ services:
     ports:
       - "4002:4002"
     restart: always
+    volumes:
+      - ../config.env:/config.env
   react-client:
     build:
       context: .

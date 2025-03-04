@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, JSX } from 'react';
 import { BellOutlined, MediumOutlined, ReadOutlined, YoutubeOutlined } from '@ant-design/icons';
 import { Tag, Timeline, Tooltip } from 'antd';
 import './time.css';
@@ -6,7 +6,37 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime'
 dayjs.extend(relativeTime);
 
-const dotList = {
+interface ParamsProps {
+    type?: string;
+    count?: number;
+}
+interface TimeProps {
+    params: ParamsProps,
+    timeData: TimeDTO[];
+}
+
+interface TimeDTO {
+    routineTypeId: number
+    serialNumber: number
+    des: string;
+    duration: string;
+    date: string;
+    ltnWrong: boolean;
+    gap: number;
+    routineType: string;
+    label?: string;
+}
+
+interface ItemProps {
+    label?: string;
+    children: JSX.Element;
+    type: string,
+    date: string,
+    color?: string;
+    dot?: JSX.Element;
+}
+
+const dotList: { [key in 'LTN' | 'wrong' | 'reading' | 'TED' | 'movie' | 'thing']: { color?: string; dot?: JSX.Element } } = {
     LTN: {
         color: 'blue',
     },
@@ -42,14 +72,14 @@ const dotList = {
         )
     }
 }
-const text = (time, type, text) => {
+const getText = (type: string, text: string) => {
     return <span>
         {type.toUpperCase()} &nbsp;
         &nbsp; {text}
     </span>
 }
 
-const ltnText = (time, type, ltnId, text, duration, gap) => {
+const transLtnText = (time: string, type: string, ltnId: number, text: string, duration: string, gap: number) => {
     const title = type === 'LTN' ? `LTN${ltnId}` : '错题重做';
     return <Tooltip title={title}>
         <span className='time-ltn'>
@@ -61,9 +91,9 @@ const ltnText = (time, type, ltnId, text, duration, gap) => {
     </Tooltip>
 }
 
-export default function Time({ params, timeData }) {
-    const [items, setItems] = useState([]);
-    const [mode, setMode] = useState('alternate');
+export default function Time({ params, timeData }: TimeProps) {
+    const [items, setItems] = useState<ItemProps[]>([]);
+    const [mode, setMode] = useState<'alternate' | "left" | "right">('alternate');
 
     useEffect(() => {
         if (!timeData) return;
@@ -84,13 +114,13 @@ export default function Time({ params, timeData }) {
         }
     }, [items, params?.type])
 
-    const addLabel = (arr) => {
+    const addLabel = (arr: ItemProps[]) => {
         return arr.map(it => ({ ...it, label: it.date }))
     }
-    const removeLabel = (arr) => {
+    const removeLabel = (arr: TimeDTO[]) => {
         return arr.map(it => { delete it.label; return it })
     }
-    const filterFun = (filters, arr) => {
+    const filterFun = (filters: ParamsProps, arr: TimeDTO[]) => {
         let res = arr;
         if (filters.type) {
             res = arr.filter(it => it.routineType === filters.type && !it.ltnWrong);
@@ -101,13 +131,13 @@ export default function Time({ params, timeData }) {
         return res;
     }
 
-    const transformItems = (times) => {
+    const transformItems = (times: TimeDTO[]) => {
         return times.map((time) => {
-            let dotType = time.routineType;
-            let children = text(time.date, dotType, time.des);
+            let dotType = time.routineType as keyof typeof dotList;
+            let children = getText(dotType, time.des);
             if (dotType === 'LTN') {
                 dotType = time.ltnWrong ? 'wrong' : 'LTN';
-                children = ltnText(time.date, dotType, time.serialNumber, time.des, time.duration, time.gap);
+                children = transLtnText(time.date, dotType, time.serialNumber, time.des, time.duration, time.gap);
             }
             return {
                 children,

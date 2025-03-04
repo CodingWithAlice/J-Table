@@ -1,10 +1,10 @@
 import { AppstoreAddOutlined } from "@ant-design/icons";
-import { FloatButton, Input, Modal, Radio } from "antd";
+import { FloatButton, Input, message, Modal, Radio } from "antd";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { LtnApi } from "../apis/ltn";
 
-export default function AddLtn({fresh}) {
+export default function AddLtn({ fresh }: { fresh: () => void }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [title, setTitle] = useState('');
     const [source, setSource] = useState(0);
@@ -22,6 +22,10 @@ export default function AddLtn({fresh}) {
         }
         LtnApi.add(data).then(() => {
             fresh();
+        }).catch(e => {
+            if (e instanceof Error) {
+                message.error(e.message);
+            }
         });
         setIsModalOpen(false);
     };
@@ -54,7 +58,7 @@ export default function AddLtn({fresh}) {
                     <Radio.Button key={it.value} value={it.value}>{it.desc}</Radio.Button>
                 ))}
             </Radio.Group>
-            <Input placeholder="BOX ID" value={boxId} onChange={(e) => { setBoxId(e.target.value) }} type="number" />
+            <Input placeholder="BOX ID" value={boxId} onChange={(e) => { setBoxId(+e.target.value) }} type="number" />
         </Modal>
     </>
 }
