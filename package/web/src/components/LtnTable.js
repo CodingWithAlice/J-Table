@@ -5,8 +5,11 @@ import Filter from "./Filter";
 import TimeModal from "./TimeModal";
 import AddLtn from "./AddLtn";
 import { message } from "antd";
+import { useSearchParams } from "react-router-dom";
 
 export default function LtnTable() {
+    const [params, setParams] = useSearchParams();
+    localStorage.setItem('type', params.get('type'));
     let [ltns, setLtns] = useState([]);
     const [tempParams, setTempParams] = useState({
         start: undefined,

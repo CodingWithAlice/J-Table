@@ -10,7 +10,8 @@ export function getApiBaseUrl() {
 }
 export function request(options) {
     let baseURL = getApiBaseUrl();
-    const headers = { 'JTable-Test-Host': window.location.host };
+    const localStorageType = localStorage.getItem('type')
+    const headers = { 'Authorization': localStorageType === 'owner-alice' ? 'owner' : '' };
     const mergeOpt = {
         ...options,
         baseURL: options.baseURL || baseURL,
