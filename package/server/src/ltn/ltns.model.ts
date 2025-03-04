@@ -5,8 +5,8 @@ import { LtnController } from './ltns.controller';
 import { LtnService } from './ltns.service';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Ltn])],
-  providers: [LtnService],
   controllers: [LtnController],
+  providers: [LtnService],
+  imports: [SequelizeModule.forFeature([Ltn])],
 })
 export class LtnsModule {}

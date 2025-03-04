@@ -5,8 +5,8 @@ import { RoutineService } from './routines.service';
 import { RoutineController } from './routines.controller';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Routine])],
-  providers: [RoutineService],
   controllers: [RoutineController],
+  providers: [RoutineService],
+  imports: [SequelizeModule.forFeature([Routine])],
 })
 export class RoutinesModule {}

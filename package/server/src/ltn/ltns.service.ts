@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Ltn } from '../models/ltn.model';
 import dayjs from 'dayjs';
+import { CreateLtnDTO, ListAllEntities } from './create-ltn.dto';
 
 @Injectable()
 export class LtnService {
@@ -11,7 +12,7 @@ export class LtnService {
   ) {}
 
   // 按照 boxId 分组
-  async findAll({ start, end }): Promise<any> {
+  async findAll({ start, end }: ListAllEntities): Promise<any> {
     const ltns = await this.ltnModel.findAll({ raw: true });
     const data = ltns.reduce((pre, cur) => {
       const boxId = cur.boxId;
@@ -40,7 +41,7 @@ export class LtnService {
     return { data };
   }
 
-  async findAllCopy({ start, end }): Promise<any> {
+  async findAllCopy({ start, end }: ListAllEntities): Promise<any> {
     const { data } = await this.findAll({ start, end });
     const totalArr = Object.keys(data).reduce((pre, cur) => {
       const count = data[cur].length;
@@ -118,11 +119,7 @@ export class LtnService {
     }
   }
 
-  async updateBoxId(
-    id: string,
-    type: 'update' | 'degrade' | 'fresh',
-    time: string,
-  ) {
+  async updateBoxId({ id, type, time }: CreateLtnDTO) {
     const ltn = await this.findOne(id);
     if (type === 'degrade' || type === 'fresh') {
       ltn.boxId = 1; // 1 代表做错了
