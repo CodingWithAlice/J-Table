@@ -2,6 +2,7 @@ import { Button, message, Popconfirm } from "antd"
 import { LtnApi } from "../apis/ltn";
 import { CaretDownFilled, CaretUpFilled } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { useSearchParams } from "react-router-dom";
 
 const description = {
     update: {
@@ -29,8 +30,13 @@ interface GradeProps {
 }
 
 export default function Grade({ boxId, fresh, ltnId }: GradeProps) {
+    const [params, setParams] = useSearchParams();
+    const date = params.get('date');
+
     const confirm = (key: number, type: string) => {
-        LtnApi.update(key, type, dayjs().subtract(0, 'day').toDate()).then(res => {
+        const time = date ? new Date(date) : dayjs().subtract(0, 'day').toDate();
+
+        LtnApi.update(key, type, time).then(res => {
             message.success(`更新 ${res.title} 到 box${res.boxId} 成功`);
             fresh();
         })
