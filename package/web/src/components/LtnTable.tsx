@@ -18,6 +18,8 @@ export interface LtnDTO {
     source: number;
     boxId: number;
     solveTime: string;
+    customDuration: number;
+    levelId: number;
 }
 
 export interface LtnsProps {

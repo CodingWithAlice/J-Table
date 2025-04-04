@@ -12,14 +12,14 @@ interface LtnListProps {
 
 export default function LtnList({ list, boxId, fresh }: LtnListProps) {
     const isMobile = useMediaQuery('(max-width: 767px)');
-    const getNextTime = (solveTime: string) => {
-        const date = dayjs(solveTime || '2025-01-20').add(boxId * 7, 'day').format('YYYY-MM-DD');
+    const getNextTime = (solveTime: string, customDuration: number) => {
+        const date = dayjs(solveTime || '2025-01-20').add(customDuration, 'day').format('YYYY-MM-DD');
         return isMobile ? date.slice(5) : date;
     }
     const sortList = list.sort((a, b) => {
         ;
         return dayjs(a.solveTime).isBefore(dayjs(b.solveTime)) ? -1 : 1;
-    })
+    })    
     return <div className="ltn-list">
         {sortList.map((it, index) => <div key={it.id} className="ltn-item">
             {/* 序号 */}
@@ -30,7 +30,7 @@ export default function LtnList({ list, boxId, fresh }: LtnListProps) {
             <Grade boxId={boxId} fresh={fresh} ltnId={it.id} />
             {/* 下次做题时间 */}
             {it.solveTime &&
-                <span className="ltn-time">{getNextTime(it.solveTime)}</span>}
+                <span className="ltn-time">{getNextTime(it.solveTime, it.customDuration)}</span>}
         </div>)}
     </div>
 }

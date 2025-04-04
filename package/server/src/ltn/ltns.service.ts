@@ -24,7 +24,7 @@ export class LtnService {
         if (cur.solveTime) {
           const time =
             new Date(cur.solveTime).getTime() +
-            cur.boxId * 7 * 24 * 60 * 60 * 1000;
+            cur.customDuration * 24 * 60 * 60 * 1000;
           if (
             time >= new Date(start).getTime() &&
             time <= new Date(end).getTime()
@@ -82,7 +82,7 @@ export class LtnService {
         ltnData.forEach((ltn) => {
           // 添加推荐做题时间
           const suggestTime = dayjs(ltn.solveTime)
-            .add(ltn.boxId * 7, 'day')
+            .add(ltn.customDuration, 'day')
             .format('MM-DD');
           const newOne = {
             ...ltn,

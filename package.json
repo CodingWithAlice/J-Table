@@ -17,7 +17,8 @@
   },
   "scripts": {
     "web": "npm run start --workspace=web",
-    "server": "npm run start:dev --workspace=server"
+    "server": "npm run start:dev --workspace=server",
+    "dev:iterm": "osascript dev.applescript"
   },
   "eslintConfig": {
     "extends": [
