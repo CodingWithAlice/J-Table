@@ -7,7 +7,11 @@
 -   package/Web    存放客户端代码
 -   package/server 存放服务端代码
 
-3、项目使用 js ，暂未支持 TS
+3、本地启动项目
+
+```js
+    npm run dev:iterm
+```
 
 ### 2025.1.18
 
