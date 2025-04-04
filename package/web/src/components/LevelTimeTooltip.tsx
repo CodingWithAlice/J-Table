@@ -1,21 +1,23 @@
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { Tooltip } from "antd";
+import { useEffect, useState } from "react";
+import { LevelApi } from "../apis/level";
 
 export default function LevelTimeTooltip() {
-    const levelData = {
-        1: { basic: 7, max: 28 },
-        2: { basic: 8, max: 32 },
-        3: { basic: 9, max: 38 },
-        4: { basic: 11, max: 42 },
-        5: { basic: 13, max: 54 }
-    };
-    const tooltipContent = (<div>
-        {Object.entries(levelData).map(([level, times]) => (
-            <div key={level}>
-                层级 {level}: 基本间隔 {times.basic}天, 最大 {times.max}天
-            </div>
-        ))}
-    </div>);
+    const [tooltipContent, setTooltipContent] = useState<React.ReactNode>();
+
+    useEffect(() => {
+        LevelApi.list().then(res => {
+            setTooltipContent((<div>
+                {res.map(({ id, desc, basicDuration, maxDuration }: { id: number, basicDuration: number, maxDuration: number, desc: string }) => (
+                    <div key={id}>
+                        {desc}: 基本间隔 {basicDuration}天
+                        {/* 最大 {maxDuration}天 */}
+                    </div>
+                ))}
+            </div>))
+        })
+    }, [])
 
     return <Tooltip title={tooltipContent} placement="topLeft">
         <QuestionCircleOutlined />

@@ -25,6 +25,10 @@ export default function AddLtn({ fresh }: { fresh: () => void }) {
             levelId,
             solveTime: dayjs().format('YYYY-MM-DD')
         }
+        if(!title) {
+            message.error('请输入题目！');
+            return
+        }
         LtnApi.add(data).then(() => {
             fresh();
         }).catch(e => {

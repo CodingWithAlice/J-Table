@@ -3,12 +3,14 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Ltn } from '../models/ltn.model';
 import dayjs from 'dayjs';
 import { CreateLtnDTO, ListAllEntities } from './create-ltn.dto';
+import { LevelService } from 'src/level/levels.service';
 
 @Injectable()
 export class LtnService {
   constructor(
     @InjectModel(Ltn)
     private ltnModel: typeof Ltn,
+    private readonly levelService: LevelService,
   ) {}
 
   // 按照 boxId 分组
@@ -132,8 +134,16 @@ export class LtnService {
   }
 
   async addLtn(data) {
-    const newLtn = await this.ltnModel.create(data);
-    return { data: newLtn };
+    // 取默认间隔时间
+    const levels = await this.levelService.findAll();
+    const levelId = data.levelId;
+    const level = levels.data.find((it) => it.id === levelId);
+
+    const newLtn = await this.ltnModel.create({
+      ...data,
+      customDuration: level.basicDuration,
+    });
+    return { data: newLtn, levels, levelId };
   }
 
   findOne(id: string): Promise<Ltn> {
