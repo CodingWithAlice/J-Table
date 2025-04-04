@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { LtnsModule } from './ltn/ltns.model';
+import { LtnsModule } from './ltn/ltns.module';
 import { Ltn } from './models/ltn.model';
 import { Routine } from './models/routine.model';
-import { RoutinesModule } from './routine/routines.model';
+import { Level } from './models/level.model';
+import { RoutinesModule } from './routine/routines.module';
 import { Time } from './models/time.model';
-import { TimesModule } from './time/times.model';
+import { TimesModule } from './time/times.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { LevelsModule } from './level/levels.model';
 
 @Module({
   imports: [
@@ -24,13 +26,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         username: 'root',
         password: configService.get<string>('DB_PASSWORD'),
         database: 'Daily',
-        models: [Ltn, Routine, Time],
+        models: [Ltn, Routine, Time, Level],
       }),
       inject: [ConfigService],
     }),
     LtnsModule,
     RoutinesModule,
     TimesModule,
+    LevelsModule,
   ],
 })
 export class AppModule {}
