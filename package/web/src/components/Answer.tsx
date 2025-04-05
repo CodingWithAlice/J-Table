@@ -4,7 +4,7 @@ import { useState } from "react";
 
 const { TextArea } = Input;
 
-export default function Answer() {
+export default function Answer({ placeholder }: { placeholder: string }) {
     const [answer, setAnswer] = useState<string>();
     const handleSave = () => { };
     return <>
@@ -12,13 +12,13 @@ export default function Answer() {
             key="answer"
             value={answer}
             onChange={(e) => setAnswer((e.target as HTMLTextAreaElement).value)}
-            placeholder="请输入你的答案"
+            placeholder={placeholder}
             style={{
                 resize: 'both',
             }}
             autoSize={{ minRows: 1 }}
         />
-        <Button onClick={handleSave} icon={<FontColorsOutlined />}>
+        <Button onClick={handleSave} icon={<FontColorsOutlined />} className="check-button">
             校验
         </Button>
     </>

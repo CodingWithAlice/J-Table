@@ -142,6 +142,7 @@
 .ltn-time {
     color: #510c4c;
     white-space: nowrap;
+    margin: 0 8px;
 }
 
 .filter-form {
@@ -163,4 +164,9 @@
 
 .radio-group {
     margin: 10px 0;
+}
+
+.check-button {
+    margin-top: 10px;
+    margin-left: 60%;
 }

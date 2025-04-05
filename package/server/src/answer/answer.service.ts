@@ -14,20 +14,47 @@ export class AnswersService {
     return this.answerModel.create(answer);
   }
 
-  async findAll() {
-    return this.answerModel.find().exec();
+  async findAll(params: { questionId: number }) {
+    return this.answerModel.find({ question_id: +params.questionId }).exec();
   }
+
   // 添加答案
   async addAnswer(dto: {
     answerText: string;
     wrongNotes?: string[];
     questionId: number;
+    questionTitle: string;
   }) {
+    console.log('🌹🌹🌹🌹', dto);
+
     const answer = new this.answerModel({
       answer_text: dto.answerText,
       wrong_notes: dto.wrongNotes || [],
       question_id: dto.questionId,
+      question_title: dto.questionTitle,
     });
     return answer.save();
+  }
+
+  // 修改答案
+  async updateAnswer(dto: {
+    answerText: string;
+    wrongNotes?: string[];
+    questionId: number;
+    questionTitle: string;
+  }) {
+    return this.answerModel
+      .findByIdAndUpdate(
+        { question_id: dto.questionId },
+        {
+          $set: {
+            answer_text: dto.answerText,
+            wrong_notes: dto.wrongNotes,
+            question_title: dto.questionTitle, // 可选更新字段
+          },
+        },
+        { new: true }, // 返回更新后的文档
+      )
+      .exec();
   }
 }

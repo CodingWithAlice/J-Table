@@ -10,7 +10,8 @@ import { Time } from './models/time.model';
 import { TimesModule } from './time/times.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LevelsModule } from './level/levels.model';
-import { MongoModule } from './mongo/mongo.module';
+import { RecordsModule } from './record/record.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -32,13 +33,21 @@ import { MongoModule } from './mongo/mongo.module';
       }),
       inject: [ConfigService],
     }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule], // 明确声明依赖
+      inject: [ConfigService], // 注入 ConfigService
+      useFactory: (config: ConfigService) => ({
+        uri: config.get<string>('MONGO_URI'), // 从环境变量获取
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }),
+    }),
     LtnsModule,
     RoutinesModule,
     TimesModule,
     LevelsModule,
-    // MongoDB 配置
-    MongoModule,
     AnswersModule,
+    RecordsModule,
   ],
 })
 export class AppModule {}
