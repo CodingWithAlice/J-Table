@@ -1,3 +1,4 @@
+import { AnswersModule } from './answer/answers.module';
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { LtnsModule } from './ltn/ltns.module';
@@ -9,6 +10,7 @@ import { Time } from './models/time.model';
 import { TimesModule } from './time/times.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LevelsModule } from './level/levels.model';
+import { MongoModule } from './mongo/mongo.module';
 
 @Module({
   imports: [
@@ -34,6 +36,9 @@ import { LevelsModule } from './level/levels.model';
     RoutinesModule,
     TimesModule,
     LevelsModule,
+    // MongoDB 配置
+    MongoModule,
+    AnswersModule,
   ],
 })
 export class AppModule {}
