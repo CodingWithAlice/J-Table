@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
 @Schema()
-export class AnswerRecord extends Document {
+export class Record extends Document {
   @Prop({ required: true })
   question_title: string;
 
@@ -18,4 +19,4 @@ export class AnswerRecord extends Document {
   is_correct: boolean;
 }
 
-export const AnswerRecordSchema = SchemaFactory.createForClass(AnswerRecord);
+export const RecordSchema = SchemaFactory.createForClass(Record);

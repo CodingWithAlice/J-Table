@@ -4,10 +4,13 @@ import { Document } from 'mongoose';
 @Schema()
 export class Answer extends Document {
   @Prop({ required: true })
-  name: string;
+  answer_text: string;
 
-  @Prop()
-  price: number;
+  @Prop({ type: [String] })
+  wrong_notes: string[];
+
+  @Prop({ required: true })
+  question_id: number; // 关联 MySQL
 }
 
 export const AnswerSchema = SchemaFactory.createForClass(Answer);

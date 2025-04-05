@@ -1,4 +1,4 @@
-import { AnswersModule } from './answer/answers.module';
+import { AnswersModule } from './answer/answer.module';
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { LtnsModule } from './ltn/ltns.module';
