@@ -4,6 +4,7 @@ import Grade from "./Grade";
 import LongPage from "./LongPage";
 import { LtnDTO } from "./LtnTable";
 import { useMediaQuery } from '@mui/material';
+import AnswerModal from "./AnswerModal";
 interface LtnListProps {
     list: LtnDTO[],
     boxId: number, 
@@ -26,6 +27,8 @@ export default function LtnList({ list, boxId, fresh }: LtnListProps) {
             <Avatar className="ltn-avatar" size='small'>{index + 1}</Avatar>
             {/* 默认单行展示 - 过长通过悬浮展示 */}
             <LongPage title={it.title} />
+            {/* 做题弹窗 */}
+            <AnswerModal title={it.title} />
             {/* 升降 */}
             <Grade boxId={boxId} fresh={fresh} ltnId={it.id} />
             {/* 下次做题时间 */}
