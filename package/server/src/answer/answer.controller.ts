@@ -6,8 +6,8 @@ export class AnswerController {
   constructor(private readonly answerService: AnswersService) {}
 
   @Get()
-  findAll(@Query() params): Promise<any[]> {
-    return this.answerService.findAll(params);
+  findAll(@Query() params) {
+    return this.answerService.findOne(params);
   }
 
   @Post('add')

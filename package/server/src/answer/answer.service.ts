@@ -14,8 +14,11 @@ export class AnswersService {
     return this.answerModel.create(answer);
   }
 
-  async findAll(params: { questionId: number }) {
-    return this.answerModel.find({ question_id: +params.questionId }).exec();
+  async findOne(params: { questionId: number }) {
+    const data = await this.answerModel
+      .find({ question_id: +params.questionId })
+      .exec();
+    return { data };
   }
 
   // 添加答案
@@ -25,8 +28,6 @@ export class AnswersService {
     questionId: number;
     questionTitle: string;
   }) {
-    console.log('🌹🌹🌹🌹', dto);
-
     const answer = new this.answerModel({
       answer_text: dto.answerText,
       wrong_notes: dto.wrongNotes || [],
@@ -44,7 +45,7 @@ export class AnswersService {
     questionTitle: string;
   }) {
     return this.answerModel
-      .findByIdAndUpdate(
+      .findOneAndUpdate(
         { question_id: dto.questionId },
         {
           $set: {

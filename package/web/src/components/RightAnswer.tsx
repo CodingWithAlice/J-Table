@@ -18,12 +18,11 @@ export default function RightAnswer({ placeholder, questionId, title }: { placeh
         }
         if (isNew) {
             AnswerApi.add(data).then(res => {
-                console.log(22222, res);
                 message.success('成功');
+                setIsNew(false);
             })
         } else {
             AnswerApi.update(data).then(res => {
-                console.log(3333, res);
                 message.success('成功');
             })
         }
@@ -32,7 +31,7 @@ export default function RightAnswer({ placeholder, questionId, title }: { placeh
     useEffect(() => {
         AnswerApi.list(questionId).then(res => {
             console.log(1111, res);
-            if (!res) { setIsNew(true) }
+            if (!res || res.length === 0) { setIsNew(true) }
         })
     }, [questionId])
 
