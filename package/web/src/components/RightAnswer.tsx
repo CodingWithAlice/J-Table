@@ -30,8 +30,9 @@ export default function RightAnswer({ placeholder, questionId, title }: { placeh
 
     useEffect(() => {
         AnswerApi.list(questionId).then(res => {
-            console.log(1111, res);
             if (!res || res.length === 0) { setIsNew(true) }
+            const data = res[0];
+            setAnswer(data.right_answer);
         })
     }, [questionId])
 
