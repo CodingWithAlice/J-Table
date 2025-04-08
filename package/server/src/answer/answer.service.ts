@@ -14,44 +14,44 @@ export class AnswersService {
     return this.answerModel.create(answer);
   }
 
-  async findOne(params: { questionId: number }) {
+  async findOne(params: { topicId: number }) {
     const data = await this.answerModel
-      .find({ topic_id: +params.questionId })
+      .find({ topic_id: +params.topicId })
       .exec();
     return { data };
   }
 
   // 添加答案
   async addAnswer(dto: {
-    answerText: string;
+    rightAnswer: string;
     wrongNotes?: string[];
-    questionId: number;
-    questionTitle: string;
+    topicId: number;
+    topicTitle: string;
   }) {
     const answer = new this.answerModel({
-      right_answer: dto.answerText,
+      right_answer: dto.rightAnswer,
       wrong_notes: dto.wrongNotes || [],
-      topic_id: dto.questionId,
-      topic_title: dto.questionTitle,
+      topic_id: dto.topicId,
+      topic_title: dto.topicTitle,
     });
     return answer.save();
   }
 
   // 修改答案
   async updateAnswer(dto: {
-    answerText: string;
+    rightAnswer: string;
     wrongNotes?: string[];
-    questionId: number;
-    questionTitle: string;
+    topicId: number;
+    topicTitle: string;
   }) {
     return this.answerModel
       .findOneAndUpdate(
-        { topic_id: dto.questionId },
+        { topic_id: dto.topicId },
         {
           $set: {
-            right_answer: dto.answerText,
+            right_answer: dto.rightAnswer,
             wrong_notes: dto.wrongNotes,
-            topic_title: dto.questionTitle, // 可选更新字段
+            topic_title: dto.topicTitle, // 可选更新字段
           },
         },
         { new: true }, // 返回更新后的文档

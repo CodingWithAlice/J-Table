@@ -5,36 +5,38 @@ import { AnswerApi } from "../apis/answer";
 
 const { TextArea } = Input;
 
-export default function RightAnswer({ placeholder, questionId, title }: { placeholder: string, questionId: number, title: string }) {
+export default function RightAnswer({ placeholder, topicId, title, closeModal }: { placeholder: string, topicId: number, title: string, closeModal: () => void }) {
     const [answer, setAnswer] = useState<string>('');
     const [isNew, setIsNew] = useState<boolean>(false);
 
     const handleSave = () => {
         const data = {
-            questionId,
-            questionTitle: title,
-            answerText: answer,
+            topicId,
+            topicTitle: title,
+            rightAnswer: answer,
             wrongNotes: []
         }
         if (isNew) {
             AnswerApi.add(data).then(res => {
-                message.success('成功');
+                message.success('添加成功');
                 setIsNew(false);
+                closeModal();
             })
         } else {
             AnswerApi.update(data).then(res => {
-                message.success('成功');
+                message.success('修改成功');
+                // closeModal(); 修改后暂时不保存
             })
         }
     };
 
     useEffect(() => {
-        AnswerApi.list(questionId).then(res => {
+        AnswerApi.list(topicId).then(res => {
             if (!res || res.length === 0) { setIsNew(true) }
             const data = res[0];
-            setAnswer(data.right_answer);
+            setAnswer(data?.right_answer);
         })
-    }, [questionId])
+    }, [topicId])
 
     return <>
         <TextArea

@@ -28,14 +28,14 @@ export default function LtnList({ list, boxId, fresh }: LtnListProps) {
             {/* 默认单行展示 - 过长通过悬浮展示 */}
             <LongPage title={it.title} />
             {/* 做题弹窗 */}
-            <AnswerModal title={it.title} type="answer" questionId={it.id} />
+            <AnswerModal title={it.title} type="answer" topicId={it.id} />
             {/* 升降 */}
             {/* <Grade boxId={boxId} fresh={fresh} ltnId={it.id} /> */}
             {/* 下次做题时间 */}
             {it.solveTime &&
                 <span className="ltn-time">{getNextTime(it.solveTime, it.customDuration)}</span>}
             {/* 修改弹窗答案 */}
-            <AnswerModal title={it.title} type="rightAnswer" questionId={+it.id} />
+            <AnswerModal title={it.title} type="rightAnswer" topicId={+it.id} />
         </div>)}
     </div>
 }

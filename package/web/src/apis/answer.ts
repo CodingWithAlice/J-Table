@@ -1,17 +1,17 @@
 import { request } from '../utils/request'
 
 interface AnswerDTO {
-	questionId: number
-	questionTitle: string
-	answerText: string
+	topicId: number
+	topicTitle: string
+	rightAnswer: string
 	wrongNotes?: string[]
 }
 
 // 列表查询 - 所有
-function list(questionId: number) {
+function list(topicId: number) {
 	return request({
 		url: '/api/answer',
-		params: { questionId },
+		params: { topicId },
 	})
 }
 
