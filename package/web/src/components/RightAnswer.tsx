@@ -10,6 +10,10 @@ export default function RightAnswer({ placeholder, topicId, title, closeModal }:
     const [isNew, setIsNew] = useState<boolean>(false);
 
     const handleSave = () => {
+        if (!answer) {
+            message.warning('请输入正确答案');
+            return
+        };
         const data = {
             topicId,
             topicTitle: title,
