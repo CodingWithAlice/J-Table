@@ -23,10 +23,10 @@ export class RecordsService {
     isCorrect: boolean;
   }) {
     const record = new this.recordModel({
-      question_title: dto.questionTitle,
+      topic_title: dto.questionTitle,
       duration_sec: dto.durationSec,
       submit_time: new Date(),
-      question_id: dto.questionId,
+      topic_id: dto.questionId,
       is_correct: dto.isCorrect,
     });
     return record.save();

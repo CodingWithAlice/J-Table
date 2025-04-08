@@ -16,7 +16,7 @@ export class AnswersService {
 
   async findOne(params: { questionId: number }) {
     const data = await this.answerModel
-      .find({ question_id: +params.questionId })
+      .find({ topic_id: +params.questionId })
       .exec();
     return { data };
   }
@@ -29,10 +29,10 @@ export class AnswersService {
     questionTitle: string;
   }) {
     const answer = new this.answerModel({
-      answer_text: dto.answerText,
+      right_answer: dto.answerText,
       wrong_notes: dto.wrongNotes || [],
-      question_id: dto.questionId,
-      question_title: dto.questionTitle,
+      topic_id: dto.questionId,
+      topic_title: dto.questionTitle,
     });
     return answer.save();
   }
@@ -46,12 +46,12 @@ export class AnswersService {
   }) {
     return this.answerModel
       .findOneAndUpdate(
-        { question_id: dto.questionId },
+        { topic_id: dto.questionId },
         {
           $set: {
-            answer_text: dto.answerText,
+            right_answer: dto.answerText,
             wrong_notes: dto.wrongNotes,
-            question_title: dto.questionTitle, // 可选更新字段
+            topic_title: dto.questionTitle, // 可选更新字段
           },
         },
         { new: true }, // 返回更新后的文档

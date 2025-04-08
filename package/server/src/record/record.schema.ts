@@ -4,7 +4,7 @@ import { Document } from 'mongoose';
 @Schema()
 export class Record extends Document {
   @Prop({ required: true })
-  question_title: string;
+  topic_title: string;
 
   @Prop({ required: true })
   duration_sec: number;
@@ -13,7 +13,7 @@ export class Record extends Document {
   submit_time: Date;
 
   @Prop({ required: true })
-  question_id: number;
+  topic_id: number;
 
   @Prop({ required: true })
   is_correct: boolean;
