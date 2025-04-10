@@ -16,7 +16,7 @@ const ModalContent = {
 }
 type Type = keyof typeof ModalContent;
 
-export default function AnswerModal({ title, type, questionId }: { title: string, type: Type, questionId: number }) {
+export default function AnswerModal({ title, type, topicId }: { title: string, type: Type, topicId: number }) {
     const [isAnswerModalOpen, setIsAnswerModalOpen] = useState(false);
     const handleCancel = () => {
         setIsAnswerModalOpen(false);
@@ -31,7 +31,7 @@ export default function AnswerModal({ title, type, questionId }: { title: string
         </span>
         <Modal title={title} open={isAnswerModalOpen} footer={null} onCancel={handleCancel} destroyOnClose >
             {type === 'answer' && <Answer placeholder="请输入正确答案" />}
-            {type === 'rightAnswer' && <RightAnswer placeholder="修改答案" questionId={questionId} title={title} />}
+            {type === 'rightAnswer' && <RightAnswer placeholder="修改答案" topicId={topicId} title={title} closeModal={handleCancel} />}
         </Modal>
     </>
 }

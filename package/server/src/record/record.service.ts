@@ -17,16 +17,16 @@ export class RecordsService {
 
   // 添加做题记录
   async addRecord(dto: {
-    questionTitle: string;
+    topicTitle: string;
     durationSec: number;
-    questionId: number;
+    topicId: number;
     isCorrect: boolean;
   }) {
     const record = new this.recordModel({
-      topic_title: dto.questionTitle,
+      topic_title: dto.topicTitle,
       duration_sec: dto.durationSec,
       submit_time: new Date(),
-      topic_id: dto.questionId,
+      topic_id: dto.topicId,
       is_correct: dto.isCorrect,
     });
     return record.save();
