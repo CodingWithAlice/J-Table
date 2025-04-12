@@ -1,20 +1,30 @@
 import { FontColorsOutlined } from "@ant-design/icons";
 import { Button, Input, message } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { RecordApi } from "../apis/record";
 
 const { TextArea } = Input;
 
-export default function Answer({ placeholder }: { placeholder: string }) {
-    const [answer, setAnswer] = useState<string>();
+export default function Answer({ placeholder, topicId, topicTitle }: { placeholder: string, topicId: number, topicTitle: string }) {
+    const [answer, setAnswer] = useState<string>('');
+    const [record, serRecord] = useState();
+    const [showRightAnswer, setShowRightAnswer] = useState(false);
     const handleCheck = () => {
-        message.info('功能开发中...');
-        if(!answer) {
-            return;
-        }
+        // message.info('功能开发中...');
+        // if (!answer) {
+        //     return;
+        // }
+        RecordApi.add({ recentAnswer: answer, topicId, topicTitle }).then(res => {
+            console.log(1111, res);
 
-        console.log(1111,answer);
-        
-     };
+        })
+    };
+    useEffect(() => {
+        RecordApi.list(topicId).then((res) => {
+            setShowRightAnswer(res?.showRightAnswer);
+            serRecord(res?.record);
+        })
+    }, [topicId])
     return <>
         <TextArea
             key="answer"

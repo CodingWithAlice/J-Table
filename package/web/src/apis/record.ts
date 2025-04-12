@@ -3,17 +3,16 @@ import { request } from '../utils/request'
 interface RecordDTO {
 	topicId: number
 	topicTitle: string
-	durationSec: number
-	submitTime: Date
-    isCorrect: boolean
+	durationSec?: number
+    isCorrect?: boolean
     recentAnswer: string
 }
 
 // 列表查询 - 所有
-function list(topic_id: number) {
+function list(topicId: number) {
 	return request({
 		url: '/api/record',
-		params: { topic_id },
+		params: { topicId },
 	})
 }
 
