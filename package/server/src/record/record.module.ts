@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RecordsService } from './record.service';
 import { Record, RecordSchema } from './record.schema';
+import { RecordController } from './record.controller';
 
 @Module({
   imports: [
@@ -9,5 +10,6 @@ import { Record, RecordSchema } from './record.schema';
   ],
   providers: [RecordsService],
   exports: [RecordsService],
+  controllers: [RecordController],
 })
 export class RecordsModule {}

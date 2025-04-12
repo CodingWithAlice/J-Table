@@ -17,6 +17,9 @@ export class Record extends Document {
 
   @Prop({ required: true })
   is_correct: boolean;
+
+  @Prop({ required: true })
+  recent_answer: boolean; // 最近一次的答案
 }
 
 export const RecordSchema = SchemaFactory.createForClass(Record);

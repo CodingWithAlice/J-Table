@@ -9,5 +9,6 @@ import { LevelsModule } from 'src/level/levels.model';
   controllers: [LtnController],
   providers: [LtnService],
   imports: [SequelizeModule.forFeature([Ltn]), LevelsModule],
+  exports: [LtnService],
 })
 export class LtnsModule {}
