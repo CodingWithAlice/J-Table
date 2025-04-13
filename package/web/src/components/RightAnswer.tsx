@@ -20,18 +20,11 @@ export default function RightAnswer({ placeholder, topicId, title, closeModal }:
             rightAnswer: answer,
             wrongNotes: []
         }
-        if (isNew) {
-            AnswerApi.add(data).then(res => {
-                message.success('添加成功');
-                setIsNew(false);
-                closeModal();
-            })
-        } else {
-            AnswerApi.update(data).then(res => {
-                message.success('修改成功');
-                // closeModal(); 修改后暂时不保存
-            })
-        }
+        AnswerApi.update(data).then(res => {
+            message.success(isNew ? '添加成功' : '修改成功');
+            isNew && setIsNew(false);
+            isNew && closeModal();
+        })
     };
 
     useEffect(() => {

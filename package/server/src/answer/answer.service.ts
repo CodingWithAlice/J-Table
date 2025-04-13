@@ -19,22 +19,6 @@ export class AnswersService {
     return { data };
   }
 
-  // 添加答案
-  async addAnswer(dto: {
-    rightAnswer: string;
-    wrongNotes?: string[];
-    topicId: number;
-    topicTitle: string;
-  }) {
-    const answer = new this.answerModel({
-      right_answer: dto.rightAnswer,
-      wrong_notes: dto.wrongNotes || [],
-      topic_id: dto.topicId,
-      topic_title: dto.topicTitle,
-    });
-    return answer.save();
-  }
-
   // 修改答案
   async updateAnswer(dto: {
     rightAnswer: string;
@@ -48,11 +32,16 @@ export class AnswersService {
         {
           $set: {
             right_answer: dto.rightAnswer,
-            wrong_notes: dto.wrongNotes,
+            wrong_notes: dto.wrongNotes || [],
             topic_title: dto.topicTitle, // 可选更新字段
+            topic_id: dto.topicId,
           },
         },
-        { new: true }, // 返回更新后的文档
+        {
+          new: true, // 返回更新后的文档
+          upsert: true, // 如果不存在则创建
+          setDefaultsOnInsert: true, // 如果创建，应用 schema 默认值
+        },
       )
       .exec();
   }

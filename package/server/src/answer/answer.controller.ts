@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Query, Body } from '@nestjs/common';
+import { Controller, Get, Post, Query, Body } from '@nestjs/common';
 import { AnswersService } from './answer.service';
 
 @Controller('api/answer')
@@ -10,12 +10,7 @@ export class AnswerController {
     return this.answerService.findOne(params);
   }
 
-  @Post('add')
-  addAnswer(@Body() data) {
-    return this.answerService.addAnswer(data);
-  }
-
-  @Patch('update')
+  @Post('update')
   updateAnswer(@Body() data) {
     return this.answerService.updateAnswer(data);
   }

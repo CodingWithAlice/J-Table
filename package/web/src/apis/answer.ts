@@ -15,26 +15,16 @@ function list(topicId: number) {
 	})
 }
 
-// 更新
+// 添加新题目
 function update(data: AnswerDTO) {
 	return request({
-		method: 'PATCH',
-		url: '/api/answer/update',
-		data,
-	})
-}
-
-// 添加新题目
-function add(data: AnswerDTO) {
-	return request({
 		method: 'POST',
-		url: '/api/answer/add',
+		url: '/api/answer/update',
 		data,
 	})
 }
 
 export const AnswerApi = {
 	list,
-	add,
 	update,
 }
