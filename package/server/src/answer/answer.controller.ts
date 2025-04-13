@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Query, Body } from '@nestjs/common';
+import { Controller, Get, Post, Query, Body, UseGuards } from '@nestjs/common';
 import { AnswersService } from './answer.service';
+import { AuthGuard } from 'src/auth.guard';
 
 @Controller('api/answer')
 export class AnswerController {
@@ -11,6 +12,7 @@ export class AnswerController {
   }
 
   @Post('update')
+  @UseGuards(AuthGuard)
   updateAnswer(@Body() data) {
     return this.answerService.updateAnswer(data);
   }

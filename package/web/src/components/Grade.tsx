@@ -28,7 +28,7 @@ interface GradeProps {
     fresh: () => void,
     ltnId: number
 }
-
+// 网站支持做题，暂时不开放直接操作 BoxId 入口
 export default function Grade({ boxId, fresh, ltnId }: GradeProps) {
     const [params, setParams] = useSearchParams();
     const date = params.get('date');
