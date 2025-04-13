@@ -14,27 +14,27 @@ export class AnswersService {
     return this.answerModel.create(answer);
   }
 
-  async findOne({ topicId }: { topicId: number }) {
-    const data = await this.answerModel.find({ topic_id: +topicId }).exec();
-    return { data };
+  async findOne({ topicId }: { topicId: number | string }) {
+    const res = await this.answerModel.find({ topicId: +topicId }).lean();
+    return { data: res?.[0] || {} };
   }
 
   // 修改答案
   async updateAnswer(dto: {
     rightAnswer: string;
-    wrongNotes?: string[];
+    wrongNotes?: string;
     topicId: number;
     topicTitle: string;
   }) {
     return this.answerModel
       .findOneAndUpdate(
-        { topic_id: dto.topicId },
+        { topicId: dto.topicId },
         {
           $set: {
-            right_answer: dto.rightAnswer,
-            wrong_notes: dto.wrongNotes || [],
-            topic_title: dto.topicTitle, // 可选更新字段
-            topic_id: dto.topicId,
+            rightAnswer: dto.rightAnswer,
+            wrongNotes: dto.wrongNotes,
+            topicTitle: dto.topicTitle, // 可选更新字段
+            topicId: dto.topicId,
           },
         },
         {

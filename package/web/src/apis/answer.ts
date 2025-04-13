@@ -4,7 +4,7 @@ interface AnswerDTO {
 	topicId: number
 	topicTitle: string
 	rightAnswer: string
-	wrongNotes?: string[]
+	wrongNotes?: string
 }
 
 // 列表查询 - 所有

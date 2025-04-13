@@ -4,6 +4,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Record } from './record.schema';
 import dayjs from 'dayjs';
+import { AnswersService } from 'src/answer/answer.service';
+
+interface RecordDTO {
+  topicId: number;
+  topicTitle?: string;
+  recentAnswer?: string;
+  durationSec?: number;
+  isCorrect?: boolean;
+}
 
 @Injectable()
 export class RecordsService {
@@ -11,6 +20,7 @@ export class RecordsService {
     @InjectModel(Record.name)
     private recordModel: Model<Record>,
     private readonly ltnService: LtnService,
+    private readonly answersService: AnswersService,
   ) {}
 
   async create(record: Partial<Record>) {
@@ -26,29 +36,23 @@ export class RecordsService {
       dayjs(solveTime).add(customDuration, 'days'),
     );
 
-    const record = await this.recordModel.find({ topic_id: +topicId }).exec();
-    return { data: { showRightAnswer, record: record?.[0] || {} } };
+    const record = await this.recordModel.find({ topicId: +topicId }).lean();
+    const rightAnswer = await this.answersService.findOne({ topicId });
+    return {
+      data: {
+        showRightAnswer,
+        record: { ...(record?.[0] || {}), ...rightAnswer.data },
+      },
+    };
   }
 
   // 修改记录信息
-  async updateRecord(dto: {
-    topicId: number;
-    topicTitle: string;
-    durationSec?: number;
-    isCorrect?: boolean;
-    recentAnswer?: string;
-  }) {
+  async updateRecord(dto: RecordDTO) {
     return this.recordModel
       .findOneAndUpdate(
-        { topic_id: dto.topicId },
+        { topicId: dto.topicId },
         {
-          $set: {
-            topic_title: dto.topicTitle,
-            duration_sec: dto.durationSec,
-            topic_id: dto.topicId,
-            is_correct: dto.isCorrect,
-            recent_answer: dto.recentAnswer,
-          },
+          $set: dto,
         },
         {
           new: true, // 返回更新后的文档

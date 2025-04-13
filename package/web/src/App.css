@@ -167,6 +167,9 @@
 }
 
 .check-button {
-    margin-top: 10px;
-    margin-left: 60%;
+    margin: 0 0 0 10px;
+}
+.check-btn-wrap {
+    display: flex;
+    justify-content: flex-end;
 }
