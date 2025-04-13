@@ -30,24 +30,6 @@ export class RecordsService {
     return { showRightAnswer, record };
   }
 
-  // 添加做题记录
-  async addRecord(dto: {
-    topicId: number;
-    topicTitle: string;
-    durationSec?: number;
-    isCorrect?: boolean;
-    recentAnswer?: string;
-  }) {
-    const record = new this.recordModel({
-      topic_id: dto.topicId,
-      topic_title: dto.topicTitle,
-      duration_sec: dto?.durationSec,
-      is_correct: dto.isCorrect,
-      recent_answer: dto?.recentAnswer,
-    });
-    return record.save();
-  }
-
   // 修改记录信息
   async updateRecord(dto: {
     topicId: number;
@@ -63,12 +45,16 @@ export class RecordsService {
           $set: {
             topic_title: dto.topicTitle,
             duration_sec: dto.durationSec,
-            submit_time: new Date(),
             topic_id: dto.topicId,
             is_correct: dto.isCorrect,
+            recent_answer: dto.recentAnswer,
           },
         },
-        { new: true }, // 返回更新后的文档
+        {
+          new: true, // 返回更新后的文档
+          upsert: true, // 如果不存在则创建
+          setDefaultsOnInsert: true, // 如果创建，应用 schema 默认值
+        },
       )
       .exec();
   }

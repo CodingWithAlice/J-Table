@@ -16,26 +16,16 @@ function list(topicId: number) {
 	})
 }
 
-// 更新
+// 添加新题目
 function update(data: RecordDTO) {
 	return request({
-		method: 'PATCH',
-		url: '/api/record/update',
-		data,
-	})
-}
-
-// 添加新题目
-function add(data: RecordDTO) {
-	return request({
 		method: 'POST',
-		url: '/api/record/add',
+		url: '/api/record/update',
 		data,
 	})
 }
 
 export const RecordApi = {
 	list,
-	add,
 	update,
 }

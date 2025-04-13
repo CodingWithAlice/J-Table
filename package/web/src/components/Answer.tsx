@@ -14,7 +14,7 @@ export default function Answer({ placeholder, topicId, topicTitle }: { placehold
         // if (!answer) {
         //     return;
         // }
-        RecordApi.add({ recentAnswer: answer, topicId, topicTitle }).then(res => {
+        RecordApi.update({ recentAnswer: answer, topicId, topicTitle }).then(res => {
             console.log(1111, res);
 
         })

@@ -1,5 +1,5 @@
 import { RecordsService } from './record.service';
-import { Controller, Get, Post, Patch, Query, Body } from '@nestjs/common';
+import { Controller, Get, Post, Query, Body } from '@nestjs/common';
 
 @Controller('api/record')
 export class RecordController {
@@ -10,12 +10,7 @@ export class RecordController {
     return this.recordService.findOne(params);
   }
 
-  @Post('add')
-  addRecord(@Body() data) {
-    return this.recordService.addRecord(data);
-  }
-
-  @Patch('update')
+  @Post('update')
   updateRecord(@Body() data) {
     return this.recordService.updateRecord(data);
   }
