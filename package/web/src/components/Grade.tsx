@@ -39,7 +39,11 @@ export default function Grade({ boxId, fresh, ltnId }: GradeProps) {
         LtnApi.update(key, type, time).then(res => {
             message.success(`更新 ${res.title} 到 box${res.boxId} 成功`);
             fresh();
-        })
+        }).catch(e => {
+            if (e instanceof Error) {
+                message.error(e.message);
+            }
+        });
     };
 
     const cancel = () => {

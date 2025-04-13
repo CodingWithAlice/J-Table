@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 
 const { TextArea } = Input;
 
-export default function Answer({ placeholder, topicId, topicTitle }: { placeholder: string, topicId: number, topicTitle: string }) {
+export default function Answer({ placeholder, topicId, closeModal }: { placeholder: string, topicId: number, closeModal: () => void }) {
     const [form] = Form.useForm();
     const [record, setRecord] = useState<RecordDTO>();
     const [showRightAnswer, setShowRightAnswer] = useState(false);
@@ -21,9 +21,15 @@ export default function Answer({ placeholder, topicId, topicTitle }: { placehold
             }).then(res => {
                 message.success(needAI ? '查询成功' : '提交成功');
                 setShowRightAnswer(true);
-            })
+            }).catch(e => {
+                if (e instanceof Error) {
+                    message.error(e.message);
+                }
+            });
             if (needAI) {
                 console.log('AI')
+            } else {
+                closeModal();
             }
         }, 250)
     };

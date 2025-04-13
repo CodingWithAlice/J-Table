@@ -23,8 +23,12 @@ export default function RightAnswer({ placeholder, topicId, title, closeModal }:
         AnswerApi.update(data).then(res => {
             message.success(isNew ? '添加成功' : '修改成功');
             isNew && setIsNew(false);
-            isNew && closeModal();
-        })
+            closeModal();
+        }).catch(e => {
+            if (e instanceof Error) {
+                message.error(e.message);
+            }
+        });
     };
 
     useEffect(() => {
