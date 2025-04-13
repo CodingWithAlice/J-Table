@@ -27,7 +27,7 @@ export class RecordsService {
     );
 
     const record = await this.recordModel.find({ topic_id: +topicId }).exec();
-    return { showRightAnswer, record };
+    return { data: { showRightAnswer, record: record?.[0] || {} } };
   }
 
   // 修改记录信息

@@ -7,7 +7,6 @@ const { TextArea } = Input;
 
 export default function Answer({ placeholder, topicId, topicTitle }: { placeholder: string, topicId: number, topicTitle: string }) {
     const [answer, setAnswer] = useState<string>('');
-    const [record, serRecord] = useState();
     const [showRightAnswer, setShowRightAnswer] = useState(false);
     const handleCheck = () => {
         // message.info('功能开发中...');
@@ -22,7 +21,7 @@ export default function Answer({ placeholder, topicId, topicTitle }: { placehold
     useEffect(() => {
         RecordApi.list(topicId).then((res) => {
             setShowRightAnswer(res?.showRightAnswer);
-            serRecord(res?.record);
+            setAnswer(res?.record?.recent_answer || '');
         })
     }, [topicId])
     return <>
