@@ -1,11 +1,12 @@
 import { request } from '../utils/request'
 
 export interface RecordDTO {
-    topicId: number;
-    topicTitle?: string;
-    recentAnswer?: string;
-    durationSec?: number;
-    isCorrect?: boolean;
+	topicId: number
+	topicTitle?: string
+	recentAnswer?: string
+	durationSec?: number
+	submitTime: string
+	isCorrect?: boolean
 }
 
 // 列表查询 - 所有

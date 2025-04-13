@@ -10,6 +10,9 @@ export class Record extends Document {
   durationSec: number;
 
   @Prop({ required: true })
+  submitTime: string;
+
+  @Prop({ required: true })
   topicId: number;
 
   @Prop()

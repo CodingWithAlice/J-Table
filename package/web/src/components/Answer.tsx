@@ -2,6 +2,7 @@ import { FontColorsOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Radio } from "antd";
 import { useEffect, useState } from "react";
 import { RecordApi, type RecordDTO } from "../apis/record";
+import dayjs from "dayjs";
 
 const { TextArea } = Input;
 
@@ -9,17 +10,22 @@ export default function Answer({ placeholder, topicId, topicTitle }: { placehold
     const [form] = Form.useForm();
     const [record, setRecord] = useState<RecordDTO>();
     const [showRightAnswer, setShowRightAnswer] = useState(false);
-    // 检验
+    // 检验、提交
     const handleCheck = (needAI: boolean) => {
-        const newData = form.getFieldsValue();
-        RecordApi.update({ ...record, ...newData }).then(res => {
-            console.log(1111, res);
-            setShowRightAnswer(true);
-
-        })
-        if (needAI) {
-            console.log('AI')
-        }
+        setTimeout(() => {
+            const newData = form.getFieldsValue();
+            RecordApi.update({
+                ...record,
+                ...newData,
+                submitTime: dayjs().format('YYYY-MM-DD'),
+            }).then(res => {
+                message.success(needAI ? '查询成功' : '提交成功');
+                setShowRightAnswer(true);
+            })
+            if (needAI) {
+                console.log('AI')
+            }
+        }, 250)
     };
 
     // 初始化

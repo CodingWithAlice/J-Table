@@ -11,6 +11,7 @@ interface RecordDTO {
   topicTitle?: string;
   recentAnswer?: string;
   durationSec?: number;
+  submitTime: string;
   isCorrect?: boolean;
 }
 
@@ -36,21 +37,28 @@ export class RecordsService {
       dayjs(solveTime).add(customDuration, 'days'),
     );
 
-    const record = await this.recordModel.find({ topicId: +topicId }).lean();
+    const record = await this.recordModel
+      .find({ topicId: +topicId })
+      .select('-_id') // 排除 _id 字段
+      .lean();
     const rightAnswer = await this.answersService.findOne({ topicId });
     return {
       data: {
         showRightAnswer,
         record: { ...(record?.[0] || {}), ...rightAnswer.data },
+        initValue: { record, rightAnswer },
       },
     };
   }
 
   // 修改记录信息
   async updateRecord(dto: RecordDTO) {
+    // 存储错误记录
+    await this.answersService.updateAnswer(dto);
+    // 存储做题记录
     return this.recordModel
       .findOneAndUpdate(
-        { topicId: dto.topicId },
+        { topicId: dto.topicId, submitTime: dto.submitTime },
         {
           $set: dto,
         },

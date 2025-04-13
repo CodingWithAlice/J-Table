@@ -15,16 +15,19 @@ export class AnswersService {
   }
 
   async findOne({ topicId }: { topicId: number | string }) {
-    const res = await this.answerModel.find({ topicId: +topicId }).lean();
+    const res = await this.answerModel
+      .find({ topicId: +topicId })
+      .select('-_id') // 排除 _id 字段
+      .lean();
     return { data: res?.[0] || {} };
   }
 
   // 修改答案
   async updateAnswer(dto: {
-    rightAnswer: string;
+    rightAnswer?: string;
     wrongNotes?: string;
     topicId: number;
-    topicTitle: string;
+    topicTitle?: string;
   }) {
     return this.answerModel
       .findOneAndUpdate(
