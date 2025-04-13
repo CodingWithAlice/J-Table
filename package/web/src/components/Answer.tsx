@@ -1,4 +1,4 @@
-import { FontColorsOutlined } from "@ant-design/icons";
+import { CheckSquareOutlined, FontColorsOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Radio } from "antd";
 import { useEffect, useState } from "react";
 import { RecordApi, type RecordDTO } from "../apis/record";
@@ -51,7 +51,15 @@ export default function Answer({ placeholder, topicId, topicTitle }: { placehold
         </Form.Item>
         {showRightAnswer && (<>
             <Form.Item name="rightAnswer" label="正确答案">
-                <Input disabled></Input>
+                <TextArea
+                    key="answer"
+                    placeholder={placeholder}
+                    style={{
+                        resize: 'both',
+                    }}
+                    disabled
+                    autoSize={{ minRows: 1 }}
+                />
             </Form.Item>
             <Form.Item name="AI_suggest" label="AI 判定">
                 <Input disabled></Input>
@@ -81,7 +89,7 @@ export default function Answer({ placeholder, topicId, topicTitle }: { placehold
             <Button onClick={() => handleCheck(true)} icon={<FontColorsOutlined />} className="check-button">
                 校验
             </Button>
-            {showRightAnswer && <Button onClick={() => handleCheck(false)} icon={<FontColorsOutlined />} className="check-button">
+            {showRightAnswer && <Button type="primary" onClick={() => handleCheck(false)} icon={<CheckSquareOutlined />} className="check-button">
                 提交
             </Button>}
         </Form.Item>

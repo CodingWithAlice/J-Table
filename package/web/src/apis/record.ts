@@ -6,6 +6,7 @@ export interface RecordDTO {
 	recentAnswer?: string
 	durationSec?: number
 	submitTime: string
+	solveTime?: string
 	isCorrect?: boolean
 }
 

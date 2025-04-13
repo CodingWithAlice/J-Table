@@ -1,5 +1,5 @@
 export class CreateLtnDTO {
-  id: string;
+  id: string | number;
   type: 'update' | 'degrade' | 'fresh';
   time: string;
 }

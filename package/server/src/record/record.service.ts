@@ -12,6 +12,7 @@ interface RecordDTO {
   recentAnswer?: string;
   durationSec?: number;
   submitTime: string;
+  solveTime?: string;
   isCorrect?: boolean;
 }
 
@@ -45,8 +46,7 @@ export class RecordsService {
     return {
       data: {
         showRightAnswer,
-        record: { ...(record?.[0] || {}), ...rightAnswer.data },
-        initValue: { record, rightAnswer },
+        record: { ...(record?.[0] || {}), ...rightAnswer.data, solveTime },
       },
     };
   }
@@ -55,6 +55,14 @@ export class RecordsService {
   async updateRecord(dto: RecordDTO) {
     // 存储错误记录
     await this.answersService.updateAnswer(dto);
+    // 操作做题后的升降
+    if (dto?.solveTime !== dto.submitTime) {
+      await this.ltnService.updateBoxId({
+        id: dto.topicId,
+        type: dto?.isCorrect ? 'update' : 'degrade', // boxId 的升降
+        time: dto.submitTime,
+      });
+    }
     // 存储做题记录
     return this.recordModel
       .findOneAndUpdate(
