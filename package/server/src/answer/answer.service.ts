@@ -14,47 +14,37 @@ export class AnswersService {
     return this.answerModel.create(answer);
   }
 
-  async findOne(params: { topicId: number }) {
-    const data = await this.answerModel
-      .find({ topic_id: +params.topicId })
-      .exec();
-    return { data };
-  }
-
-  // 添加答案
-  async addAnswer(dto: {
-    rightAnswer: string;
-    wrongNotes?: string[];
-    topicId: number;
-    topicTitle: string;
-  }) {
-    const answer = new this.answerModel({
-      right_answer: dto.rightAnswer,
-      wrong_notes: dto.wrongNotes || [],
-      topic_id: dto.topicId,
-      topic_title: dto.topicTitle,
-    });
-    return answer.save();
+  async findOne({ topicId }: { topicId: number | string }) {
+    const res = await this.answerModel
+      .find({ topicId: +topicId })
+      .select('-_id') // 排除 _id 字段
+      .lean();
+    return { data: res?.[0] || {} };
   }
 
   // 修改答案
   async updateAnswer(dto: {
-    rightAnswer: string;
-    wrongNotes?: string[];
+    rightAnswer?: string;
+    wrongNotes?: string;
     topicId: number;
-    topicTitle: string;
+    topicTitle?: string;
   }) {
     return this.answerModel
       .findOneAndUpdate(
-        { topic_id: dto.topicId },
+        { topicId: dto.topicId },
         {
           $set: {
-            right_answer: dto.rightAnswer,
-            wrong_notes: dto.wrongNotes,
-            topic_title: dto.topicTitle, // 可选更新字段
+            rightAnswer: dto.rightAnswer,
+            wrongNotes: dto.wrongNotes,
+            topicTitle: dto.topicTitle, // 可选更新字段
+            topicId: dto.topicId,
           },
         },
-        { new: true }, // 返回更新后的文档
+        {
+          new: true, // 返回更新后的文档
+          upsert: true, // 如果不存在则创建
+          setDefaultsOnInsert: true, // 如果创建，应用 schema 默认值
+        },
       )
       .exec();
   }

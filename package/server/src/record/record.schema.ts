@@ -1,22 +1,25 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-@Schema()
+@Schema({ timestamps: true, collection: 'answer_records' })
 export class Record extends Document {
   @Prop({ required: true })
-  topic_title: string;
+  topicTitle: string;
+
+  @Prop()
+  durationSec: number;
 
   @Prop({ required: true })
-  duration_sec: number;
-
-  @Prop({ required: true, type: Date })
-  submit_time: Date;
+  submitTime: string;
 
   @Prop({ required: true })
-  topic_id: number;
+  topicId: number;
+
+  @Prop()
+  isCorrect: boolean;
 
   @Prop({ required: true })
-  is_correct: boolean;
+  recentAnswer: string; // 最近一次的答案
 }
 
 export const RecordSchema = SchemaFactory.createForClass(Record);

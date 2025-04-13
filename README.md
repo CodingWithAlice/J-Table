@@ -13,6 +13,8 @@
     npm run dev:iterm
 ```
 
+> 开发 tips：后端接口所有数据统一包裹在 data 属性中返回
+
 ### 2025.1.18
 
 package/server - 使用 Nestjs 做后端接口

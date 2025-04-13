@@ -1,5 +1,5 @@
 import { HeartTwoTone } from "@ant-design/icons";
-import { Button, Input, message } from "antd";
+import { Button, Form, Input, message } from "antd";
 import { useEffect, useState } from "react";
 import { AnswerApi } from "../apis/answer";
 
@@ -18,43 +18,43 @@ export default function RightAnswer({ placeholder, topicId, title, closeModal }:
             topicId,
             topicTitle: title,
             rightAnswer: answer,
-            wrongNotes: []
+            wrongNotes: ''
         }
-        if (isNew) {
-            AnswerApi.add(data).then(res => {
-                message.success('添加成功');
-                setIsNew(false);
-                closeModal();
-            })
-        } else {
-            AnswerApi.update(data).then(res => {
-                message.success('修改成功');
-                // closeModal(); 修改后暂时不保存
-            })
-        }
+        AnswerApi.update(data).then(res => {
+            message.success(isNew ? '添加成功' : '修改成功');
+            isNew && setIsNew(false);
+            closeModal();
+        }).catch(e => {
+            if (e instanceof Error) {
+                message.error(e.message);
+            }
+        });
     };
 
     useEffect(() => {
         AnswerApi.list(topicId).then(res => {
             if (!res || res.length === 0) { setIsNew(true) }
-            const data = res[0];
-            setAnswer(data?.right_answer);
+            setAnswer(res?.rightAnswer);
         })
     }, [topicId])
 
-    return <>
-        <TextArea
-            key="answer"
-            value={answer}
-            onChange={(e) => setAnswer((e.target as HTMLTextAreaElement).value)}
-            placeholder={placeholder}
-            style={{
-                resize: 'both',
-            }}
-            autoSize={{ minRows: 1 }}
-        />
-        <Button onClick={handleSave} icon={<HeartTwoTone twoToneColor="#eb2f96" />} className="check-button">
-            修改答案
-        </Button>
-    </>
+    return <Form>
+        <Form.Item label="答案">
+            <TextArea
+                key="answer"
+                value={answer}
+                onChange={(e) => setAnswer((e.target as HTMLTextAreaElement).value)}
+                placeholder={placeholder}
+                style={{
+                    resize: 'both',
+                }}
+                autoSize={{ minRows: 1 }}
+            />
+        </Form.Item>
+        <Form.Item className="check-btn-wrap">
+            <Button onClick={handleSave} icon={<HeartTwoTone twoToneColor="#eb2f96" />} className="check-button">
+                修改答案
+            </Button>
+        </Form.Item>
+    </Form>
 }

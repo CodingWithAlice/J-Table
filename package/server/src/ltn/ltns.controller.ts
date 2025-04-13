@@ -26,6 +26,7 @@ export class LtnController {
   }
 
   @Patch('operate')
+  @UseGuards(AuthGuard)
   update(@Body() { id, type, time }: CreateLtnDTO) {
     if (!id || !type || !time) {
       throw new Error('参数错误');

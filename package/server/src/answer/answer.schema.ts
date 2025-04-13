@@ -4,16 +4,16 @@ import { Document } from 'mongoose';
 @Schema({ timestamps: true, collection: 'question_answers' })
 export class Answer extends Document {
   @Prop({ required: true })
-  right_answer: string;
+  rightAnswer: string;
 
-  @Prop({ type: [String], default: [] })
-  wrong_notes: string[];
+  @Prop()
+  wrongNotes: string;
 
   @Prop({ type: String })
-  topic_title: string;
+  topicTitle: string;
 
   @Prop({ required: true })
-  topic_id: number; // 关联 MySQL
+  topicId: number; // 关联 MySQL
 }
 
 export const AnswerSchema = SchemaFactory.createForClass(Answer);

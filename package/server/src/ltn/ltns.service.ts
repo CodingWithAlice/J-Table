@@ -122,7 +122,7 @@ export class LtnService {
   }
 
   async updateBoxId({ id, type, time }: CreateLtnDTO) {
-    const ltn = await this.findOne(id);
+    const ltn = await this.findOne(+id);
     if (type === 'degrade' || type === 'fresh') {
       ltn.boxId = 1; // 1 代表做错了
     } else {
@@ -146,7 +146,7 @@ export class LtnService {
     return { data: newLtn, levels, levelId };
   }
 
-  findOne(id: string): Promise<Ltn> {
+  findOne(id: number): Promise<Ltn> {
     return this.ltnModel.findOne({
       where: {
         id,
@@ -154,7 +154,7 @@ export class LtnService {
     });
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     const ltn = await this.findOne(id);
     await ltn.destroy();
   }
