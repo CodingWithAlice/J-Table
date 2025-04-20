@@ -54,3 +54,8 @@ sudo /usr/local/bin/docker-compose logs nestjs-server
 // 实时监听错误
 sudo /usr/local/bin/docker-compose logs -f nestjs-server
 ```
+
+- step4: 运行过程中查看接口调用日志
+```js
+sudo /usr/local/bin/docker-compose logs -f nestjs-server 
+```
