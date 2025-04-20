@@ -14,12 +14,6 @@ export default function Answer({ placeholder, topicId, closeModal }: { placehold
     const handleCheck = (needAI: boolean) => {
         setTimeout(() => {
             const newData = form.getFieldsValue();
-            console.log({
-                ...record,
-                ...newData,
-                submitTime: dayjs().format('YYYY-MM-DD'),
-            });
-            
             RecordApi.update({
                 ...record,
                 ...newData,
