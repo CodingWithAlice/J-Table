@@ -18,7 +18,6 @@ export default function LtnList({ list, boxId, fresh }: LtnListProps) {
         return isMobile ? date.slice(5) : date;
     }
     const sortList = list.sort((a, b) => {
-        ;
         return dayjs(a.solveTime).isBefore(dayjs(b.solveTime)) ? -1 : 1;
     })
     return <div className="ltn-list">
@@ -28,7 +27,7 @@ export default function LtnList({ list, boxId, fresh }: LtnListProps) {
             {/* 默认单行展示 - 过长通过悬浮展示 */}
             <LongPage title={it.title} />
             {/* 做题弹窗 */}
-            <AnswerModal title={it.title} type="answer" topicId={it.id} />
+            <AnswerModal title={`【BOX${boxId}】${it.title}`} type="answer" topicId={it.id} />
             {/* 升降 */}
             {/* <Grade boxId={boxId} fresh={fresh} ltnId={it.id} /> */}
             {/* 下次做题时间 */}

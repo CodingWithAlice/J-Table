@@ -47,6 +47,11 @@ sudo /usr/local/bin/docker-compose ps
 sudo /usr/local/bin/docker-compose down
 sudo /usr/local/bin/docker-compose build
 sudo /usr/local/bin/docker-compose up -d
+// 可以合并为
+sudo /usr/local/bin/docker-compose down && docker-compose up --build -d
+// 定时清理不使用的镜像
+sudo su -
+docker system prune -f
 ```
 ```js
 sudo docker logs j-table-react-client-1
