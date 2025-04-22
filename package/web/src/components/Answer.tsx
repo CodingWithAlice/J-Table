@@ -39,7 +39,9 @@ export default function Answer({ placeholder, topicId, closeModal }: { placehold
         RecordApi.list(topicId).then((res) => {
             setShowRightAnswer(res?.showRightAnswer);
             form.setFieldsValue(res?.record); // 动态填充表单
-            setRecord(res?.record);
+            if(res) {
+                setRecord({...res.record, topicId});
+            }
         })
     }, [topicId])
 
