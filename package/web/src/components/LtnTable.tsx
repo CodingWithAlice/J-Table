@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { LtnApi } from "../apis/ltn";
 import LtnList from "./LtnList";
-import Filter from "./Filter";
-import TimeModal from "./TimeModal";
-import AddLtn from "./AddLtn";
+import FilterBtn from "./FilterBtn";
+import TimeModalBtn from "./TimeModalBtn";
+import AddLtnBtn from "./AddLtnBtn";
 import { message } from "antd";
 import { useSearchParams } from "react-router-dom";
+import TodayRecordBtn from "./TodayRecordBtn";
 
 export interface TimeProps {
     start?: string,
@@ -60,8 +61,13 @@ export default function LtnTable() {
                 <LtnList list={ltns[ltnType]} boxId={+ltnType} fresh={init} />
             </div>}
         </div>)}
-        <Filter fresh={init} initValue={tempParams} />
-        <TimeModal />
-        <AddLtn fresh={init} />
+        {/* 过滤 */}
+        <FilterBtn fresh={init} initValue={tempParams} />
+        {/* 线轴 */}
+        <TimeModalBtn />
+         {/* 添加 */}
+        <AddLtnBtn fresh={init} />
+        {/* 今日做题记录 */}
+        <TodayRecordBtn />
     </div>
 }

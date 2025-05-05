@@ -11,6 +11,11 @@ export class RecordController {
     return this.recordService.findOne(params);
   }
 
+  @Get('by-date')
+  findByDate(@Query() params) {
+    return this.recordService.findByDate(params);
+  }
+
   @Post('update')
   @UseGuards(AuthGuard)
   updateRecord(@Body() data) {

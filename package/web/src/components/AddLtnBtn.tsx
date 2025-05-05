@@ -7,7 +7,7 @@ import LevelTimeTooltip from "./LevelTimeTooltip";
 
 const { Title } = Typography;
 
-export default function AddLtn({ fresh }: { fresh: () => void }) {
+export default function AddLtnBtn({ fresh }: { fresh: () => void }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [title, setTitle] = useState('');
     const [source, setSource] = useState(0);

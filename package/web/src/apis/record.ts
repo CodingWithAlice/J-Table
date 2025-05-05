@@ -18,6 +18,14 @@ function list(topicId: number) {
 	})
 }
 
+// 列表查询 - 指定日期
+function listByDate(date: string) {
+	return request({
+		url: '/api/record/by-date',
+		params: { date },
+	})
+}
+
 // 添加新题目
 function update(data: RecordDTO) {
 	return request({
@@ -30,4 +38,5 @@ function update(data: RecordDTO) {
 export const RecordApi = {
 	list,
 	update,
+    listByDate
 }

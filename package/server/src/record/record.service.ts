@@ -5,6 +5,8 @@ import { Model } from 'mongoose';
 import { Record } from './record.schema';
 import dayjs from 'dayjs';
 import { AnswersService } from 'src/answer/answer.service';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 interface RecordDTO {
   topicId: number;
@@ -40,6 +42,7 @@ export class RecordsService {
 
     const record = await this.recordModel
       .find({ topicId: +topicId })
+      .sort({ submitTime: -1 }) // 按时间倒排
       .select('-_id') // 排除 _id 字段
       .lean();
     const rightAnswer = await this.answersService.findOne({ topicId });
@@ -49,6 +52,39 @@ export class RecordsService {
         record: { ...(record?.[0] || {}), ...rightAnswer.data, solveTime },
       },
     };
+  }
+
+  // 查询指定日期的记录
+  // 调用方式 GET /records/by-date?date=2023-08-01
+  async findByDate({ date }: { date: string }) {
+    const normalizedDate = dayjs(date).format('YYYY-MM-DD');
+    const data = await this.recordModel
+      .find({
+        submitTime: normalizedDate,
+      })
+      .select('-_id')
+      .lean();
+    return { data };
+  }
+
+  // 查询周期内的记录
+  // 调用方式 GET /records/by-period?startDate=2023-08-01&endDate=2023-08-31
+  async findByPeriod({
+    startDate,
+    endDate,
+  }: {
+    startDate: string;
+    endDate: string;
+  }) {
+    const start = dayjs(startDate).startOf('day').toDate();
+    const end = dayjs(endDate).endOf('day').toDate();
+
+    return this.recordModel
+      .find({
+        submitTime: { $gte: start, $lte: end },
+      })
+      .select('-_id')
+      .lean();
   }
 
   // 修改记录信息
