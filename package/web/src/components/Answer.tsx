@@ -1,5 +1,5 @@
 import { CheckSquareOutlined, FontColorsOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message, Radio } from "antd";
+import { Button, Form, Input, message, Radio, Flex, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { RecordApi, type RecordDTO } from "../apis/record";
 import dayjs from "dayjs";
@@ -9,7 +9,9 @@ const { TextArea } = Input;
 export default function Answer({ placeholder, topicId, closeModal }: { placeholder: string, topicId: number, closeModal: () => void }) {
     const [form] = Form.useForm();
     const [record, setRecord] = useState<RecordDTO>();
+    const [historyRecords, setHistoryRecords] = useState([]);
     const [showRightAnswer, setShowRightAnswer] = useState(false);
+    const colors = ["magenta", "red", "volcano", "orange", "gold", "lime", "green", "cyan", "blue",  "purple"];
     // 检验、提交
     const handleCheck = (needAI: boolean) => {
         setTimeout(() => {
@@ -38,9 +40,10 @@ export default function Answer({ placeholder, topicId, closeModal }: { placehold
     useEffect(() => {
         RecordApi.list(topicId).then((res) => {
             setShowRightAnswer(res?.showRightAnswer);
+            setHistoryRecords(res?.historyRecords || []);
             form.setFieldsValue(res?.record); // 动态填充表单
-            if(res) {
-                setRecord({...res.record, topicId});
+            if (res) {
+                setRecord({ ...res.record, topicId });
             }
         })
     }, [topicId])
@@ -72,6 +75,11 @@ export default function Answer({ placeholder, topicId, closeModal }: { placehold
             <Form.Item name="AI_suggest" label="AI 判定">
                 <Input disabled></Input>
             </Form.Item>
+           {historyRecords?.length > 0 && <Form.Item name="historyRecords" label="历史做题记录">
+                <Flex gap="4px 0" wrap>
+                    {historyRecords.map((item, index) => <Tag color={colors[index % 10]}>{item}</Tag>)}
+                </Flex>
+            </Form.Item>}
             <Form.Item name="wrongNotes" label="历史错误信息">
                 <TextArea
                     style={{

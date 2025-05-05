@@ -40,16 +40,32 @@ export class RecordsService {
       dayjs(solveTime).add(customDuration, 'days'),
     );
 
-    const record = await this.recordModel
+    // 查询该topicId的所有记录（仅获取submitTime）
+    const historyRecords = await this.recordModel
       .find({ topicId: +topicId })
+      .sort({ submitTime: -1 }) // 按时间倒排
+      .select('submitTime durationSec -_id') // 只返回submitTime字段，排除_id
+      .lean();
+
+    // 查询最近一次完整记录
+    const latestRecord = await this.recordModel
+      .findOne({ topicId: +topicId })
       .sort({ submitTime: -1 }) // 按时间倒排
       .select('-_id') // 排除 _id 字段
       .lean();
+
     const rightAnswer = await this.answersService.findOne({ topicId });
     return {
       data: {
         showRightAnswer,
-        record: { ...(record?.[0] || {}), ...rightAnswer.data, solveTime },
+        record: {
+          ...(latestRecord || {}),
+          ...rightAnswer.data,
+          solveTime,
+        },
+        historyRecords: historyRecords.map(
+          (item) => `${item.submitTime}/${item.durationSec}m`,
+        ), // 只返回时间数组
       },
     };
   }
@@ -68,7 +84,6 @@ export class RecordsService {
   }
 
   // 查询周期内的记录
-  // 调用方式 GET /records/by-period?startDate=2023-08-01&endDate=2023-08-31
   async findByPeriod({
     startDate,
     endDate,
