@@ -7,11 +7,12 @@ import { useMediaQuery } from '@mui/material';
 import AnswerModal from "./AnswerModal";
 interface LtnListProps {
     list: LtnDTO[],
-    boxId: number,
-    fresh: () => void
+    boxId?: number,
+    fresh?: () => void,
+    lastStatus?: boolean
 }
 
-export default function LtnList({ list, boxId, fresh }: LtnListProps) {
+export default function LtnList({ list, boxId, lastStatus }: LtnListProps) {
     const isMobile = useMediaQuery('(max-width: 767px)');
     const getNextTime = (solveTime: string, customDuration: number) => {
         const date = dayjs(solveTime || '2025-01-20').add(customDuration, 'day').format('YYYY-MM-DD');
@@ -27,14 +28,14 @@ export default function LtnList({ list, boxId, fresh }: LtnListProps) {
             {/* 默认单行展示 - 过长通过悬浮展示 */}
             <LongPage title={it.title} />
             {/* 做题弹窗 */}
-            <AnswerModal title={`【BOX${boxId}】${it.title}`} type="answer" topicId={it.id} />
+            <AnswerModal title={lastStatus ? `【BOX${boxId}】${it.title}` : ''} type="answer" topicId={it.id} lastStatus={lastStatus} />
             {/* 升降 */}
             {/* <Grade boxId={boxId} fresh={fresh} ltnId={it.id} /> */}
             {/* 下次做题时间 */}
-            {it.solveTime &&
+            {it.solveTime && !lastStatus &&
                 <span className="ltn-time">{getNextTime(it.solveTime, it.customDuration)}</span>}
-            {/* 修改弹窗答案 */}
-            <AnswerModal title={it.title} type="rightAnswer" topicId={+it.id} />
+            {/* 修改弹窗答案 - 隔天重做时，没有 boxId */}
+            {!lastStatus && <AnswerModal title={it.title} type="rightAnswer" topicId={+it.id} />}
         </div>)}
     </div>
 }

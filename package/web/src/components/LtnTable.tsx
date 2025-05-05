@@ -7,6 +7,7 @@ import AddLtnBtn from "./AddLtnBtn";
 import { message } from "antd";
 import { useSearchParams } from "react-router-dom";
 import TodayRecordBtn from "./TodayRecordBtn";
+import DoitSecondBtn from "./DoitSecondBtn";
 
 export interface TimeProps {
     start?: string,
@@ -69,5 +70,7 @@ export default function LtnTable() {
         <AddLtnBtn fresh={init} />
         {/* 今日做题记录 */}
         <TodayRecordBtn />
+        {/* 隔天重做 */}
+        <DoitSecondBtn />
     </div>
 }

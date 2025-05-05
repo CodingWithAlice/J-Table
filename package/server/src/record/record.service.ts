@@ -16,6 +16,7 @@ interface RecordDTO {
   submitTime: string;
   solveTime?: string;
   isCorrect?: boolean;
+  lastStatus?: boolean;
 }
 
 @Injectable()
@@ -85,31 +86,48 @@ export class RecordsService {
     return { data };
   }
 
-  // 查询周期内的记录
-  async findByPeriod({
-    startDate,
-    endDate,
-  }: {
-    startDate: string;
-    endDate: string;
-  }) {
-    const start = dayjs(startDate).startOf('day').toDate();
-    const end = dayjs(endDate).endOf('day').toDate();
+  // 查询隔天重做的记录
+  async findLastWrong() {
+    // 1、聚合查询：按topicId分组，只保留每组最新的错误记录
+    const incorrectRecords = await this.recordModel.aggregate([
+      {
+        $match: { isCorrect: false }, // 只筛选错误答案
+      },
+      {
+        $sort: { submitTime: -1 }, // 按提交时间倒序
+      },
+      {
+        $group: {
+          _id: '$topicId', // 按topicId分组
+          latestRecord: { $first: '$$ROOT' }, // 取每组第一条（即最新记录）
+        },
+      },
+      {
+        $replaceRoot: { newRoot: '$latestRecord' }, // 展开为完整文档
+      },
+      {
+        $project: { _id: 0 }, // 排除MongoDB默认_id
+      },
+    ]);
 
-    return this.recordModel
-      .find({
-        submitTime: { $gte: start, $lte: end },
-      })
-      .select('-_id')
-      .lean();
+    // 2. 关联题目详情
+    const topics = await Promise.all(
+      incorrectRecords.map((record) => this.ltnService.findOne(record.topicId)),
+    );
+    return {
+      data: incorrectRecords.map((record, index) => ({
+        ...record,
+        ...topics[index]?.dataValues, // 附加题目详情
+      })),
+    };
   }
 
   // 修改记录信息
   async updateRecord(dto: RecordDTO) {
-    // 存储错误记录
+    // 存储错误记录 wrongNotes
     await this.answersService.updateAnswer(dto);
-    // 操作做题后的升降
-    if (dto?.solveTime !== dto.submitTime) {
+    // 操作做题后的升降(隔天重做时不操作)
+    if (dto?.solveTime !== dto.submitTime && !dto?.lastStatus) {
       await this.ltnService.updateBoxId({
         id: dto.topicId,
         type: dto?.isCorrect ? 'update' : 'degrade', // boxId 的升降

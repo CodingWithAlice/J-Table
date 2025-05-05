@@ -5,8 +5,15 @@ import { RecordApi, type RecordDTO } from "../apis/record";
 import dayjs from "dayjs";
 
 const { TextArea } = Input;
+interface AnswerProps {
+    placeholder: string,
+    topicId: number,
+    closeModal: () => void,
+    title: string,
+    lastStatus?: boolean
+}
 
-export default function Answer({ placeholder, topicId, closeModal, title }: { placeholder: string, topicId: number, closeModal: () => void, title: string }) {
+export default function Answer({ placeholder, topicId, closeModal, title, lastStatus }: AnswerProps) {
     const [form] = Form.useForm();
     const [record, setRecord] = useState<RecordDTO>();
     const [historyRecords, setHistoryRecords] = useState([]);
@@ -20,7 +27,8 @@ export default function Answer({ placeholder, topicId, closeModal, title }: { pl
                 ...record,
                 ...newData,
                 submitTime: dayjs().format('YYYY-MM-DD'),
-                topicTitle: title
+                topicTitle: title,
+                lastStatus
             }
             // 校验答案 - 做题时长 + 是否正确
             if (data?.isCorrect === undefined || data?.durationSec === undefined) {

@@ -16,6 +16,11 @@ export class RecordController {
     return this.recordService.findByDate(params);
   }
 
+  @Get('last')
+  findLastWrong() {
+    return this.recordService.findLastWrong();
+  }
+
   @Post('update')
   @UseGuards(AuthGuard)
   updateRecord(@Body() data) {
