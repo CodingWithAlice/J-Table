@@ -1,5 +1,5 @@
 import { MenuUnfoldOutlined } from "@ant-design/icons";
-import { FloatButton, Modal } from "antd";
+import { FloatButton, message, Modal } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { RecordApi, RecordDTO } from "../apis/record";
@@ -18,6 +18,11 @@ export default function TodayRecordBtn() {
     const initTodayRecord = () => {
         const date = urlParams.get('date') || dayjs().format('YYYY-MM-DD');
         RecordApi.listByDate(date).then(res => {
+            if(res?.length === 0){
+                changeModalShow(false);
+                message.warning('暂无做题记录');
+                return
+            }
             setList(res || [])
         })
     }
@@ -44,7 +49,7 @@ export default function TodayRecordBtn() {
             onOk={() => changeModalShow(false)}
             onCancel={() => changeModalShow(false)}
         >
-            {list.length > 0 && list.map((item, index) => <div> {index + 1}、{item?.topicTitle} {item?.isCorrect ? '✅' : '❌'}</div>)}
+            {list.length > 0 && list.map((item, index) => <div key={item.topicId}> {index + 1}、{item?.topicTitle || item?.topicId} {item?.isCorrect ? '✅' : '❌'} 耗时{item?.durationSec}m</div>)}
         </Modal>
     </>
 }
