@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Time from "./Time";
 import { TimeApi } from "../apis/time";
 
-export default function TimeModal() {
+export default function TimeModalBtn() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [timeLineType, setTimeLineType] = useState<'LTN' | 'all'>('LTN');
     const [timeData, setTimeData] = useState([]);

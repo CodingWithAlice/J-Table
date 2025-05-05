@@ -8,6 +8,7 @@ export interface RecordDTO {
 	submitTime: string
 	solveTime?: string
 	isCorrect?: boolean
+	lastStatus?: boolean // 隔天重做状态
 }
 
 // 列表查询 - 所有
@@ -15,6 +16,21 @@ function list(topicId: number) {
 	return request({
 		url: '/api/record',
 		params: { topicId },
+	})
+}
+
+// 列表查询 - 指定日期
+function listByDate(date: string) {
+	return request({
+		url: '/api/record/by-date',
+		params: { date },
+	})
+}
+
+// 列表查询 - 指定日期
+function lastList() {
+	return request({
+		url: '/api/record/last',
 	})
 }
 
@@ -30,4 +46,6 @@ function update(data: RecordDTO) {
 export const RecordApi = {
 	list,
 	update,
+	listByDate,
+	lastList,
 }

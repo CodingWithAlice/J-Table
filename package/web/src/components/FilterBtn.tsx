@@ -9,7 +9,7 @@ interface FilterProps {
     initValue: TimeProps
 }
 
-export default function Filter({ fresh, initValue }: FilterProps) {
+export default function FilterBtn({ fresh, initValue }: FilterProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [start, setStart] = useState(initValue.start);
     const [end, setEnd] = useState(initValue.end);
