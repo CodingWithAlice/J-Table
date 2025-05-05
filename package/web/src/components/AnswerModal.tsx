@@ -29,8 +29,16 @@ export default function AnswerModal({ title, type, topicId }: { title: string, t
         <span onClick={showModal}>
             <Tooltip title={ModalContent[type].toolTip}>{ModalContent[type].icon}</Tooltip>
         </span>
-        <Modal title={title} open={isAnswerModalOpen} footer={null} onCancel={handleCancel} destroyOnClose >
-            {type === 'answer' && <Answer topicId={topicId} placeholder="请输入正确答案" closeModal={handleCancel} /> }
+        <Modal
+            title={title}
+            width={'75%'}
+            open={isAnswerModalOpen}
+            footer={null}
+            onCancel={handleCancel}
+            destroyOnClose
+            maskClosable={false}
+        >
+            {type === 'answer' && <Answer topicId={topicId} placeholder="请输入正确答案" closeModal={handleCancel} />}
             {type === 'rightAnswer' && <RightAnswer placeholder="修改答案" topicId={topicId} title={title} closeModal={handleCancel} />}
         </Modal>
     </>
