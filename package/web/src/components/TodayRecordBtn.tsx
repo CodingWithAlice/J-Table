@@ -18,7 +18,7 @@ export default function TodayRecordBtn() {
     const initTodayRecord = () => {
         const date = urlParams.get('date') || dayjs().format('YYYY-MM-DD');
         RecordApi.listByDate(date).then(res => {
-            if(res?.length === 0){
+            if (res?.length === 0) {
                 changeModalShow(false);
                 message.warning('暂无做题记录');
                 return
@@ -29,7 +29,9 @@ export default function TodayRecordBtn() {
 
     // 初始化查询今日做题记录
     useEffect(() => {
-        initTodayRecord();
+        if (modalShow) {
+            initTodayRecord();
+        }
     }, [modalShow])
 
     return <>
