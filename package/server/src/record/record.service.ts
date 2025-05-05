@@ -125,16 +125,12 @@ export class RecordsService {
   // 修改记录信息
   async updateRecord(dto: RecordDTO) {
     // 1、更新/创建 做题记录
-    const where = {
-      topicId: dto.topicId,
-      submitTime: dto.submitTime,
-    };
-    const existingRecord = await this.recordModel.findOne(where);
-    const isCreated = !existingRecord;
-
     const result = await this.recordModel
       .findOneAndUpdate(
-        where,
+        {
+          topicId: dto.topicId,
+          submitTime: dto.submitTime,
+        },
         {
           $set: dto,
         },
@@ -147,8 +143,9 @@ export class RecordsService {
       .exec();
     // 2、存储错误记录 wrongNotes
     await this.answersService.updateAnswer(dto);
+
     // 3、操作做题后的升降(隔天重做时不操作、修改做题记录时不操作-避免重复操作)
-    if (isCreated && dto?.solveTime !== dto.submitTime && !dto?.lastStatus) {
+    if (dto?.solveTime !== dto.submitTime && !dto?.lastStatus) {
       await this.ltnService.updateBoxId({
         id: dto.topicId,
         type: dto?.isCorrect ? 'update' : 'degrade', // boxId 的升降
