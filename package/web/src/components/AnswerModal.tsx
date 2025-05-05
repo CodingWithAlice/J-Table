@@ -38,7 +38,7 @@ export default function AnswerModal({ title, type, topicId }: { title: string, t
             destroyOnClose
             maskClosable={false}
         >
-            {type === 'answer' && <Answer topicId={topicId} placeholder="请输入正确答案" closeModal={handleCancel} />}
+            {type === 'answer' && <Answer topicId={topicId} title={title} placeholder="请输入正确答案" closeModal={handleCancel} />}
             {type === 'rightAnswer' && <RightAnswer placeholder="修改答案" topicId={topicId} title={title} closeModal={handleCancel} />}
         </Modal>
     </>

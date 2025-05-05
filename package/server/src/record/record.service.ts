@@ -63,9 +63,11 @@ export class RecordsService {
           ...rightAnswer.data,
           solveTime,
         },
-        historyRecords: historyRecords.map(
-          (item) => `${item.submitTime}/${item.durationSec}m`,
-        ), // 只返回时间数组
+        historyRecords: historyRecords.map((item) => {
+          const durationSec = item?.durationSec;
+          const formattedDuration = durationSec ? '/' + durationSec + 'm' : ''; // 处理展示格式
+          return `${item.submitTime}${formattedDuration}`;
+        }), // 只返回时间数组
       },
     };
   }

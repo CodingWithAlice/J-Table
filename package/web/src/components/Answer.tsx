@@ -6,21 +6,28 @@ import dayjs from "dayjs";
 
 const { TextArea } = Input;
 
-export default function Answer({ placeholder, topicId, closeModal }: { placeholder: string, topicId: number, closeModal: () => void }) {
+export default function Answer({ placeholder, topicId, closeModal, title }: { placeholder: string, topicId: number, closeModal: () => void, title: string }) {
     const [form] = Form.useForm();
     const [record, setRecord] = useState<RecordDTO>();
     const [historyRecords, setHistoryRecords] = useState([]);
     const [showRightAnswer, setShowRightAnswer] = useState(false);
-    const colors = ["magenta", "red", "volcano", "orange", "gold", "lime", "green", "cyan", "blue",  "purple"];
+    const colors = ["magenta", "red", "volcano", "orange", "gold", "lime", "green", "cyan", "blue", "purple"];
     // 检验、提交
     const handleCheck = (needAI: boolean) => {
         setTimeout(() => {
             const newData = form.getFieldsValue();
-            RecordApi.update({
+            const data = {
                 ...record,
                 ...newData,
                 submitTime: dayjs().format('YYYY-MM-DD'),
-            }).then(res => {
+                topicTitle: title
+            }
+            // 校验答案 - 做题时长 + 是否正确
+            if (data?.isCorrect === undefined || data?.durationSec === undefined) {
+                message.error('请填写必填项');
+                return;
+            }
+            RecordApi.update(data).then(res => {
                 message.success(needAI ? '查询成功' : '提交成功');
                 setShowRightAnswer(true);
             }).catch(e => {
@@ -75,7 +82,7 @@ export default function Answer({ placeholder, topicId, closeModal }: { placehold
             <Form.Item name="AI_suggest" label="AI 判定">
                 <Input disabled></Input>
             </Form.Item>
-           {historyRecords?.length > 0 && <Form.Item name="historyRecords" label="历史做题记录">
+            {historyRecords?.length > 0 && <Form.Item name="historyRecords" label="历史做题记录">
                 <Flex gap="4px 0" wrap>
                     {historyRecords.map((item, index) => <Tag color={colors[index % 10]}>{item}</Tag>)}
                 </Flex>
