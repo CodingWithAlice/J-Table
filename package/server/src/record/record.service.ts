@@ -63,6 +63,7 @@ export class RecordsService {
           ...(latestRecord || {}),
           ...rightAnswer.data,
           solveTime,
+          recentAnswer: showRightAnswer ? latestRecord.recentAnswer : '',
         },
         historyRecords: historyRecords.map((item) => {
           const durationSec = item?.durationSec;
