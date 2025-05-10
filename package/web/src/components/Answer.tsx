@@ -31,7 +31,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                 lastStatus
             }
             // 校验答案 - 做题时长 + 是否正确
-            if (data?.isCorrect === undefined || data?.durationSec === undefined) {
+            if (showRightAnswer && (data?.isCorrect === undefined || data?.durationSec === undefined)) {
                 message.error('请填写必填项');
                 return;
             }

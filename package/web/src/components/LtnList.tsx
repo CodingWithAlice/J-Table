@@ -28,7 +28,7 @@ export default function LtnList({ list, boxId, lastStatus }: LtnListProps) {
             {/* 默认单行展示 - 过长通过悬浮展示 */}
             <LongPage title={it.title} />
             {/* 做题弹窗 */}
-            <AnswerModal title={lastStatus ? `【BOX${boxId}】${it.title}` : ''} type="answer" topicId={it.id} lastStatus={lastStatus} />
+            <AnswerModal title={!lastStatus ? `【BOX${boxId}】${it.title}` : ''} type="answer" topicId={it.id} lastStatus={lastStatus} />
             {/* 升降 */}
             {/* <Grade boxId={boxId} fresh={fresh} ltnId={it.id} /> */}
             {/* 下次做题时间 */}

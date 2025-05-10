@@ -63,6 +63,7 @@ export class RecordsService {
           ...(latestRecord || {}),
           ...rightAnswer.data,
           solveTime,
+          recentAnswer: showRightAnswer ? latestRecord.recentAnswer : '',
         },
         historyRecords: historyRecords.map((item) => {
           const durationSec = item?.durationSec;
@@ -125,9 +126,12 @@ export class RecordsService {
   // 修改记录信息
   async updateRecord(dto: RecordDTO) {
     // 1、更新/创建 做题记录
-    const result = (await this.recordModel
+    const result = await this.recordModel
       .findOneAndUpdate(
-        { topicId: dto.topicId, submitTime: dto.submitTime },
+        {
+          topicId: dto.topicId,
+          submitTime: dto.submitTime,
+        },
         {
           $set: dto,
         },
@@ -135,22 +139,14 @@ export class RecordsService {
           new: true, // 返回更新后的文档
           upsert: true, // 如果不存在则创建
           setDefaultsOnInsert: true, // 如果创建，应用 schema 默认值
-          rawResult: true, // 返回完整的 mongodb 操作结果
         },
       )
-      .exec()) as any as {
-      // 双重类型断言
-      value: any;
-      lastErrorObject?: {
-        updatedExisting: boolean;
-        upserted?: any;
-      };
-    };
+      .exec();
     // 2、存储错误记录 wrongNotes
     await this.answersService.updateAnswer(dto);
+
     // 3、操作做题后的升降(隔天重做时不操作、修改做题记录时不操作-避免重复操作)
-    const isNewRecord = !!result?.lastErrorObject?.upserted;
-    if (isNewRecord && dto?.solveTime !== dto.submitTime && !dto?.lastStatus) {
+    if (dto?.solveTime !== dto.submitTime && !dto?.lastStatus) {
       await this.ltnService.updateBoxId({
         id: dto.topicId,
         type: dto?.isCorrect ? 'update' : 'degrade', // boxId 的升降
@@ -158,6 +154,6 @@ export class RecordsService {
       });
     }
     // 返回更新后的文档（兼容原有逻辑）
-    return result.value;
+    return result;
   }
 }
