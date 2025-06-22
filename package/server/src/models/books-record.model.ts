@@ -6,9 +6,6 @@ import { Column, Model, Table, DataType } from 'sequelize-typescript';
   timestamps: true,
 })
 export class BooksRecord extends Model<BooksRecord> {
-  @Column(DataType.INTEGER)
-  id: number;
-
   @Column(DataType.DATE)
   recent: Date;
 

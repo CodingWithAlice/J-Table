@@ -14,9 +14,6 @@ import {
 })
 export class Serial extends Model<Serial> {
   @Column(DataType.INTEGER)
-  id: number;
-
-  @Column(DataType.INTEGER)
   serialNumber: number;
 
   @Column(DataType.DATE)
@@ -47,6 +44,9 @@ export class Serial extends Model<Serial> {
 
   @Column(DataType.STRING)
   sport: string;
+
+  @Column(DataType.STRING)
+  spool: string;
 
   @Column(DataType.STRING)
   movie: string;
