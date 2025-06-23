@@ -16,7 +16,7 @@ export class Time extends Model<Time> {
   des: string;
 
   @Column
-  duration: string;
+  duration: number;
 
   @Column
   date: Date;

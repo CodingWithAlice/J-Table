@@ -12,6 +12,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LevelsModule } from './level/levels.model';
 import { RecordsModule } from './record/record.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { Serial } from './models/serial.model';
+import { SerialModule } from './serial/serials.module';
+import { BooksRecord } from './models/books-record.model';
+import { BooksRecordModule } from './books-record/books-record.module';
 
 @Module({
   imports: [
@@ -29,7 +33,7 @@ import { MongooseModule } from '@nestjs/mongoose';
         username: 'root',
         password: configService.get<string>('DB_PASSWORD'),
         database: 'Daily',
-        models: [Ltn, Routine, Time, Level],
+        models: [Ltn, Routine, Time, Level, Serial, BooksRecord],
       }),
       inject: [ConfigService],
     }),
@@ -44,6 +48,8 @@ import { MongooseModule } from '@nestjs/mongoose';
     }),
     LtnsModule,
     RoutinesModule,
+    SerialModule,
+    BooksRecordModule,
     TimesModule,
     LevelsModule,
     AnswersModule,

@@ -11,7 +11,7 @@ export default function TimeModalBtn() {
 
     const timeLineParams: { [key in 'LTN' | 'all']: { params: { type?: string, count?: number }, text: string } } = {
         LTN: {
-            params: { type: 'LTN', count: 8 },
+            params: { type: 'LTN', count: 15 },
             text: '展示全部',
         },
         all: {
@@ -53,7 +53,13 @@ export default function TimeModalBtn() {
             icon={<FieldTimeOutlined />}
             onClick={showModal}
         />
-        <Modal title={titleNode} open={isModalOpen} footer={null} onCancel={handleCancel} >
+        <Modal 
+            title={titleNode} 
+            open={isModalOpen} 
+            footer={null} 
+            onCancel={handleCancel}
+            width={'75%'} 
+        >
             <Time params={timeLineParams[timeLineType].params} timeData={timeData} />
         </Modal>
     </>

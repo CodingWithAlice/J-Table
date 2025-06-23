@@ -38,29 +38,32 @@ interface ItemProps {
 
 const dotList: { [key in 'LTN' | 'wrong' | 'reading' | 'TED' | 'movie' | 'thing']: { color?: string; dot?: JSX.Element } } = {
     LTN: {
-        color: 'blue',
+        color: '#4E6EF2',
     },
     wrong: {
-        color: 'red',
+        color: '#FF6B81',
     },
     reading: {
         dot: (<ReadOutlined style={{
             fontSize: '16px',
-        }} />)
+        }} />),
+        color: '#58C2A9',
     },
     TED: {
         dot: (
             <YoutubeOutlined style={{
                 fontSize: '16px',
             }} />
-        )
+        ),
+        color: '#FF9F43',
     },
     movie: {
         dot: (
             <MediumOutlined style={{
                 fontSize: '16px',
             }} />
-        )
+        ),
+        color: '#9C51B6',
     },
     thing: {
         dot: (
@@ -69,29 +72,33 @@ const dotList: { [key in 'LTN' | 'wrong' | 'reading' | 'TED' | 'movie' | 'thing'
                     fontSize: '16px',
                 }}
             />
-        )
+        ),
+        color: '#6C757D',
     }
 }
 const getText = (type: string, text: string) => {
+    console.log({type});
+    
     return <span>
-        {type.toUpperCase()} &nbsp;
+        {type?.toUpperCase()} &nbsp;
         &nbsp; {text}
     </span>
 }
 
-const transLtnText = (time: string, type: string, ltnId: number, text: string, duration: string, gap: number) => {
+const transLtnText = (time: string, type: string, ltnId: number, text: string, duration: string) => {
     const title = type === 'LTN' ? `LTN${ltnId}` : '错题重做';
     return <Tooltip title={title}>
         <span className='time-ltn'>
-            {!!gap && <Tag className='time-ltn-tag'>{gap}天</Tag>}
+            {!!duration && <Tag className='time-ltn-tag'>{duration}天</Tag>}
             <span className='time-ltn-time'>{time}</span>
             <span className='time-ltn-text'>{text}</span>
-            {duration}
         </span>
     </Tooltip>
 }
 
 export default function Time({ params, timeData }: TimeProps) {
+    console.log({params, timeData});
+    
     const [items, setItems] = useState<ItemProps[]>([]);
     const [mode, setMode] = useState<'alternate' | "left" | "right">('alternate');
 
@@ -136,8 +143,7 @@ export default function Time({ params, timeData }: TimeProps) {
             let dotType = time.routineType as keyof typeof dotList;
             let children = getText(dotType, time.des);
             if (dotType === 'LTN') {
-                dotType = time.ltnWrong ? 'wrong' : 'LTN';
-                children = transLtnText(time.date, dotType, time.serialNumber, time.des, time.duration, time.gap);
+                children = transLtnText(time.date, dotType, time.serialNumber, time.des, time.duration);
             }
             return {
                 children,
