@@ -53,6 +53,21 @@ export class TimeService {
     };
   }
 
+  private transformTimeData(
+    time: Time,
+    routineType: string,
+    routineTypeId: number,
+  ): RoutineItem {
+    return {
+      des: time.des,
+      routineType,
+      serialNumber: null,
+      duration: time.duration,
+      routineTypeId,
+      date: time.date,
+    };
+  }
+
   async findAll(): Promise<any> {
     // 获取所有的 routineType
     const routineTypes = await this.routineModel.findAll();
@@ -61,13 +76,15 @@ export class TimeService {
         type: cur.type,
         id: cur.id,
       };
+      pre[cur.id] = cur.type;
       return pre;
     }, {});
 
-    // 并行查询两张表
-    const [serialData, booksData] = await Promise.all([
+    // 并行查询三张表
+    const [serialData, booksData, timesData] = await Promise.all([
       this.serialModel.findAll(),
       this.booksRecordModel.findAll(),
+      this.timeModel.findAll(),
     ]);
 
     // 转换数据结构
@@ -82,10 +99,21 @@ export class TimeService {
       ),
     );
 
+    const transformedTimes = timesData.map((it) =>
+      this.transformTimeData(
+        it,
+        routineTypeByIds?.[`${it.routineTypeId}`] || 'movie',
+        it.routineTypeId,
+      ),
+    );
+
     return {
-      data: [...transformedSerials, ...transformedBooks].sort(
-        (a: RoutineItem, b: RoutineItem) =>
-          dayjs(a.date).isBefore(b.date) ? 1 : -1,
+      data: [
+        ...transformedSerials,
+        ...transformedBooks,
+        ...transformedTimes,
+      ].sort((a: RoutineItem, b: RoutineItem) =>
+        dayjs(a.date).isBefore(b.date) ? 1 : -1,
       ),
     };
   }
