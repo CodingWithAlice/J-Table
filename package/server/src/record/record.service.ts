@@ -154,6 +154,6 @@ export class RecordsService {
       });
     }
     // 返回更新后的文档（兼容原有逻辑）
-    return result;
+    return { data: result };
   }
 }

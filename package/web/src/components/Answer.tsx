@@ -3,6 +3,7 @@ import { Button, Form, Input, message, Radio, Flex, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { RecordApi, type RecordDTO } from "../apis/record";
 import dayjs from "dayjs";
+import { AIApi } from "../apis/ai";
 
 const { TextArea } = Input;
 interface AnswerProps {
@@ -30,6 +31,11 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                 topicTitle: title,
                 lastStatus
             }
+            // AI 查询
+            if (needAI && showRightAnswer) {
+                handleAISuggest(data?.recentAnswer, data?.rightAnswer);
+                return;
+            }
             // 校验答案 - 做题时长 + 是否正确
             if (showRightAnswer && (data?.isCorrect === undefined || data?.durationSec === undefined)) {
                 message.error('请填写必填项');
@@ -43,13 +49,20 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                     message.error(e.message);
                 }
             });
-            if (needAI) {
-                console.log('AI')
-            } else {
+            // 提交后关闭弹窗
+            if (!needAI) {
                 closeModal();
             }
         }, 250)
     };
+
+    // AI 查询建议
+    const handleAISuggest = (recentAnswer: string, rightAnswer: string) => {
+        AIApi.compare(recentAnswer, rightAnswer).then(res =>{
+            console.log('setAiSuggest', {res});
+            form.setFieldsValue({ AI_suggest: res });
+        })
+    }
 
     // 初始化
     useEffect(() => {
