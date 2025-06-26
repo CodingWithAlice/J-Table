@@ -6,9 +6,6 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
-import dotenv from 'dotenv';
-import path from 'path';
-dotenv.config({ path: path.resolve(__dirname, '../../../../config.env') });
 
 function validateRequest(request: Request): boolean {
   // 自定义验证函数

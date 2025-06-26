@@ -16,6 +16,7 @@ import { Serial } from './models/serial.model';
 import { SerialModule } from './serial/serials.module';
 import { BooksRecord } from './models/books-record.model';
 import { BooksRecordModule } from './books-record/books-record.module';
+import { DeepSeekModule } from './deepseek/deepseek.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { BooksRecordModule } from './books-record/books-record.module';
     LevelsModule,
     AnswersModule,
     RecordsModule,
+    DeepSeekModule,
   ],
 })
 export class AppModule {}

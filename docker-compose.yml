@@ -16,3 +16,5 @@ services:
     ports:
       - "4001:4001"
     restart: always
+    volumes:
+      - ../config.env:/app/config.env  # 将宿主机上的 config.env 挂载到容器内的 /app/config.env

@@ -1,8 +1,9 @@
-import { CheckSquareOutlined, FontColorsOutlined } from "@ant-design/icons";
+import { CheckSquareOutlined, FontColorsOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Radio, Flex, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { RecordApi, type RecordDTO } from "../apis/record";
 import dayjs from "dayjs";
+import { AIApi } from "../apis/ai";
 
 const { TextArea } = Input;
 interface AnswerProps {
@@ -18,6 +19,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
     const [record, setRecord] = useState<RecordDTO>();
     const [historyRecords, setHistoryRecords] = useState([]);
     const [showRightAnswer, setShowRightAnswer] = useState(false);
+    const [showAILoading, setShowAILoading] = useState(true);
     const colors = ["magenta", "red", "volcano", "orange", "gold", "lime", "green", "cyan", "blue", "purple"];
     // 检验、提交
     const handleCheck = (needAI: boolean) => {
@@ -30,6 +32,11 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                 topicTitle: title,
                 lastStatus
             }
+            // AI 查询
+            if (needAI && showRightAnswer) {
+                handleAISuggest(data?.topicTitle, data?.recentAnswer, data?.rightAnswer);
+                return;
+            }
             // 校验答案 - 做题时长 + 是否正确
             if (showRightAnswer && (data?.isCorrect === undefined || data?.durationSec === undefined)) {
                 message.error('请填写必填项');
@@ -38,23 +45,33 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
             RecordApi.update(data).then(res => {
                 message.success(needAI ? '查询成功' : '提交成功');
                 setShowRightAnswer(true);
+                setShowAILoading(false)
             }).catch(e => {
                 if (e instanceof Error) {
                     message.error(e.message);
                 }
             });
-            if (needAI) {
-                console.log('AI')
-            } else {
+            // 提交后关闭弹窗
+            if (!needAI) {
                 closeModal();
             }
         }, 250)
     };
 
+    // AI 查询建议
+    const handleAISuggest = (title: string,recent: string, right: string) => {
+        setShowAILoading(true)
+        AIApi.compare({ recent, right, title }).then(({suggestion}) => {
+            setShowAILoading(false)
+            form.setFieldsValue({ AI_suggest: suggestion.join('\n') });
+        })
+    }
+
     // 初始化
     useEffect(() => {
         RecordApi.list(topicId).then((res) => {
             setShowRightAnswer(res?.showRightAnswer);
+            setShowAILoading(!res?.showRightAnswer)
             setHistoryRecords(res?.historyRecords || []);
             form.setFieldsValue(res?.record); // 动态填充表单
             if (res) {
@@ -88,7 +105,17 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                 />
             </Form.Item>
             <Form.Item name="AI_suggest" label="AI 判定">
-                <Input disabled></Input>
+                {(showRightAnswer && showAILoading) 
+                ?  <LoadingOutlined /> 
+                : <TextArea
+                    key="AI_suggest"
+                    placeholder="点击下方「校验」进行 AI 判题"
+                    style={{
+                        resize: 'both',
+                    }}
+                    disabled
+                    autoSize={{ minRows: 1 }}
+                />}
             </Form.Item>
             {historyRecords?.length > 0 && <Form.Item name="historyRecords" label="历史做题记录">
                 <Flex gap="4px 0" wrap>

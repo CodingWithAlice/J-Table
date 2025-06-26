@@ -1,6 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// 先加载线上配置
+dotenv.config({ path: path.resolve(__dirname, '../../../../config.env') });
+// 再加载本地配置（如果有会覆盖线上配置）
+dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
