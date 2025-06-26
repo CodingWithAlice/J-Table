@@ -1,13 +1,13 @@
 import { request } from '../utils/request'
 
 // 列表查询 - 所有
-function compare(recent: string, right: string) {
+function compare(params: { recent: string; right: string }) {
 	return request({
-		url: '/api/ai',
-		params: { recent, right },
+		url: '/api/ai/compare',
+		params,
 	})
 }
 
 export const AIApi = {
-	compare,
+	compare
 }

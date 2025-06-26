@@ -58,8 +58,8 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
 
     // AI 查询建议
     const handleAISuggest = (recentAnswer: string, rightAnswer: string) => {
-        AIApi.compare(recentAnswer, rightAnswer).then(res =>{
-            console.log('setAiSuggest', {res});
+        AIApi.compare({ recent: recentAnswer, right: rightAnswer }).then(res => {
+            console.log('setAiSuggest', { res });
             form.setFieldsValue({ AI_suggest: res });
         })
     }
