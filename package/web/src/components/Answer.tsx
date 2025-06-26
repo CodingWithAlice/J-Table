@@ -33,7 +33,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
             }
             // AI 查询
             if (needAI && showRightAnswer) {
-                handleAISuggest(data?.recentAnswer, data?.rightAnswer);
+                handleAISuggest(data?.topicTitle, data?.recentAnswer, data?.rightAnswer);
                 return;
             }
             // 校验答案 - 做题时长 + 是否正确
@@ -57,8 +57,8 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
     };
 
     // AI 查询建议
-    const handleAISuggest = (recentAnswer: string, rightAnswer: string) => {
-        AIApi.compare({ recent: recentAnswer, right: rightAnswer }).then(res => {
+    const handleAISuggest = (title: string,recent: string, right: string) => {
+        AIApi.compare({ recent, right, title }).then(res => {
             console.log('setAiSuggest', { res });
             form.setFieldsValue({ AI_suggest: res });
         })

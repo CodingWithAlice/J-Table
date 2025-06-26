@@ -2,6 +2,10 @@ import { Injectable, Inject } from '@nestjs/common';
 import OpenAI from 'openai';
 import { ConfigService } from '@nestjs/config';
 
+export interface MessageProp {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
 @Injectable()
 export class DeepSeekService {
   private openai: OpenAI;
@@ -17,20 +21,36 @@ export class DeepSeekService {
   }
 
   async chatCompletion(prompt: string, model = 'deepseek-chat') {
-    try {
-      const response = await this.openai.chat.completions.create({
-        model,
-        messages: [{ role: 'user', content: prompt }],
-      });
-      return response.choices[0]?.message?.content || 'No response';
-    } catch (error) {
-      console.error('DeepSeek API error:', error);
-      throw new Error('Failed to get response from DeepSeek');
-    }
+    const messages: MessageProp[] = [
+      { role: 'user', content: prompt || '' },
+      {
+        role: 'assistant',
+        content: process.env?.ltn_EXAMPLE || '',
+      },
+    ];
+    const response = await this.openai.chat.completions.create({
+      model,
+      messages,
+      response_format: {
+        type: 'json_object',
+      },
+    });
+    const content = response.choices[0]?.message?.content;
+
+    return { data: JSON.parse(content) };
   }
 
-  async compare({ recent, right }: { recent: string; right: string }) {
-    const prompt = `${recent} ${right}`;
-    await this.chatCompletion(prompt);
+  async compare({
+    recent,
+    right,
+    title,
+  }: {
+    recent: string;
+    right: string;
+    title: string;
+  }) {
+    const prompt = `我在复习题目为：${title} 的前端相关内容，我这次面对这个问题想到的答案是：${recent}，我看了下之前的学习笔记，当时记录的答案是${right}，可以帮我比较下两个答案，针对我现在的答案，给出一些意见吗`;
+
+    return this.chatCompletion(prompt);
   }
 }

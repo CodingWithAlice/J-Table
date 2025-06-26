@@ -9,7 +9,8 @@ export class DeepSeekController {
   async askQuestion(
     @Query('recent') recent: string,
     @Query('right') right: string,
+    @Query('title') title: string,
   ) {
-    return this.deepSeekService.compare({ recent, right });
+    return this.deepSeekService.compare({ recent, right, title });
   }
 }
