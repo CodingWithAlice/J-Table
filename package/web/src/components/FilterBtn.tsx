@@ -1,31 +1,56 @@
 import { BgColorsOutlined } from "@ant-design/icons";
-import { FloatButton, Input, Modal } from "antd";
-import dayjs from "dayjs";
-import { useState } from "react";
-import { TimeProps } from "./LtnTable";
+import { FloatButton, Modal } from "antd";
+import { useEffect, useState } from "react";
+import { LtnApi } from "../apis/ltn";
+import { LtnsProps, LtnDTO } from "./LtnTable";
+import LtnList from "./LtnList";
 
-interface FilterProps {
-    fresh: (params: TimeProps) => void,
-    initValue: TimeProps
-}
+type LtnsType = keyof LtnsProps
 
-export default function FilterBtn({ fresh, initValue }: FilterProps) {
+export default function FilterBtn() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [start, setStart] = useState(initValue.start);
-    const [end, setEnd] = useState(initValue.end);
+    const [ltns, setLtns] = useState<LtnsProps>({});
+    const [minDate, setMinDate] = useState<string>('');
 
     const showModal = () => {
-        setStart(initValue?.start || dayjs().format('YYYY-MM-DD'));
-        setEnd(initValue?.end || dayjs().add(10, 'day').format('YYYY-MM-DD'));
         setIsModalOpen(true);
     };
-    const handleOk = () => {
-        fresh({ start, end });
-        setIsModalOpen(false);
-    };
+
     const handleCancel = () => {
         setIsModalOpen(false);
     };
+
+    // 获取最小日期当天的数据
+    useEffect(() => {
+        if (isModalOpen) {
+            // 传递 useMinDate 标识，后端会返回最小日期当天的数据
+            LtnApi.list({ useMinDate: true }).then((data) => {
+                setLtns(data);
+                // 从所有数据中计算最小日期
+                let minDateValue: Date | null = null;
+                Object.keys(data).forEach((boxId) => {
+                    const boxData = data[boxId as LtnsType];
+                    if (Array.isArray(boxData)) {
+                        boxData.forEach((ltn: LtnDTO) => {
+                            if (ltn.solveTime) {
+                                const nextTime = new Date(
+                                    new Date(ltn.solveTime).getTime() +
+                                    ltn.customDuration * 24 * 60 * 60 * 1000
+                                );
+                                if (!minDateValue || nextTime < minDateValue) {
+                                    minDateValue = nextTime;
+                                }
+                            }
+                        });
+                    }
+                });
+                if (minDateValue !== null) {
+                    const dateStr = (minDateValue as Date).toISOString().split('T')[0];
+                    setMinDate(dateStr);
+                }
+            });
+        }
+    }, [isModalOpen]);
 
     return <>
         <FloatButton
@@ -38,10 +63,20 @@ export default function FilterBtn({ fresh, initValue }: FilterProps) {
             icon={<BgColorsOutlined />}
             onClick={showModal}
         />
-        <Modal title="过滤当前周期题目列表" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-            <div className="filter-form">
-                <Input placeholder="周期开始时间" value={start} onChange={(e) => { setStart(e.target.value) }} allowClear />
-                <Input placeholder="周期结束时间" value={end} onChange={(e) => { setEnd(e.target.value) }} />
+        <Modal
+            title={`过滤当前最小日期题目列表${minDate ? ` - ${minDate}` : ''}`}
+            open={isModalOpen}
+            footer={null}
+            onCancel={handleCancel}
+            width={'75%'}
+        >
+            <div className="ltn-wrapper">
+                {Object.keys(ltns).map((ltnType: LtnsType) => <div key={ltnType}>
+                    {!!ltns[ltnType].length && <div key={ltnType}>
+                        <h2 className="ltn-box">BOX{ltnType}</h2>
+                        <LtnList list={ltns[ltnType]} boxId={+ltnType} />
+                    </div>}
+                </div>)}
             </div>
         </Modal>
     </>

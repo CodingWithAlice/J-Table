@@ -14,27 +14,58 @@ export class LtnService {
   ) {}
 
   // 按照 boxId 分组
-  async findAll({ start, end }: ListAllEntities): Promise<any> {
+  async findAll({ start, end, useMinDate }: ListAllEntities): Promise<any> {
     const ltns = await this.ltnModel.findAll({ raw: true });
+    
+    let queryStart = start;
+    let queryEnd = end;
+    
+    // 只有在 useMinDate 为 true 时，才计算最小日期并查询当天数据
+    if (useMinDate && (!start || !end)) {
+      // 计算最小日期（所有 LTN 的下次做题时间中的最小值）
+      let minDate: Date | null = null;
+      ltns.forEach((ltn) => {
+        if (ltn.solveTime) {
+          const nextTime = new Date(
+            new Date(ltn.solveTime).getTime() +
+              ltn.customDuration * 24 * 60 * 60 * 1000,
+          );
+          if (!minDate || nextTime < minDate) {
+            minDate = nextTime;
+          }
+        }
+      });
+
+      // 如果没有找到最小日期，使用当前日期
+      if (!minDate) {
+        minDate = new Date();
+      }
+
+      const minDateStr = dayjs(minDate).format('YYYY-MM-DD');
+      queryStart = minDateStr;
+      queryEnd = minDateStr;
+    }
+    
     const data = ltns.reduce((pre, cur) => {
       const boxId = cur.boxId;
       if (!pre[boxId]) {
         pre[boxId] = [];
       }
       // 有时间筛选条件
-      if (start && end) {
+      if (queryStart && queryEnd) {
         if (cur.solveTime) {
           const time =
             new Date(cur.solveTime).getTime() +
             cur.customDuration * 24 * 60 * 60 * 1000;
           if (
-            time >= new Date(start).getTime() &&
-            time <= new Date(end).getTime()
+            time >= new Date(queryStart).getTime() &&
+            time <= new Date(queryEnd).getTime()
           ) {
             pre[boxId].push(cur);
           }
         }
       } else {
+        // 没有时间筛选条件，返回全量数据
         pre[boxId].push(cur);
       }
 
