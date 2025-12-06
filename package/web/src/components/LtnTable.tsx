@@ -37,19 +37,19 @@ export default function LtnTable() {
     const [tempParams, setTempParams] = useState<TimeProps>({});
 
     const init = useCallback((params?: TimeProps) => {
-        let options = { ...tempParams, ...params }
-        if (options?.start !== tempParams.start || options?.end !== tempParams.end) {
-            setTempParams({
-                start: options?.start,
-                end: options?.end
-            });
+        // 如果传入了参数，使用传入的参数；否则不传参数，后端返回全量数据
+        const queryParams = params;
+        
+        if (queryParams) {
+            setTempParams(queryParams);
         }
 
-        LtnApi.list(options).then((data) => {
+        // 不传参数时，后端返回全量数据
+        LtnApi.list(queryParams).then((data) => {
             setLtns(data);
             message.success('刷新成功');
         });
-    }, [tempParams])
+    }, [])
 
     useEffect(() => {
         init();
@@ -63,7 +63,7 @@ export default function LtnTable() {
             </div>}
         </div>)}
         {/* 过滤 */}
-        <FilterBtn fresh={init} initValue={tempParams} />
+        <FilterBtn />
         {/* 线轴 */}
         <TimeModalBtn />
          {/* 添加 */}
