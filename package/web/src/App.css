@@ -112,7 +112,9 @@
 }
 
 .ltn-grade-box {
-    width: 4rem;
+    min-width: 4rem;
+    white-space: nowrap;
+    vertical-align: middle;
 }
 
 .ltn-grade {
@@ -139,6 +141,8 @@
 
 .ltn-time {
     color: #510c4c;
+    white-space: nowrap;
+    margin: 0 8px;
 }
 
 .filter-form {
@@ -160,4 +164,12 @@
 
 .radio-group {
     margin: 10px 0;
+}
+
+.check-button {
+    margin: 0 0 0 10px;
+}
+.check-btn-wrap {
+    display: flex;
+    justify-content: flex-end;
 }
