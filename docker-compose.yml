@@ -1,5 +1,21 @@
-version: '3'
+version: '3.8'
 services:
+  # MongoDB 服务
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - /data/mongodb:/data/db
+    command: 
+      - --auth
+      - --bind_ip_all          # 允许所有 IP 连接
+      - --wiredTigerCacheSizeGB=1
+    networks:
+      - app-network
+
   nestjs-server:
     build:
       context: .
@@ -9,6 +25,11 @@ services:
     restart: always
     volumes:
       - ../config.env:/config.env
+    depends_on:
+      - mongodb  # 确保 MongoDB 先启动
+    networks:
+      - app-network
+
   react-client:
     build:
       context: .
@@ -17,4 +38,13 @@ services:
       - "4001:4001"
     restart: always
     volumes:
-      - ../config.env:/app/config.env  # 将宿主机上的 config.env 挂载到容器内的 /app/config.env
+      - ../config.env:/app/config.env
+    depends_on:
+      - nestjs-server  # 如果需要，可以添加这个依赖
+    networks:
+      - app-network
+
+# 自定义网络，让服务可以通过服务名相互访问
+networks:
+  app-network:
+    driver: bridge
