@@ -8,8 +8,9 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - /data/mongodb:/data/db  # 挂载现有数据
+      - /data/mongodb:/data/db
     command: 
+      - --auth
       - --bind_ip_all
     networks:
       - app-network
