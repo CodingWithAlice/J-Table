@@ -1,20 +1,5 @@
 version: '3.8'
 services:
-  # MongoDB 服务
-  mongodb:
-    image: mongo:6.0
-    container_name: mongodb
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-    volumes:
-      - /data/mongodb:/data/db
-    command: 
-      - --auth
-      - --bind_ip_all          # 允许所有 IP 连接
-      - --wiredTigerCacheSizeGB=1
-    networks:
-      - app-network
 
   nestjs-server:
     build:
