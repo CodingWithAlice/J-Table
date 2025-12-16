@@ -1,6 +1,5 @@
-version: '3.8'
+version: '3'
 services:
-
   nestjs-server:
     build:
       context: .
@@ -10,11 +9,6 @@ services:
     restart: always
     volumes:
       - ../config.env:/config.env
-    depends_on:
-      - mongodb  # 确保 MongoDB 先启动
-    networks:
-      - app-network
-
   react-client:
     build:
       context: .
@@ -23,13 +17,4 @@ services:
       - "4001:4001"
     restart: always
     volumes:
-      - ../config.env:/app/config.env
-    depends_on:
-      - nestjs-server  # 如果需要，可以添加这个依赖
-    networks:
-      - app-network
-
-# 自定义网络，让服务可以通过服务名相互访问
-networks:
-  app-network:
-    driver: bridge
+      - ../config.env:/app/config.env  # 将宿主机上的 config.env 挂载到容器内的 /app/config.env
