@@ -14,12 +14,13 @@ services:
       - --bind_ip_all          # 允许所有 IP 连接
       - --wiredTigerCacheSizeGB=1
     networks:
-      - app-network
+      - j-table-network  # 使用明确的网络名
 
   nestjs-server:
     build:
       context: .
       dockerfile: package/server/dockerfile
+    container_name: j-table-nestjs-server  # 明确指定容器名
     ports:
       - "4002:4002"
     restart: always
@@ -28,12 +29,17 @@ services:
     depends_on:
       - mongodb  # 确保 MongoDB 先启动
     networks:
-      - app-network
+      - j-table-network  # 使用相同的网络
+    # 添加 DNS 配置
+    dns:
+      - 8.8.8.8
+      - 114.114.114.114
 
   react-client:
     build:
       context: .
       dockerfile: package/web/dockerfile
+    container_name: j-table-react-client
     ports:
       - "4001:4001"
     restart: always
@@ -42,9 +48,10 @@ services:
     depends_on:
       - nestjs-server  # 如果需要，可以添加这个依赖
     networks:
-      - app-network
+      - j-table-network
 
-# 自定义网络，让服务可以通过服务名相互访问
+# 明确创建网络
 networks:
-  app-network:
+  j-table-network:
+    name: j-table-network
     driver: bridge
