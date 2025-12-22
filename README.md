@@ -90,3 +90,16 @@ sudo du -h --max-depth=1 /var/lib 2>/dev/null | sort -rh | head -20
 <!-- 关闭容器、镜像，删除不了文件内容，强制删除该文件，避免再耗时处理，已确认不会影响数据库 -->
 sudo rm -rf /var/lib/docker/overlay2
 ```
+
+重新启动 mongodb
+```
+sudo docker run -d --name mongodb \
+  -p 27017:27017 \
+  -v /data/mongodb:/data/db \
+  -e MONGO_INITDB_ROOT_USERNAME=admin \
+  -e MONGO_INITDB_ROOT_PASSWORD=admin123 \
+  mongo:6.0 \
+  --auth \
+  --bind_ip_all \
+  --wiredTigerCacheSizeGB=1
+```
