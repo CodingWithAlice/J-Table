@@ -153,7 +153,18 @@ export class LtnService {
   }
 
   async updateBoxId({ id, type, time }: CreateLtnDTO) {
-    const ltn = await this.findOne(+id);
+    // 兼容 NaN 和无效的 id 值，不抛出错误，只不执行后续操作
+    const numericId = +id;
+    if (isNaN(numericId) || numericId <= 0 || !Number.isInteger(numericId)) {
+      return { data: null };
+    }
+    
+    const ltn = await this.findOne(numericId);
+    // 没有找到记录，则不处理，直接返回
+    if (!ltn) {
+      return { data: null };
+    }
+    
     if (type === 'degrade' || type === 'fresh') {
       ltn.boxId = 1; // 1 代表做错了
     } else {

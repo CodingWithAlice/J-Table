@@ -64,3 +64,42 @@ sudo /usr/local/bin/docker-compose logs -f nestjs-server
 ```js
 sudo /usr/local/bin/docker-compose logs -f nestjs-server 
 ```
+
+### 2025.12.14 mongodb 异常处理
+```
+<!-- 按盘查看 -->
+lsblk
+<!-- 检查 inode 使用情况 -->
+df -i
+<!-- 查看磁盘分配空间 -> 可以看到 /dev/vda3 快满了，由于/dev/vda3 是根分区（/），里面包含了整个操作系统和所有文件。不能随意删除，需要小心操作 -->
+df -h
+devtmpfs        1.8G     0  1.8G   0% /dev
+tmpfs           1.8G     0  1.8G   0% /dev/shm
+tmpfs           1.8G  884K  1.8G   1% /run
+tmpfs           1.8G     0  1.8G   0% /sys/fs/cgroup
+/dev/vda3        40G   38G     0 100% /
+/dev/vda2       200M  5.8M  194M   3% /boot/efi
+/dev/vdb1        40G  3.9G   34G  11% /test
+tmpfs           357M     0  357M   0% /run/user/1000
+<!-- 查看根目录 / 下最大文件 -> 查出来 /var 下面33G了 -->
+sudo du -h --max-depth=1 / 2>/dev/null | sort -rh | head -20
+<!-- 查看根目录 /var 下最大文件 -> 查出来 /var/lib 下面 32G，这个文件下面：MySQL 数据/Docker 数据/包管理器数据 -->
+sudo du -h --max-depth=1 /var 2>/dev/null | sort -rh | head -20
+<!-- 查看根目录 /var/lib 下最大文件 -> /var/lib/docker 下面 32G -> /var/lib/docker/overlay2 该文件里面存了所有的 Docker 镜像和容器数据 -->
+sudo du -h --max-depth=1 /var/lib 2>/dev/null | sort -rh | head -20
+<!-- 关闭容器、镜像，删除不了文件内容，强制删除该文件，避免再耗时处理，已确认不会影响数据库 -->
+sudo rm -rf /var/lib/docker/overlay2
+```
+
+重新启动 mongodb
+```
+sudo docker run -d --name mongodb \
+  -p 27017:27017 \
+  -v /data/mongodb:/data/db \
+  -e MONGO_INITDB_ROOT_USERNAME=admin \
+  -e MONGO_INITDB_ROOT_PASSWORD=admin123 \
+  mongo:6.0 \
+  --auth \
+  --bind_ip_all \
+  --wiredTigerCacheSizeGB=1
+```
