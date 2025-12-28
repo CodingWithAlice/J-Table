@@ -7,6 +7,34 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 防止移动端输入框聚焦时自动放大 */
+input,
+textarea,
+select {
+  font-size: 16px !important;
+}
+
+/* 针对 Ant Design 的输入框组件 */
+.ant-input,
+.ant-input-number-input,
+.ant-select-selector,
+.ant-picker-input > input {
+  font-size: 16px !important;
+}
+
+/* 针对移动端的特殊处理 */
+@media screen and (max-width: 768px) {
+  input,
+  textarea,
+  select,
+  .ant-input,
+  .ant-input-number-input,
+  .ant-select-selector,
+  .ant-picker-input > input {
+    font-size: 16px !important;
+  }
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

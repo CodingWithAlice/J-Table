@@ -44,7 +44,7 @@ export default function DoitSecondBtn() {
             onOk={() => changeModalShow(false)}
             onCancel={() => changeModalShow(false)}
         >
-            <LtnList list={list} boxId={0} lastStatus={true} />
+            <LtnList list={list} boxId={0} lastStatus={true} fresh={initTodayRecord} />
         </Modal>
     </>
 }

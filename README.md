@@ -91,7 +91,7 @@ sudo du -h --max-depth=1 /var/lib 2>/dev/null | sort -rh | head -20
 sudo rm -rf /var/lib/docker/overlay2
 ```
 
-重新启动 mongodb
+服务器重新启动 mongodb
 ```
 sudo docker run -d --name mongodb \
   -p 27017:27017 \
@@ -102,4 +102,9 @@ sudo docker run -d --name mongodb \
   --auth \
   --bind_ip_all \
   --wiredTigerCacheSizeGB=1
+```
+
+本地启动mongodb测试
+```
+mongod --dbpath /usr/local/var/mongodb --logpath /usr/local/var/log/mongodb/mongo.log --fork
 ```
