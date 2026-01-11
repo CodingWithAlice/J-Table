@@ -5,6 +5,7 @@ export class CreateLtnDTO {
 }
 
 export class ListAllEntities {
-  start: string;
-  end: string;
+  start?: string;
+  end?: string;
+  useMinDate?: boolean; // 是否使用最小日期查询
 }

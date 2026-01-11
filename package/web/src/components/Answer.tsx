@@ -11,10 +11,11 @@ interface AnswerProps {
     topicId: number,
     closeModal: () => void,
     title: string,
-    lastStatus?: boolean
+    lastStatus?: boolean,
+    fresh?: () => void
 }
 
-export default function Answer({ placeholder, topicId, closeModal, title, lastStatus }: AnswerProps) {
+export default function Answer({ placeholder, topicId, closeModal, title, lastStatus, fresh }: AnswerProps) {
     const [form] = Form.useForm();
     const [record, setRecord] = useState<RecordDTO>();
     const [historyRecords, setHistoryRecords] = useState([]);
@@ -45,7 +46,9 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
             RecordApi.update(data).then(res => {
                 message.success(needAI ? '查询成功' : '提交成功');
                 setShowRightAnswer(true);
-                setShowAILoading(false)
+                setShowAILoading(false);
+                // 重新查询 api/ltn 更新界面数据
+                fresh?.();
             }).catch(e => {
                 if (e instanceof Error) {
                     message.error(e.message);

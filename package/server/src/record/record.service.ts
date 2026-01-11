@@ -89,11 +89,8 @@ export class RecordsService {
 
   // 查询隔天重做的记录
   async findLastWrong() {
-    // 1、聚合查询：按topicId分组，只保留每组最新的错误记录
+    // 1、聚合查询：先找到每个topicId的最新记录，再筛选出错误记录
     const incorrectRecords = await this.recordModel.aggregate([
-      {
-        $match: { isCorrect: false }, // 只筛选错误答案
-      },
       {
         $sort: { submitTime: -1 }, // 按提交时间倒序
       },
@@ -105,6 +102,9 @@ export class RecordsService {
       },
       {
         $replaceRoot: { newRoot: '$latestRecord' }, // 展开为完整文档
+      },
+      {
+        $match: { isCorrect: false }, // 筛选出最新记录中仍然是错误的题目
       },
       {
         $project: { _id: 0 }, // 排除MongoDB默认_id
