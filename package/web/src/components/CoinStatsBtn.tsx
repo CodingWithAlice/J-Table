@@ -1,8 +1,9 @@
 import { DollarOutlined } from "@ant-design/icons";
 import { FloatButton, Modal, Statistic, List, Tag } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { CoinApi } from "../apis/coin";
 import dayjs from "dayjs";
+import { coinEventEmitter, COIN_CHANGED_EVENT } from "../utils/coinEvent";
 
 export default function CoinStatsBtn() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,24 +18,40 @@ export default function CoinStatsBtn() {
         setIsModalOpen(false);
     };
 
-    const loadData = () => {
+    const loadTotalCoins = useCallback(() => {
         // 加载总金币数
         CoinApi.getTotal().then((res) => {
             setTotalCoins(res || 0);
         });
+    }, []);
+
+    const loadData = useCallback(() => {
+        // 加载总金币数
+        loadTotalCoins();
 
         // 加载趋势数据（最近30天）
         CoinApi.getTrend(30).then((res) => {
             setTrendData(res || []);
         });
-    };
+    }, [loadTotalCoins]);
 
     useEffect(() => {
         // 初始化加载总金币数
-        CoinApi.getTotal().then((res) => {
-            setTotalCoins(res || 0);
-        });
-    }, []);
+        loadTotalCoins();
+
+        // 监听金币变更事件
+        const handleCoinChanged = () => {
+            // 只刷新总金币数，不刷新趋势数据（除非弹窗打开）
+            loadTotalCoins();
+        };
+
+        coinEventEmitter.on(COIN_CHANGED_EVENT, handleCoinChanged);
+
+        // 清理监听器
+        return () => {
+            coinEventEmitter.off(COIN_CHANGED_EVENT, handleCoinChanged);
+        };
+    }, [loadTotalCoins]);
 
     useEffect(() => {
         if (isModalOpen) {

@@ -48,7 +48,6 @@ export default function LtnTable() {
         // 不传参数时，后端返回全量数据
         LtnApi.list(queryParams).then((data) => {
             setLtns(data);
-            message.success('刷新成功');
         });
     }, [])
 

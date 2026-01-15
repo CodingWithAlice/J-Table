@@ -147,8 +147,12 @@ export class RecordsService {
     // 2、存储错误记录 wrongNotes
     await this.answersService.updateAnswer(dto);
 
+    // 判断是否是真实做完题（有 durationSec 和 isCorrect）
+    const isRealSubmit = dto?.isCorrect !== undefined && dto?.durationSec !== undefined;
+
     // 3、操作做题后的升降(隔天重做时不操作、修改做题记录时不操作-避免重复操作)
-    if (dto?.solveTime !== dto.submitTime && !dto?.lastStatus) {
+    // 只有在真实做完题时才操作升降
+    if (isRealSubmit && dto?.solveTime !== dto.submitTime && !dto?.lastStatus) {
       await this.ltnService.updateBoxId({
         id: dto.topicId,
         type: dto?.isCorrect ? 'update' : 'degrade', // boxId 的升降
@@ -156,9 +160,9 @@ export class RecordsService {
       });
     }
 
-    // 4、计算并添加金币
+    // 4、计算并添加金币（只有在真实做完题时才给金币）
     let coinAdded = false;
-    try {
+    if (isRealSubmit) {
       const ltn = await this.ltnService.findOne(dto.topicId);
       if (ltn) {
         const boxId = ltn.boxId;
@@ -186,12 +190,10 @@ export class RecordsService {
           coinAdded = true;
         }
       }
-    } catch (error) {
-      // 金币记录失败不应影响主流程
-      console.error('金币记录失败:', error);
     }
 
     // 返回更新后的文档（兼容原有逻辑）
-    return { data: result, coinAdded };
+    // 将 coinAdded 放在 data 内部，确保前端能正确获取
+    return { data: { ...result, coinAdded } };
   }
 }

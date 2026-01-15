@@ -2,6 +2,7 @@ import { HeartTwoTone } from "@ant-design/icons";
 import { Button, Form, Input, message } from "antd";
 import { useEffect, useState } from "react";
 import { AnswerApi } from "../apis/answer";
+import { coinEventEmitter, COIN_CHANGED_EVENT } from "../utils/coinEvent";
 
 const { TextArea } = Input;
 
@@ -21,7 +22,14 @@ export default function RightAnswer({ placeholder, topicId, title, closeModal }:
             wrongNotes: ''
         }
         AnswerApi.update(data).then(res => {
-            message.success(isNew ? '添加成功' : '修改成功');
+            // 合并提示信息
+            if (res?.coinAdded) {
+                message.success(isNew ? '添加成功，金币 +1 👏🏻' : '修改成功，金币 +1 👏🏻');
+                // 触发金币变更事件
+                coinEventEmitter.emit(COIN_CHANGED_EVENT);
+            } else {
+                message.success(isNew ? '添加成功' : '修改成功');
+            }
             isNew && setIsNew(false);
             closeModal();
         }).catch(e => {

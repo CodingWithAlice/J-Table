@@ -12,6 +12,7 @@ export class LtnService {
     @InjectModel(Ltn)
     private ltnModel: typeof Ltn,
     private readonly levelService: LevelService,
+    private readonly coinService: CoinService,
   ) {}
 
   // 按照 boxId 分组
@@ -85,7 +86,6 @@ export class LtnService {
 
     const dataByDate = getDataByDate(data);
 
-    console.log('过滤后的数据data 按时间和 LTN 分类', totalArr, dataByDate);
     return { totalArr, dataByDate };
 
     function getDataByLtns(data) {
@@ -188,16 +188,12 @@ export class LtnService {
     });
 
     // 添加题目成功后，给金币
-    let coinAdded = false;
-    try {
-      const today = dayjs().format('YYYY-MM-DD');
-      await this.coinService.addCoins(today, 1);
-      coinAdded = true;
-    } catch (error) {
-      console.error('金币记录失败:', error);
-    }
+    const today = dayjs().format('YYYY-MM-DD');
+    await this.coinService.addCoins(today, 1);
+    const coinAdded = true;
 
-    return { data: newLtn, levels, levelId, coinAdded };
+    // 将 coinAdded 放在 data 内部，确保前端能正确获取
+    return { data: { ...newLtn, levels, levelId, coinAdded } };
   }
 
   findOne(id: number): Promise<Ltn> {

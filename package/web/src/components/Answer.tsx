@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { RecordApi, type RecordDTO } from "../apis/record";
 import dayjs from "dayjs";
 import { AIApi } from "../apis/ai";
+import { coinEventEmitter, COIN_CHANGED_EVENT } from "../utils/coinEvent";
 
 const { TextArea } = Input;
 interface AnswerProps {
@@ -43,15 +44,25 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                 message.error('请填写必填项');
                 return;
             }
+            
+            // 判断是否是真实做完题（有 durationSec 和 isCorrect）
+            const isRealSubmit = data?.isCorrect !== undefined && data?.durationSec !== undefined;
+            
             RecordApi.update(data).then(res => {
-                message.success(needAI ? '查询成功' : '提交成功');
+                // 合并提示信息
                 if (res?.coinAdded) {
-                    message.success('金币 +1 👏🏻');
+                    message.success(needAI ? '查询成功，金币 +1 👏🏻' : '提交成功，金币 +1 👏🏻');
+                    // 触发金币变更事件
+                    coinEventEmitter.emit(COIN_CHANGED_EVENT);
+                } else {
+                    message.success(needAI ? '查询成功' : '提交成功');
                 }
                 setShowRightAnswer(true);
                 setShowAILoading(false);
-                // 重新查询 api/ltn 更新界面数据
-                fresh?.();
+                // 只有在真实做完题时才刷新 api/ltn 更新界面数据
+                if (isRealSubmit) {
+                    fresh?.();
+                }
             }).catch(e => {
                 if (e instanceof Error) {
                     message.error(e.message);
