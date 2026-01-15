@@ -45,6 +45,9 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
             }
             RecordApi.update(data).then(res => {
                 message.success(needAI ? '查询成功' : '提交成功');
+                if (res?.coinAdded) {
+                    message.success('金币 +1 👏🏻');
+                }
                 setShowRightAnswer(true);
                 setShowAILoading(false);
                 // 重新查询 api/ltn 更新界面数据

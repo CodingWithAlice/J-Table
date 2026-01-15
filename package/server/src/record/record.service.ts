@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { Record } from './record.schema';
 import dayjs from 'dayjs';
 import { AnswersService } from 'src/answer/answer.service';
+import { CoinService } from 'src/coin/coin.service';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
@@ -26,6 +27,7 @@ export class RecordsService {
     private recordModel: Model<Record>,
     private readonly ltnService: LtnService,
     private readonly answersService: AnswersService,
+    private readonly coinService: CoinService,
   ) {}
 
   async create(record: Partial<Record>) {
@@ -153,7 +155,43 @@ export class RecordsService {
         time: dto.submitTime,
       });
     }
+
+    // 4、计算并添加金币
+    let coinAdded = false;
+    try {
+      const ltn = await this.ltnService.findOne(dto.topicId);
+      if (ltn) {
+        const boxId = ltn.boxId;
+        let coins = 0;
+
+        // box1 初次做题：2 金币
+        if (
+          dto?.solveTime !== dto.submitTime &&
+          !dto?.lastStatus &&
+          boxId === 1
+        ) {
+          coins = 2;
+        }
+        // box1 隔天重做：1 金币
+        else if (dto?.lastStatus === true && boxId === 1) {
+          coins = 1;
+        }
+        // 其他 box 做题：1 金币
+        else if (boxId >= 2 && boxId <= 6) {
+          coins = 1;
+        }
+
+        if (coins > 0) {
+          await this.coinService.addCoins(dto.submitTime, coins);
+          coinAdded = true;
+        }
+      }
+    } catch (error) {
+      // 金币记录失败不应影响主流程
+      console.error('金币记录失败:', error);
+    }
+
     // 返回更新后的文档（兼容原有逻辑）
-    return { data: result };
+    return { data: result, coinAdded };
   }
 }

@@ -29,7 +29,10 @@ export default function AddLtnBtn({ fresh }: { fresh: () => void }) {
             message.error('请输入题目！');
             return
         }
-        LtnApi.add(data).then(() => {
+        LtnApi.add(data).then((res) => {
+            if (res?.coinAdded) {
+                message.success('金币 +1 👏🏻');
+            }
             fresh();
         }).catch(e => {
             if (e instanceof Error) {

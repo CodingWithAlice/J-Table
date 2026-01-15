@@ -8,6 +8,7 @@ import { message } from "antd";
 import { useSearchParams } from "react-router-dom";
 import TodayRecordBtn from "./TodayRecordBtn";
 import DoitSecondBtn from "./DoitSecondBtn";
+import CoinStatsBtn from "./CoinStatsBtn";
 
 export interface TimeProps {
     start?: string,
@@ -72,5 +73,7 @@ export default function LtnTable() {
         <TodayRecordBtn />
         {/* 隔天重做 */}
         <DoitSecondBtn />
+        {/* 金币统计 */}
+        <CoinStatsBtn />
     </div>
 }

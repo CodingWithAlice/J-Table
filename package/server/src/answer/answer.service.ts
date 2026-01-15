@@ -2,12 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Answer } from './answer.schema';
+import { CoinService } from 'src/coin/coin.service';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class AnswersService {
   constructor(
     @InjectModel(Answer.name)
     private answerModel: Model<Answer>,
+    private readonly coinService: CoinService,
   ) {}
 
   async create(answer: Partial<Answer>) {
@@ -29,7 +32,41 @@ export class AnswersService {
     topicId: number;
     topicTitle?: string;
   }) {
-    return this.answerModel
+    // 先查询现有的答案记录
+    const existingAnswer = await this.answerModel
+      .findOne({ topicId: dto.topicId })
+      .lean();
+
+    let coinAdded = false;
+
+    // 判断是否当天第一次修改
+    if (existingAnswer && existingAnswer.updatedAt) {
+      const lastUpdatedDate = dayjs(existingAnswer.updatedAt).format(
+        'YYYY-MM-DD',
+      );
+      const today = dayjs().format('YYYY-MM-DD');
+
+      // 如果上次更新日期与今天不同，则给金币
+      if (lastUpdatedDate !== today) {
+        try {
+          await this.coinService.addCoins(today, 1);
+          coinAdded = true;
+        } catch (error) {
+          console.error('金币记录失败:', error);
+        }
+      }
+    } else {
+      // 不存在记录，说明是新建，给金币
+      try {
+        const today = dayjs().format('YYYY-MM-DD');
+        await this.coinService.addCoins(today, 1);
+        coinAdded = true;
+      } catch (error) {
+        console.error('金币记录失败:', error);
+      }
+    }
+
+    const result = await this.answerModel
       .findOneAndUpdate(
         { topicId: dto.topicId },
         {
@@ -47,5 +84,7 @@ export class AnswersService {
         },
       )
       .exec();
+
+    return { data: result, coinAdded };
   }
 }

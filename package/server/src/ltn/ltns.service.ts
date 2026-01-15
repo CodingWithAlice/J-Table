@@ -4,6 +4,7 @@ import { Ltn } from '../models/ltn.model';
 import dayjs from 'dayjs';
 import { CreateLtnDTO, ListAllEntities } from './create-ltn.dto';
 import { LevelService } from 'src/level/levels.service';
+import { CoinService } from 'src/coin/coin.service';
 
 @Injectable()
 export class LtnService {
@@ -185,7 +186,18 @@ export class LtnService {
       ...data,
       customDuration: level.basicDuration,
     });
-    return { data: newLtn, levels, levelId };
+
+    // 添加题目成功后，给金币
+    let coinAdded = false;
+    try {
+      const today = dayjs().format('YYYY-MM-DD');
+      await this.coinService.addCoins(today, 1);
+      coinAdded = true;
+    } catch (error) {
+      console.error('金币记录失败:', error);
+    }
+
+    return { data: newLtn, levels, levelId, coinAdded };
   }
 
   findOne(id: number): Promise<Ltn> {
