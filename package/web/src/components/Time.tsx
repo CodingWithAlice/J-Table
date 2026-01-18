@@ -122,7 +122,7 @@ export default function Time({ params, timeData }: TimeProps) {
     }, [items, params?.type])
 
     const addLabel = (arr: ItemProps[]) => {
-        return arr.map(it => ({ ...it, label: it.date }))
+        return arr.map(it => ({ ...it, label: dayjs(it.date).format('YYYY-MM') }))
     }
     const removeLabel = (arr: TimeDTO[]) => {
         return arr.map(it => { delete it.label; return it })
@@ -142,8 +142,9 @@ export default function Time({ params, timeData }: TimeProps) {
         return times.map((time) => {
             let dotType = time.routineType as keyof typeof dotList;
             let children = getText(dotType, time.des);
+            const dateStr = dayjs(time.date).format('YYYY-MM');
             if (dotType === 'LTN') {
-                children = transLtnText(time.date, dotType, time.serialNumber, time.des, time.duration);
+                children = transLtnText(dateStr, dotType, time.serialNumber, time.des, time.duration);
             }
             return {
                 children,
