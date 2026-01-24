@@ -58,14 +58,19 @@ export class RecordsService {
       .lean();
 
     const rightAnswer = await this.answersService.findOne({ topicId });
+    // 如果已经有 recentAnswer，应该允许显示正确答案区域
+    const hasRecentAnswer = latestRecord?.recentAnswer && latestRecord.recentAnswer.trim() !== '';
+    const finalShowRightAnswer = showRightAnswer || hasRecentAnswer;
+    
     return {
       data: {
-        showRightAnswer,
+        showRightAnswer: finalShowRightAnswer,
         record: {
           ...(latestRecord || {}),
           ...rightAnswer.data,
           solveTime,
-          recentAnswer: showRightAnswer ? latestRecord.recentAnswer : '',
+          // 如果已经有 recentAnswer，保留它；否则根据 showRightAnswer 决定
+          recentAnswer: latestRecord?.recentAnswer || '',
         },
         historyRecords: historyRecords.map((item) => {
           const durationSec = item?.durationSec;

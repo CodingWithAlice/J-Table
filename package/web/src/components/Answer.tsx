@@ -89,8 +89,11 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
     // 初始化
     useEffect(() => {
         RecordApi.list(topicId).then((res) => {
-            setShowRightAnswer(res?.showRightAnswer);
-            setShowAILoading(!res?.showRightAnswer)
+            // 如果已经有 recentAnswer，应该显示正确答案区域
+            const hasRecentAnswer = res?.record?.recentAnswer && res.record.recentAnswer.trim() !== '';
+            const shouldShowRightAnswer = res?.showRightAnswer || hasRecentAnswer;
+            setShowRightAnswer(shouldShowRightAnswer);
+            setShowAILoading(!shouldShowRightAnswer)
             setHistoryRecords(res?.historyRecords || []);
             form.setFieldsValue(res?.record); // 动态填充表单
             if (res) {
