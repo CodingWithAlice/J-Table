@@ -142,7 +142,7 @@ export default function Time({ params, timeData }: TimeProps) {
         return times.map((time) => {
             let dotType = time.routineType as keyof typeof dotList;
             let children = getText(dotType, time.des);
-            const dateStr = dayjs(time.date).format('YYYY-MM');
+            const dateStr = dayjs(time.date).format('YYYY年MM月');
             if (dotType === 'LTN') {
                 children = transLtnText(dateStr, dotType, time.serialNumber, time.des, time.duration);
             }

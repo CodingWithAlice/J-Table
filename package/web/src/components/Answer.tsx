@@ -5,6 +5,8 @@ import { RecordApi, type RecordDTO } from "../apis/record";
 import dayjs from "dayjs";
 import { AIApi } from "../apis/ai";
 import { coinEventEmitter, COIN_CHANGED_EVENT } from "../utils/coinEvent";
+import { renderTextWithLinks } from "../utils/utils";
+import React from "react";
 
 const { TextArea } = Input;
 interface AnswerProps {
@@ -111,15 +113,24 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
         </Form.Item>
         {showRightAnswer && (<>
             <Form.Item name="rightAnswer" label="正确答案">
-                <TextArea
-                    key="answer"
-                    placeholder={placeholder}
-                    style={{
-                        resize: 'both',
+                <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues?.rightAnswer !== currentValues?.rightAnswer}>
+                    {({ getFieldValue }) => {
+                        const rightAnswer = getFieldValue('rightAnswer');
+                        return (
+                            <div style={{
+                                padding: '4px 11px',
+                                minHeight: '32px',
+                                border: '1px solid #d9d9d9',
+                                borderRadius: '6px',
+                                backgroundColor: '#f5f5f5',
+                                wordBreak: 'break-word',
+                                whiteSpace: 'pre-wrap'
+                            }}>
+                                {renderTextWithLinks(rightAnswer, title) || <span style={{ color: '#bfbfbf' }}>{placeholder}</span>}
+                            </div>
+                        );
                     }}
-                    disabled
-                    autoSize={{ minRows: 1 }}
-                />
+                </Form.Item>
             </Form.Item>
             <Form.Item name="AI_suggest" label="AI 判定">
                 {(showRightAnswer && showAILoading) 
