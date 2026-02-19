@@ -1,9 +1,9 @@
 import { DollarOutlined } from "@ant-design/icons";
-import { FloatButton, Modal, Statistic, List, Tag } from "antd";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { FloatButton } from "antd";
+import { useEffect, useState, useCallback } from "react";
 import { CoinApi } from "../apis/coin";
-import dayjs from "dayjs";
 import { coinEventEmitter, COIN_CHANGED_EVENT } from "../utils/coinEvent";
+import CoinStatsModal from "./CoinStatsModal";
 
 export default function CoinStatsBtn() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -70,33 +70,12 @@ export default function CoinStatsBtn() {
             icon={<DollarOutlined />}
             onClick={showModal}
         />
-        <Modal
-            title="金币统计"
+        <CoinStatsModal
             open={isModalOpen}
-            footer={null}
             onCancel={handleCancel}
-            width={600}
-        >
-            <Statistic
-                title="总金币数"
-                value={totalCoins}
-                valueStyle={{ fontSize: '32px', fontWeight: 'bold', color: '#1890ff' }}
-            />
-            <div style={{ marginTop: 24 }}>
-                <h3>最近30天趋势</h3>
-                <List
-                    dataSource={trendData}
-                    renderItem={(item) => (
-                        <List.Item>
-                            <List.Item.Meta
-                                title={item.date}
-                                description={<Tag color="gold">{item.coins} 金币</Tag>}
-                            />
-                        </List.Item>
-                    )}
-                />
-            </div>
-        </Modal>
+            totalCoins={totalCoins}
+            trendData={trendData}
+        />
     </>
 }
 
