@@ -18,6 +18,26 @@ interface AnswerProps {
     fresh?: () => void
 }
 
+type CompareLayout = 'vertical' | 'horizontal';
+const ANSWER_COMPARE_LAYOUT_KEY = 'jtable_answer_compare_layout';
+
+function safeReadLayout(): CompareLayout {
+    try {
+        const v = localStorage.getItem(ANSWER_COMPARE_LAYOUT_KEY);
+        return v === 'horizontal' ? 'horizontal' : 'vertical';
+    } catch {
+        return 'vertical';
+    }
+}
+
+function safeWriteLayout(layout: CompareLayout) {
+    try {
+        localStorage.setItem(ANSWER_COMPARE_LAYOUT_KEY, layout);
+    } catch {
+        // ignore
+    }
+}
+
 function shouldCollapseText(text: unknown, opts?: { maxChars?: number; maxLines?: number }) {
     const str = typeof text === 'string' ? text : '';
     const maxChars = opts?.maxChars ?? 220;
@@ -77,6 +97,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
     const [historyRecords, setHistoryRecords] = useState([]);
     const [showRightAnswer, setShowRightAnswer] = useState(false);
     const [showAILoading, setShowAILoading] = useState(true);
+    const [compareLayout, setCompareLayout] = useState<CompareLayout>(() => safeReadLayout());
     const colors = ["magenta", "red", "volcano", "orange", "gold", "lime", "green", "cyan", "blue", "purple"];
     // 检验、提交
     const handleCheck = (needAI: boolean) => {
@@ -153,36 +174,95 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                 setRecord({ ...res.record, topicId });
             }
         })
-    }, [topicId])
+    }, [topicId, form])
 
     return <Form form={form}>
-        {/* 填写答案 */}
-        <Form.Item name="recentAnswer" label="填写答案">
-            <TextArea
-                key="answer"
-                placeholder={placeholder}
-                style={{
-                    resize: 'both',
-                }}
-                autoSize={{ minRows: 1 }}
-            />
-        </Form.Item>
-        {showRightAnswer && (<>
-            <Form.Item name="rightAnswer" label="正确答案">
-                <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues?.rightAnswer !== currentValues?.rightAnswer}>
-                    {({ getFieldValue }) => {
-                        const rightAnswer = getFieldValue('rightAnswer');
-                        return (
-                            <CollapsibleBlock
-                                value={rightAnswer}
-                                placeholder={<span style={{ color: '#bfbfbf' }}>{placeholder}</span>}
-                                render={(t) => renderTextWithLinks(t, title)}
-                                maxPreviewLines={6}
-                            />
-                        );
+        {showRightAnswer && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+                <Radio.Group
+                    size="small"
+                    value={compareLayout}
+                    optionType="button"
+                    buttonStyle="solid"
+                    onChange={(e) => {
+                        const next = (e.target?.value ?? 'vertical') as CompareLayout;
+                        setCompareLayout(next);
+                        safeWriteLayout(next);
                     }}
+                    options={[
+                        { label: '上下', value: 'vertical' },
+                        { label: '左右', value: 'horizontal' },
+                    ]}
+                />
+            </div>
+        )}
+
+        {/* 填写答案 + 正确答案（可切换上下/左右） */}
+        {showRightAnswer && compareLayout === 'horizontal' ? (
+            <Flex gap={12} align="start" style={{ width: '100%' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                    <Form.Item name="recentAnswer" label="填写答案">
+                        <TextArea
+                            key="answer"
+                            placeholder={placeholder}
+                            style={{
+                                resize: 'both',
+                            }}
+                            autoSize={{ minRows: 1 }}
+                        />
+                    </Form.Item>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                    <Form.Item name="rightAnswer" label="正确答案">
+                        <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues?.rightAnswer !== currentValues?.rightAnswer}>
+                            {({ getFieldValue }) => {
+                                const rightAnswer = getFieldValue('rightAnswer');
+                                return (
+                                    <CollapsibleBlock
+                                        value={rightAnswer}
+                                        placeholder={<span style={{ color: '#bfbfbf' }}>{placeholder}</span>}
+                                        render={(t) => renderTextWithLinks(t, title)}
+                                        maxPreviewLines={6}
+                                    />
+                                );
+                            }}
+                        </Form.Item>
+                    </Form.Item>
+                </div>
+            </Flex>
+        ) : (
+            <>
+                <Form.Item name="recentAnswer" label="填写答案">
+                    <TextArea
+                        key="answer"
+                        placeholder={placeholder}
+                        style={{
+                            resize: 'both',
+                        }}
+                        autoSize={{ minRows: 1 }}
+                    />
                 </Form.Item>
-            </Form.Item>
+                {showRightAnswer && (
+                    <Form.Item name="rightAnswer" label="正确答案">
+                        <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues?.rightAnswer !== currentValues?.rightAnswer}>
+                            {({ getFieldValue }) => {
+                                const rightAnswer = getFieldValue('rightAnswer');
+                                return (
+                                    <CollapsibleBlock
+                                        value={rightAnswer}
+                                        placeholder={<span style={{ color: '#bfbfbf' }}>{placeholder}</span>}
+                                        render={(t) => renderTextWithLinks(t, title)}
+                                        maxPreviewLines={6}
+                                    />
+                                );
+                            }}
+                        </Form.Item>
+                    </Form.Item>
+                )}
+            </>
+        )}
+
+        {showRightAnswer && (<>
             <Form.Item name="AI_suggest" label="AI 判定">
                 {(showRightAnswer && showAILoading) 
                 ?  <LoadingOutlined /> 
