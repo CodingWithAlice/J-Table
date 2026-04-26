@@ -1,6 +1,6 @@
 import { CheckSquareOutlined, FontColorsOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Radio, Flex, Tag } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { RecordApi, type RecordDTO } from "../apis/record";
 import dayjs from "dayjs";
 import { AIApi } from "../apis/ai";
@@ -16,6 +16,59 @@ interface AnswerProps {
     title: string,
     lastStatus?: boolean,
     fresh?: () => void
+}
+
+function shouldCollapseText(text: unknown, opts?: { maxChars?: number; maxLines?: number }) {
+    const str = typeof text === 'string' ? text : '';
+    const maxChars = opts?.maxChars ?? 220;
+    const maxLines = opts?.maxLines ?? 6;
+    const lineCount = str ? str.split(/\r?\n/).length : 0;
+    return str.length > maxChars || lineCount > maxLines;
+}
+
+function CollapsibleBlock({
+    value,
+    placeholder,
+    render,
+    maxPreviewLines = 6,
+}: {
+    value?: unknown;
+    placeholder?: React.ReactNode;
+    render?: (text: string) => React.ReactNode;
+    maxPreviewLines?: number;
+}) {
+    const text = typeof value === 'string' ? value : '';
+    const [expanded, setExpanded] = useState(false);
+    const needCollapse = useMemo(() => shouldCollapseText(text, { maxLines: maxPreviewLines }), [text, maxPreviewLines]);
+
+    return (
+        <div>
+            <div
+                style={{
+                    padding: '4px 11px',
+                    minHeight: '32px',
+                    border: '1px solid #d9d9d9',
+                    borderRadius: '6px',
+                    backgroundColor: '#f5f5f5',
+                    wordBreak: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    overflow: 'hidden',
+                    maxHeight: !needCollapse || expanded ? undefined : `${maxPreviewLines * 1.6}em`,
+                }}
+            >
+                {text
+                    ? (render ? render(text) : text)
+                    : (placeholder ?? <span style={{ color: '#bfbfbf' }}>暂无内容</span>)}
+            </div>
+            {needCollapse && (
+                <div style={{ marginTop: 6, textAlign: 'right' }}>
+                    <Button type="link" size="small" onClick={() => setExpanded(v => !v)} style={{ padding: 0, height: 'auto' }}>
+                        {expanded ? '收起' : '展开'}
+                    </Button>
+                </div>
+            )}
+        </div>
+    );
 }
 
 export default function Answer({ placeholder, topicId, closeModal, title, lastStatus, fresh }: AnswerProps) {
@@ -120,17 +173,12 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                     {({ getFieldValue }) => {
                         const rightAnswer = getFieldValue('rightAnswer');
                         return (
-                            <div style={{
-                                padding: '4px 11px',
-                                minHeight: '32px',
-                                border: '1px solid #d9d9d9',
-                                borderRadius: '6px',
-                                backgroundColor: '#f5f5f5',
-                                wordBreak: 'break-word',
-                                whiteSpace: 'pre-wrap'
-                            }}>
-                                {renderTextWithLinks(rightAnswer, title) || <span style={{ color: '#bfbfbf' }}>{placeholder}</span>}
-                            </div>
+                            <CollapsibleBlock
+                                value={rightAnswer}
+                                placeholder={<span style={{ color: '#bfbfbf' }}>{placeholder}</span>}
+                                render={(t) => renderTextWithLinks(t, title)}
+                                maxPreviewLines={6}
+                            />
                         );
                     }}
                 </Form.Item>
@@ -138,15 +186,17 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
             <Form.Item name="AI_suggest" label="AI 判定">
                 {(showRightAnswer && showAILoading) 
                 ?  <LoadingOutlined /> 
-                : <TextArea
-                    key="AI_suggest"
-                    placeholder="点击下方「校验」进行 AI 判题"
-                    style={{
-                        resize: 'both',
-                    }}
-                    disabled
-                    autoSize={{ minRows: 1 }}
-                />}
+                : (
+                    <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues?.AI_suggest !== currentValues?.AI_suggest}>
+                        {({ getFieldValue }) => (
+                            <CollapsibleBlock
+                                value={getFieldValue('AI_suggest')}
+                                placeholder={<span style={{ color: '#bfbfbf' }}>点击下方「校验」进行 AI 判题</span>}
+                                maxPreviewLines={8}
+                            />
+                        )}
+                    </Form.Item>
+                )}
             </Form.Item>
             {historyRecords?.length > 0 && <Form.Item name="historyRecords" label="历史做题记录">
                 <Flex gap="4px 0" wrap>
