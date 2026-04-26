@@ -30,7 +30,11 @@ export default function AnswerModal({ title, type, topicId, lastStatus, fresh }:
             <Tooltip title={ModalContent[type].toolTip}>{ModalContent[type].icon}</Tooltip>
         </span>
         <Modal
-            title={title}
+            title={
+                <div style={{ whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: 1.4 }}>
+                    {title}
+                </div>
+            }
             width={'75%'}
             open={isAnswerModalOpen}
             footer={null}
