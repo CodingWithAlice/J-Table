@@ -7,17 +7,29 @@ import LtnList from "./LtnList";
 
 type LtnsType = keyof LtnsProps
 
-export default function FilterBtn() {
+export default function FilterBtn({
+    open,
+    onOpenChange,
+    refreshKey,
+}: {
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    refreshKey?: string;
+}) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [ltns, setLtns] = useState<LtnsProps>({});
     const [minDate, setMinDate] = useState<string>('');
 
+    const realOpen = open ?? isModalOpen;
+
     const showModal = () => {
-        setIsModalOpen(true);
+        if (onOpenChange) onOpenChange(true);
+        else setIsModalOpen(true);
     };
 
     const handleCancel = () => {
-        setIsModalOpen(false);
+        if (onOpenChange) onOpenChange(false);
+        else setIsModalOpen(false);
     };
 
     // 获取最小日期当天的数据
@@ -51,10 +63,10 @@ export default function FilterBtn() {
     };
 
     useEffect(() => {
-        if (isModalOpen) {
+        if (realOpen) {
             initMinDateData();
         }
-    }, [isModalOpen]);
+    }, [realOpen, refreshKey]);
 
     return <>
         <FloatButton
@@ -69,7 +81,7 @@ export default function FilterBtn() {
         />
         <Modal
             title={`过滤当前最小日期题目列表${minDate ? ` - ${minDate}` : ''}`}
-            open={isModalOpen}
+            open={realOpen}
             footer={null}
             onCancel={handleCancel}
             width={'75%'}
@@ -78,7 +90,7 @@ export default function FilterBtn() {
                 {Object.keys(ltns).map((ltnType: LtnsType) => <div key={ltnType}>
                     {!!ltns[ltnType].length && <div key={ltnType}>
                         <h2 className="ltn-box">BOX{ltnType}</h2>
-                        <LtnList list={ltns[ltnType]} boxId={+ltnType} fresh={initMinDateData} />
+                        <LtnList list={ltns[ltnType]} boxId={+ltnType} fresh={initMinDateData} returnModal="minDateFilter" />
                     </div>}
                 </div>)}
             </div>

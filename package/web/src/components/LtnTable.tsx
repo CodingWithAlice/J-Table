@@ -4,7 +4,6 @@ import LtnList from "./LtnList";
 import FilterBtn from "./FilterBtn";
 import TimeModalBtn from "./TimeModalBtn";
 import AddLtnBtn from "./AddLtnBtn";
-import { message } from "antd";
 import { useSearchParams } from "react-router-dom";
 import TodayRecordBtn from "./TodayRecordBtn";
 import DoitSecondBtn from "./DoitSecondBtn";
@@ -36,6 +35,8 @@ export default function LtnTable() {
     localStorage.setItem('type', params.get('type') || '');
     let [ltns, setLtns] = useState<LtnsProps>({});
     const [tempParams, setTempParams] = useState<TimeProps>({});
+    const modal = params.get('modal'); // redoNextDay | minDateFilter
+    const refreshKey = params.get('refresh') || '';
 
     const init = useCallback((params?: TimeProps) => {
         // 如果传入了参数，使用传入的参数；否则不传参数，后端返回全量数据
@@ -55,6 +56,20 @@ export default function LtnTable() {
         init();
     }, [init])
 
+    const openModal = useCallback((nextModal: 'redoNextDay' | 'minDateFilter') => {
+        const sp = new URLSearchParams(params);
+        sp.set('modal', nextModal);
+        sp.set('refresh', String(Date.now()));
+        setParams(sp);
+    }, [params, setParams]);
+
+    const closeModal = useCallback(() => {
+        const sp = new URLSearchParams(params);
+        sp.delete('modal');
+        sp.delete('refresh');
+        setParams(sp);
+    }, [params, setParams]);
+
     return <div className="ltn-wrapper">
         {Object.keys(ltns).map((ltnType: LtnsType) => <div key={ltnType}>
             {!!ltns[ltnType].length && <div key={ltnType}>
@@ -63,7 +78,11 @@ export default function LtnTable() {
             </div>}
         </div>)}
         {/* 过滤 */}
-        <FilterBtn />
+        <FilterBtn
+            open={modal === 'minDateFilter'}
+            refreshKey={refreshKey}
+            onOpenChange={(open) => open ? openModal('minDateFilter') : closeModal()}
+        />
         {/* 线轴 */}
         <TimeModalBtn />
          {/* 添加 */}
@@ -71,7 +90,11 @@ export default function LtnTable() {
         {/* 今日做题记录 */}
         <TodayRecordBtn />
         {/* 隔天重做 */}
-        <DoitSecondBtn />
+        <DoitSecondBtn
+            open={modal === 'redoNextDay'}
+            refreshKey={refreshKey}
+            onOpenChange={(open) => open ? openModal('redoNextDay') : closeModal()}
+        />
         {/* 金币统计 */}
         <CoinStatsBtn />
     </div>
