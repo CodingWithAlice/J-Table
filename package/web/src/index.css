@@ -48,3 +48,33 @@ code {
     -webkit-background-clip: text;
     -webkit-background-size: 200% 100%;
 }
+
+/* 金币统计悬浮按钮：金额到 100+ 也保持单行显示 */
+.coin-stats-float-btn.ant-float-btn,
+.coin-stats-float-btn.ant-float-btn-square {
+  width: auto;
+}
+
+.coin-stats-float-btn .ant-float-btn-body {
+  width: auto;
+  min-width: 40px;
+  padding-inline: 10px;
+  max-width: none;
+  overflow: visible;
+}
+
+.coin-stats-float-btn .ant-float-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.coin-stats-float-btn .ant-float-btn-icon {
+  margin: 0;
+}
+
+.coin-stats-float-btn .ant-float-btn-description,
+.coin-stats-float-btn__desc {
+  white-space: nowrap;
+  word-break: keep-all;
+}

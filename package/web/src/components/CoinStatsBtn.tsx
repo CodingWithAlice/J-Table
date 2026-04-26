@@ -61,12 +61,13 @@ export default function CoinStatsBtn() {
 
     return <>
         <FloatButton
+            className="coin-stats-float-btn"
             shape="square"
             type="primary"
             style={{
                 insetInlineEnd: 374,
             }}
-            description={`💰 ${totalCoins}`}
+            description={<span className="coin-stats-float-btn__desc">💰 {totalCoins}</span>}
             icon={<DollarOutlined />}
             onClick={showModal}
         />
