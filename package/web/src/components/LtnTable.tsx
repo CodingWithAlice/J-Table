@@ -32,7 +32,8 @@ type LtnsType = keyof LtnsProps
 
 export default function LtnTable() {
     const [params, setParams] = useSearchParams();
-    localStorage.setItem('type', params.get('type') || '');
+    const type = params.get('type');
+    if (type) localStorage.setItem('type', type);
     let [ltns, setLtns] = useState<LtnsProps>({});
     const [tempParams, setTempParams] = useState<TimeProps>({});
     const modal = params.get('modal'); // redoNextDay | minDateFilter
