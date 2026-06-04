@@ -128,6 +128,14 @@ sudo rm -rf /var/lib/docker/overlay2
 ```
 
 服务器重新启动 mongodb
+
+先查是否已有容器，有则直接启动（保留原有账号密码，无需重新找密码）：
+```
+sudo docker ps -a | grep mongodb
+sudo docker start mongodb
+```
+
+容器不存在时，才首次创建（`MONGO_INITDB_ROOT_*` 仅在空数据目录首次初始化时生效）：
 ```
 sudo docker run -d --name mongodb \
   -p 27017:27017 \
