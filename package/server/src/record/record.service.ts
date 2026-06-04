@@ -6,6 +6,7 @@ import { Record } from './record.schema';
 import dayjs from 'dayjs';
 import { AnswersService } from 'src/answer/answer.service';
 import { CoinService } from 'src/coin/coin.service';
+import { applyDurationBonus } from 'src/coin/coin-duration.util';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
@@ -167,11 +168,12 @@ export class RecordsService {
 
     // 4、计算并添加金币（只有在真实做完题时才给金币）
     let coinAdded = false;
+    let coinsAdded = 0;
     if (isRealSubmit) {
       const ltn = await this.ltnService.findOne(dto.topicId);
       if (ltn) {
         const boxId = ltn.boxId;
-        let coins = 0;
+        let baseCoins = 0;
 
         // box1 初次做题：2 金币
         if (
@@ -179,26 +181,28 @@ export class RecordsService {
           !dto?.lastStatus &&
           boxId === 1
         ) {
-          coins = 2;
+          baseCoins = 2;
         }
         // box1 隔天重做：1 金币
         else if (dto?.lastStatus === true && boxId === 1) {
-          coins = 1;
+          baseCoins = 1;
         }
         // 其他 box 做题：1 金币
         else if (boxId >= 2 && boxId <= 6) {
-          coins = 1;
+          baseCoins = 1;
         }
 
-        if (coins > 0) {
-          await this.coinService.addCoins(dto.submitTime, coins);
+        coinsAdded = applyDurationBonus(baseCoins, dto.durationSec);
+
+        if (coinsAdded > 0) {
+          await this.coinService.addCoins(dto.submitTime, coinsAdded);
           coinAdded = true;
         }
       }
     }
 
     // 返回更新后的文档（兼容原有逻辑）
-    // 将 coinAdded 放在 data 内部，确保前端能正确获取
-    return { data: { ...result, coinAdded } };
+    // 将 coinAdded / coinsAdded 放在 data 内部，确保前端能正确获取
+    return { data: { ...result, coinAdded, coinsAdded } };
   }
 }

@@ -46,7 +46,14 @@ export default function LtnTable() {
 
     useEffect(() => {
         init();
-    }, [init])
+    }, [init]);
+
+    // 从做题页返回时带 refresh 参数，刷新首页列表
+    useEffect(() => {
+        if (refreshKey) {
+            init();
+        }
+    }, [refreshKey, init]);
 
     const openModal = useCallback((nextModal: 'redoNextDay' | 'minDateFilter') => {
         const sp = new URLSearchParams(params);

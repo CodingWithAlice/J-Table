@@ -1,5 +1,5 @@
 import { Button, Card, Space } from "antd";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Answer from "../components/Answer";
 
@@ -27,7 +27,9 @@ export default function AnswerPage() {
     const lastStatus = searchParams.get('lastStatus') === '1';
     const returnModal = searchParams.get('returnModal'); // e.g. redoNextDay | minDateFilter
 
-    const backUrl = useMemo(() => buildReturnUrl({ modal: returnModal }), [returnModal]);
+    const navigateBack = useCallback(() => {
+        navigate(buildReturnUrl({ modal: returnModal }), { replace: true });
+    }, [navigate, returnModal]);
 
     if (!id) {
         return (
@@ -45,7 +47,7 @@ export default function AnswerPage() {
     return (
         <div style={{ padding: 12, maxWidth: 980, margin: '0 auto' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                <Button onClick={() => navigate(backUrl, { replace: true })}>返回列表</Button>
+                <Button onClick={navigateBack}>返回列表</Button>
                 <div style={{ fontWeight: 600, flex: 1, minWidth: 0, wordBreak: 'break-word' }}>
                     {title || `题目 ${id}`}
                 </div>
@@ -56,7 +58,7 @@ export default function AnswerPage() {
                     title={title || `题目 ${id}`}
                     placeholder={placeholder}
                     lastStatus={lastStatus}
-                    closeModal={() => navigate(backUrl, { replace: true })}
+                    closeModal={navigateBack}
                 />
             </Card>
         </div>

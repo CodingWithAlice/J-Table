@@ -69,7 +69,7 @@ function CollapsibleBlock({
                     minHeight: '32px',
                     border: '1px solid #d9d9d9',
                     borderRadius: '6px',
-                    backgroundColor: '#f5f5f5',
+                    backgroundColor: '#f6ffed',
                     wordBreak: 'break-word',
                     whiteSpace: 'pre-wrap',
                     overflow: 'hidden',
@@ -131,7 +131,8 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
             RecordApi.update(data).then(res => {
                 // 合并提示信息
                 if (res?.coinAdded) {
-                    message.success(needAI ? '查询成功，金币 +1 👏🏻' : '提交成功，金币 +1 👏🏻');
+                    const coins = res?.coinsAdded ?? 1;
+                    message.success(needAI ? `查询成功，金币 +${coins} 👏🏻` : `提交成功，金币 +${coins} 👏🏻`);
                     // 触发金币变更事件
                     coinEventEmitter.emit(COIN_CHANGED_EVENT);
                 } else {
@@ -143,15 +144,15 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                 if (isRealSubmit) {
                     fresh?.();
                 }
+                // 保存完成后再返回，避免过滤弹窗等列表读到旧数据
+                if (!needAI) {
+                    closeModal();
+                }
             }).catch(e => {
                 if (e instanceof Error) {
                     message.error(e.message);
                 }
             });
-            // 提交后关闭弹窗
-            if (!needAI) {
-                closeModal();
-            }
         }, 250)
     };
 
