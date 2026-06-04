@@ -10,7 +10,13 @@ export class DeepSeekController {
     @Query('recent') recent: string,
     @Query('right') right: string,
     @Query('title') title: string,
+    @Query('pro') pro?: string,
   ) {
-    return this.deepSeekService.compare({ recent, right, title });
+    return this.deepSeekService.compare({
+      recent,
+      right,
+      title,
+      usePro: pro === 'true',
+    });
   }
 }

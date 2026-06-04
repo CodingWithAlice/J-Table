@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import { useState } from "react";
 import { LtnApi } from "../apis/ltn";
 import LevelTimeTooltip from "./LevelTimeTooltip";
+import { coinEventEmitter, COIN_CHANGED_EVENT } from "../utils/coinEvent";
 
 const { Title } = Typography;
 
@@ -29,7 +30,12 @@ export default function AddLtnBtn({ fresh }: { fresh: () => void }) {
             message.error('请输入题目！');
             return
         }
-        LtnApi.add(data).then(() => {
+        LtnApi.add(data).then((res) => {
+            if (res?.coinAdded) {
+                message.success('金币 +1 👏🏻');
+                // 触发金币变更事件
+                coinEventEmitter.emit(COIN_CHANGED_EVENT);
+            }
             fresh();
         }).catch(e => {
             if (e instanceof Error) {

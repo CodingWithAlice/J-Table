@@ -5,6 +5,8 @@ import { Model } from 'mongoose';
 import { Record } from './record.schema';
 import dayjs from 'dayjs';
 import { AnswersService } from 'src/answer/answer.service';
+import { CoinService } from 'src/coin/coin.service';
+import { applyDurationBonus } from 'src/coin/coin-duration.util';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
@@ -26,6 +28,7 @@ export class RecordsService {
     private recordModel: Model<Record>,
     private readonly ltnService: LtnService,
     private readonly answersService: AnswersService,
+    private readonly coinService: CoinService,
   ) {}
 
   async create(record: Partial<Record>) {
@@ -56,14 +59,19 @@ export class RecordsService {
       .lean();
 
     const rightAnswer = await this.answersService.findOne({ topicId });
+    // 如果已经有 recentAnswer，应该允许显示正确答案区域
+    const hasRecentAnswer = latestRecord?.recentAnswer && latestRecord.recentAnswer.trim() !== '';
+    const finalShowRightAnswer = showRightAnswer || hasRecentAnswer;
+    
     return {
       data: {
-        showRightAnswer,
+        showRightAnswer: finalShowRightAnswer,
         record: {
           ...(latestRecord || {}),
           ...rightAnswer.data,
           solveTime,
-          recentAnswer: showRightAnswer ? latestRecord.recentAnswer : '',
+          // 如果已经有 recentAnswer，保留它；否则根据 showRightAnswer 决定
+          recentAnswer: latestRecord?.recentAnswer || '',
         },
         historyRecords: historyRecords.map((item) => {
           const durationSec = item?.durationSec;
@@ -145,15 +153,56 @@ export class RecordsService {
     // 2、存储错误记录 wrongNotes
     await this.answersService.updateAnswer(dto);
 
+    // 判断是否是真实做完题（有 durationSec 和 isCorrect）
+    const isRealSubmit = dto?.isCorrect !== undefined && dto?.durationSec !== undefined;
+
     // 3、操作做题后的升降(隔天重做时不操作、修改做题记录时不操作-避免重复操作)
-    if (dto?.solveTime !== dto.submitTime && !dto?.lastStatus) {
+    // 只有在真实做完题时才操作升降
+    if (isRealSubmit && dto?.solveTime !== dto.submitTime && !dto?.lastStatus) {
       await this.ltnService.updateBoxId({
         id: dto.topicId,
         type: dto?.isCorrect ? 'update' : 'degrade', // boxId 的升降
         time: dto.submitTime,
       });
     }
+
+    // 4、计算并添加金币（只有在真实做完题时才给金币）
+    let coinAdded = false;
+    let coinsAdded = 0;
+    if (isRealSubmit) {
+      const ltn = await this.ltnService.findOne(dto.topicId);
+      if (ltn) {
+        const boxId = ltn.boxId;
+        let baseCoins = 0;
+
+        // box1 初次做题：2 金币
+        if (
+          dto?.solveTime !== dto.submitTime &&
+          !dto?.lastStatus &&
+          boxId === 1
+        ) {
+          baseCoins = 2;
+        }
+        // box1 隔天重做：1 金币
+        else if (dto?.lastStatus === true && boxId === 1) {
+          baseCoins = 1;
+        }
+        // 其他 box 做题：1 金币
+        else if (boxId >= 2 && boxId <= 6) {
+          baseCoins = 1;
+        }
+
+        coinsAdded = applyDurationBonus(baseCoins, dto.durationSec);
+
+        if (coinsAdded > 0) {
+          await this.coinService.addCoins(dto.submitTime, coinsAdded);
+          coinAdded = true;
+        }
+      }
+    }
+
     // 返回更新后的文档（兼容原有逻辑）
-    return { data: result };
+    // 将 coinAdded / coinsAdded 放在 data 内部，确保前端能正确获取
+    return { data: { ...result, coinAdded, coinsAdded } };
   }
 }

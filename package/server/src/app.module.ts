@@ -17,6 +17,8 @@ import { SerialModule } from './serial/serials.module';
 import { BooksRecord } from './models/books-record.model';
 import { BooksRecordModule } from './books-record/books-record.module';
 import { DeepSeekModule } from './deepseek/deepseek.module';
+import { Coin } from './models/coin.model';
+import { CoinModule } from './coin/coin.module';
 
 @Module({
   imports: [
@@ -34,7 +36,7 @@ import { DeepSeekModule } from './deepseek/deepseek.module';
         username: 'root',
         password: configService.get<string>('DB_PASSWORD'),
         database: 'Daily',
-        models: [Ltn, Routine, Time, Level, Serial, BooksRecord],
+        models: [Ltn, Routine, Time, Level, Serial, BooksRecord, Coin],
       }),
       inject: [ConfigService],
     }),
@@ -56,6 +58,7 @@ import { DeepSeekModule } from './deepseek/deepseek.module';
     AnswersModule,
     RecordsModule,
     DeepSeekModule,
+    CoinModule,
   ],
 })
 export class AppModule {}

@@ -22,8 +22,6 @@ export function request(options: AxiosRequestConfig) {
 	}
 	return axios(mergeOpt)
 		.then((res) => {
-            console.log('🌹', res);
-            
 			const { data, status } = res
 			// if (options.bypass) return res;
 			// http 状态码

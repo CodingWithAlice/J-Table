@@ -5,13 +5,23 @@ import { RecordApi } from "../apis/record";
 import LtnList from "./LtnList";
 import { LtnDTO } from "./LtnTable";
 
-export default function DoitSecondBtn() {
+export default function DoitSecondBtn({
+    open,
+    onOpenChange,
+    refreshKey,
+}: {
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    refreshKey?: string;
+}) {
     const [modalShow, setModalShow] = useState(false);
     const [list, setList] = useState<LtnDTO[]>([]);
+    const realOpen = open ?? modalShow;
 
     // 切换弹窗状态
     const changeModalShow = (status: boolean) => {
-        setModalShow(status);
+        if (onOpenChange) onOpenChange(status);
+        else setModalShow(status);
     };
 
     const initTodayRecord = () => {
@@ -22,10 +32,10 @@ export default function DoitSecondBtn() {
 
     // 初始化查询今日做题记录
     useEffect(() => {
-        if (modalShow) {
+        if (realOpen) {
             initTodayRecord();
         }
-    }, [modalShow])
+    }, [realOpen, refreshKey])
 
     return <>
         <FloatButton
@@ -40,11 +50,11 @@ export default function DoitSecondBtn() {
         />
         <Modal
             title="隔天重做"
-            open={modalShow}
+            open={realOpen}
             onOk={() => changeModalShow(false)}
             onCancel={() => changeModalShow(false)}
         >
-            <LtnList list={list} boxId={0} lastStatus={true} fresh={initTodayRecord} />
+            <LtnList list={list} boxId={0} lastStatus={true} fresh={initTodayRecord} returnModal="redoNextDay" />
         </Modal>
     </>
 }

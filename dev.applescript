@@ -12,12 +12,12 @@ tell application "iTerm"
             -- ??????? web ??
             tell webSession
                 set name to "WEB"
-                write text "npm run web"
+                write text "cd \"/Users/haoling/Documents/Github/J-Table\" && npm run web"
             end tell
             
             -- ??????? server ??
             set name to "SERVER"
-            write text "npm run server"
+            write text "cd \"/Users/haoling/Documents/Github/J-Table\" && npm run server"
         end tell
     end tell
 end tell
