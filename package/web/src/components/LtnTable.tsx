@@ -35,20 +35,11 @@ export default function LtnTable() {
     const type = params.get('type');
     if (type) localStorage.setItem('type', type);
     let [ltns, setLtns] = useState<LtnsProps>({});
-    const [tempParams, setTempParams] = useState<TimeProps>({});
     const modal = params.get('modal'); // redoNextDay | minDateFilter
     const refreshKey = params.get('refresh') || '';
 
     const init = useCallback((params?: TimeProps) => {
-        // 如果传入了参数，使用传入的参数；否则不传参数，后端返回全量数据
-        const queryParams = params;
-        
-        if (queryParams) {
-            setTempParams(queryParams);
-        }
-
-        // 不传参数时，后端返回全量数据
-        LtnApi.list(queryParams).then((data) => {
+        LtnApi.list(params).then((data) => {
             setLtns(data);
         });
     }, [])

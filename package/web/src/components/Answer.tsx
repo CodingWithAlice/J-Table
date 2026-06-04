@@ -1,5 +1,5 @@
 import { CheckSquareOutlined, FontColorsOutlined, LoadingOutlined } from "@ant-design/icons";
-import { Button, Form, Input, message, Radio, Flex, Tag } from "antd";
+import { Button, Form, Input, message, Radio, Flex, Tag, Switch, Tooltip } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { RecordApi, type RecordDTO } from "../apis/record";
 import dayjs from "dayjs";
@@ -91,6 +91,9 @@ function CollapsibleBlock({
     );
 }
 
+const AI_MODEL_FLASH = 'deepseek-v4-flash';
+const AI_MODEL_PRO = 'deepseek-v4-pro';
+
 export default function Answer({ placeholder, topicId, closeModal, title, lastStatus, fresh }: AnswerProps) {
     const [form] = Form.useForm();
     const [record, setRecord] = useState<RecordDTO>();
@@ -98,6 +101,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
     const [showRightAnswer, setShowRightAnswer] = useState(false);
     const [showAILoading, setShowAILoading] = useState(true);
     const [compareLayout, setCompareLayout] = useState<CompareLayout>(() => safeReadLayout());
+    const [useAiPro, setUseAiPro] = useState(false);
     const colors = ["magenta", "red", "volcano", "orange", "gold", "lime", "green", "cyan", "blue", "purple"];
     // 检验、提交
     const handleCheck = (needAI: boolean) => {
@@ -154,7 +158,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
     // AI 查询建议
     const handleAISuggest = (title: string,recent: string, right: string) => {
         setShowAILoading(true)
-        AIApi.compare({ recent, right, title }).then(({suggestion}) => {
+        AIApi.compare({ recent, right, title, pro: useAiPro }).then(({suggestion}) => {
             setShowAILoading(false)
             form.setFieldsValue({ AI_suggest: suggestion.join('\n') });
         })
@@ -263,7 +267,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
         )}
 
         {showRightAnswer && (<>
-            <Form.Item name="AI_suggest" label="AI 判定">
+            <Form.Item name="AI_suggest" label="AI 引导">
                 {(showRightAnswer && showAILoading) 
                 ?  <LoadingOutlined /> 
                 : (
@@ -271,7 +275,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                         {({ getFieldValue }) => (
                             <CollapsibleBlock
                                 value={getFieldValue('AI_suggest')}
-                                placeholder={<span style={{ color: '#bfbfbf' }}>点击下方「校验」进行 AI 判题</span>}
+                                placeholder={<span style={{ color: '#bfbfbf' }}>点击下方「校验」获取 AI 学习引导</span>}
                                 maxPreviewLines={8}
                             />
                         )}
@@ -304,13 +308,26 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
             </Form.Item>
         </>)}
         {/* 按钮 */}
-        <Form.Item name="isCorrect" label={null} className='check-btn-wrap'>
-            <Button onClick={() => handleCheck(true)} icon={<FontColorsOutlined />} className="check-button">
-                校验
-            </Button>
-            {showRightAnswer && <Button type="primary" onClick={() => handleCheck(false)} icon={<CheckSquareOutlined />} className="check-button">
-                提交
-            </Button>}
+        <Form.Item label={null} className='check-btn-wrap'>
+            <Flex align="center" justify="flex-end" gap={8} style={{ width: '100%' }}>
+                <Tooltip title={useAiPro ? AI_MODEL_PRO : AI_MODEL_FLASH}>
+                    <Switch
+                        size="small"
+                        checked={useAiPro}
+                        checkedChildren="Pro"
+                        unCheckedChildren="Flash"
+                        onChange={setUseAiPro}
+                    />
+                </Tooltip>
+                <Button onClick={() => handleCheck(true)} icon={<FontColorsOutlined />}>
+                    校验
+                </Button>
+                {showRightAnswer && (
+                    <Button type="primary" onClick={() => handleCheck(false)} icon={<CheckSquareOutlined />}>
+                        提交
+                    </Button>
+                )}
+            </Flex>
         </Form.Item>
     </Form>
 }

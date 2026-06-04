@@ -169,7 +169,7 @@
 .check-button {
     margin: 0 0 0 10px;
 }
-.check-btn-wrap {
+.check-btn-wrap .ant-form-item-control-input-content {
     display: flex;
     justify-content: flex-end;
 }
