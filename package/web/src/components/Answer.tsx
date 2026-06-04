@@ -51,11 +51,13 @@ function CollapsibleBlock({
     placeholder,
     render,
     maxPreviewLines = 6,
+    backgroundColor = '#f6ffed',
 }: {
     value?: unknown;
     placeholder?: React.ReactNode;
     render?: (text: string) => React.ReactNode;
     maxPreviewLines?: number;
+    backgroundColor?: string;
 }) {
     const text = typeof value === 'string' ? value : '';
     const [expanded, setExpanded] = useState(false);
@@ -69,7 +71,7 @@ function CollapsibleBlock({
                     minHeight: '32px',
                     border: '1px solid #d9d9d9',
                     borderRadius: '6px',
-                    backgroundColor: '#f6ffed',
+                    backgroundColor,
                     wordBreak: 'break-word',
                     whiteSpace: 'pre-wrap',
                     overflow: 'hidden',
@@ -278,6 +280,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                                 value={getFieldValue('AI_suggest')}
                                 placeholder={<span style={{ color: '#bfbfbf' }}>点击下方「校验」获取 AI 学习引导</span>}
                                 maxPreviewLines={8}
+                                backgroundColor="#fbfff8"
                             />
                         )}
                     </Form.Item>
