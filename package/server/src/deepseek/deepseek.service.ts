@@ -1,4 +1,9 @@
-import { Injectable, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import OpenAI from 'openai';
 import { ConfigService } from '@nestjs/config';
 
@@ -30,21 +35,56 @@ const COMPARE_SYSTEM_PROMPT = `你是一位耐心、善于启发的前端学习�
 - suggestion 为 3～5 条字符串，每条 1～3 句话，口语化、像学长带学弟
 - 不要 markdown，不要用代码块包裹 JSON`;
 
+/** 简单内存限流：每 IP 每分钟最多 N 次 AI 调用 */
+const AI_RATE_LIMIT_WINDOW_MS = 60_000;
+const AI_RATE_LIMIT_MAX = 10;
+
 @Injectable()
 export class DeepSeekService {
+  private readonly logger = new Logger(DeepSeekService.name);
   private openai: OpenAI;
+  private readonly rateBuckets = new Map<
+    string,
+    { count: number; resetAt: number }
+  >();
 
   constructor(
     @Inject(ConfigService) private readonly configService: ConfigService,
   ) {
+    const apiKey = this.configService.get<string>('DEEPSEEK_API_KEY');
+    if (!apiKey) {
+      this.logger.warn(
+        'DEEPSEEK_API_KEY 未配置，AI 接口将不可用。请在服务端环境变量中设置。',
+      );
+    }
     this.openai = new OpenAI({
       baseURL: 'https://api.deepseek.com',
-      apiKey: this.configService.get<string>('DEEPSEEK_API_KEY') || 'a',
-      dangerouslyAllowBrowser: true, // 仅在浏览器环境需要
+      apiKey: apiKey || 'missing-key',
     });
   }
 
+  /** 按客户端标识限流，防止接口被刷爆额度 */
+  assertRateLimit(clientKey: string) {
+    const now = Date.now();
+    const bucket = this.rateBuckets.get(clientKey);
+    if (!bucket || now >= bucket.resetAt) {
+      this.rateBuckets.set(clientKey, {
+        count: 1,
+        resetAt: now + AI_RATE_LIMIT_WINDOW_MS,
+      });
+      return;
+    }
+    if (bucket.count >= AI_RATE_LIMIT_MAX) {
+      throw new Error('AI 调用过于频繁，请稍后再试');
+    }
+    bucket.count += 1;
+  }
+
   async chatCompletion(messages: MessageProp[], model = 'deepseek-v4-flash') {
+    if (!this.configService.get<string>('DEEPSEEK_API_KEY')) {
+      throw new ServiceUnavailableException('AI 服务未配置');
+    }
+
     const response = await this.openai.chat.completions.create({
       model,
       messages,
