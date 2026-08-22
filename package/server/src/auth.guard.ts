@@ -8,13 +8,10 @@ import { Request } from 'express';
 import { Observable } from 'rxjs';
 
 function validateRequest(request: Request): boolean {
-  // 自定义验证函数
-  const headers = request.headers;
+  const authHeader = request.headers?.authorization;
+  const expected = process.env.CHECK_AUTH;
 
-  if (
-    headers?.authorization !== process.env.CHECK_AUTH &&
-    request.method === 'POST'
-  ) {
+  if (!expected || authHeader !== expected) {
     throw new UnauthorizedException('达咩！你没有权限操作哦！');
   }
   return true;

@@ -1,10 +1,11 @@
 import { request } from '../utils/request'
 
-// 列表查询 - 所有
+// AI 校验引导（须走服务端代理，密钥不得出现在前端）
 function compare(params: { recent: string; right: string; title: string; pro?: boolean }) {
 	return request({
 		url: '/api/ai/compare',
-		params,
+		method: 'POST',
+		data: params,
 	})
 }
 
