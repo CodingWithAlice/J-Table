@@ -4,13 +4,16 @@ FROM node:18-alpine
 # 设置工作目录
 WORKDIR /app/package/web
 
+# 国内服务器优先用 npmmirror，避免 registry.npmjs.org 断连
+RUN npm config set registry https://registry.npmmirror.com
+
 # 复制根目录的 package.json 和 package-lock.json
 COPY package*.json ../../
 
 # 复制客户端的 package.json 和 package-lock.json
 COPY package/web/package*.json ./
 
-# 安装项目依赖
+# 安装项目依赖（含 serve）
 RUN npm install
 
 # 复制客户端代码
@@ -22,6 +25,5 @@ RUN npm run build
 # 暴露客户端运行的端口，假设为 4001
 EXPOSE 4001
 
-# 使用一个简单的静态服务器来运行 React 构建后的文件
-RUN npm install -g serve
-CMD ["serve", "-s", "build", "-l", "4001"]
+# 用本地依赖启动静态服务，避免再单独 npm install -g
+CMD ["npx", "serve", "-s", "build", "-l", "4001"]

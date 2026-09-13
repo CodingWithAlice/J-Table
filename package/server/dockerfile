@@ -4,6 +4,9 @@ FROM node:18-alpine
 # 设置工作目录
 WORKDIR /app/package/server
 
+# 国内服务器优先用 npmmirror，避免 registry.npmjs.org 断连
+RUN npm config set registry https://registry.npmmirror.com
+
 # 复制根目录的 package.json 和 package-lock.json
 COPY package*.json ../../
 

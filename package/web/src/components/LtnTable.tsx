@@ -104,7 +104,7 @@ export default function LtnTable() {
         />
         {/* 金币统计 */}
         <CoinStatsBtn insetInlineEnd={floatOffsets.coin} />
-        {/* 立即开始：按推荐做题时间 + LTN 顺序跳转第一题 */}
+        {/* 开始：按推荐做题时间 + LTN 顺序跳转第一题 */}
         <StartPracticeBtn insetInlineEnd={floatOffsets.start ?? 374} />
     </div>
 }
