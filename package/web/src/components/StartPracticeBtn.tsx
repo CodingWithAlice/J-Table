@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { LtnApi } from "../apis/ltn";
 import { buildAnswerPath, flattenLtns, sortLtnsForPractice } from "../utils/practiceQueue";
 
-export default function StartPracticeBtn({ insetInlineEnd = 444 }: { insetInlineEnd?: number }) {
+export default function StartPracticeBtn({ insetInlineEnd = 374 }: { insetInlineEnd?: number }) {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
 
@@ -29,11 +29,10 @@ export default function StartPracticeBtn({ insetInlineEnd = 444 }: { insetInline
 
     return (
         <FloatButton
-            className="start-practice-float-btn"
             shape="square"
             type="primary"
             style={{ insetInlineEnd }}
-            description={<span className="start-practice-float-btn__desc">立即开始</span>}
+            description="开始"
             icon={<PlayCircleOutlined />}
             onClick={handleStart}
         />

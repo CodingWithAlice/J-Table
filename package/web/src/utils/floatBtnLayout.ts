@@ -1,8 +1,8 @@
 export const FLOAT_BTN_START = 24;
 export const FLOAT_BTN_GAP = 70;
 
-const DESKTOP_ORDER = ["filter", "timeline", "add", "today", "redo", "coin", "start"] as const;
-const MOBILE_ORDER = ["filter", "add", "today", "coin", "start"] as const;
+const DESKTOP_ORDER = ["filter", "timeline", "add", "today", "redo", "start", "coin"] as const;
+const MOBILE_ORDER = ["filter", "add", "today", "start", "coin"] as const;
 
 export type FloatBtnKey = (typeof DESKTOP_ORDER)[number];
 
