@@ -78,3 +78,23 @@ code {
   white-space: nowrap;
   word-break: keep-all;
 }
+
+/* 「立即开始」与金币按钮一样保持单行 */
+.start-practice-float-btn.ant-float-btn,
+.start-practice-float-btn.ant-float-btn-square {
+  width: auto;
+}
+
+.start-practice-float-btn .ant-float-btn-body {
+  width: auto;
+  min-width: 40px;
+  padding-inline: 8px;
+  max-width: none;
+  overflow: visible;
+}
+
+.start-practice-float-btn .ant-float-btn-description,
+.start-practice-float-btn__desc {
+  white-space: nowrap;
+  word-break: keep-all;
+}

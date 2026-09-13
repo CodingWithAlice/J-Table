@@ -11,10 +11,12 @@ export default function FilterBtn({
     open,
     onOpenChange,
     refreshKey,
+    insetInlineEnd = 24,
 }: {
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
     refreshKey?: string;
+    insetInlineEnd?: number;
 }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [ltns, setLtns] = useState<LtnsProps>({});
@@ -73,7 +75,7 @@ export default function FilterBtn({
             shape="square"
             type="primary"
             style={{
-                insetInlineEnd: 24,
+                insetInlineEnd,
             }}
             description="过滤"
             icon={<BgColorsOutlined />}

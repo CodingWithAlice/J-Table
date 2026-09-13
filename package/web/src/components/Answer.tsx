@@ -169,7 +169,14 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
 
     // 初始化
     useEffect(() => {
+        let cancelled = false;
+        form.resetFields();
+        setShowRightAnswer(false);
+        setShowAILoading(true);
+        setHistoryRecords([]);
+        setRecord(undefined);
         RecordApi.list(topicId).then((res) => {
+            if (cancelled) return;
             // 如果已经有 recentAnswer，应该显示正确答案区域
             const hasRecentAnswer = res?.record?.recentAnswer && res.record.recentAnswer.trim() !== '';
             const shouldShowRightAnswer = res?.showRightAnswer || hasRecentAnswer;
@@ -181,6 +188,9 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                 setRecord({ ...res.record, topicId });
             }
         })
+        return () => {
+            cancelled = true;
+        };
     }, [topicId, form])
 
     return <Form form={form}>

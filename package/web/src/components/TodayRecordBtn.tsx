@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { RecordApi, RecordDTO } from "../apis/record";
 import { useSearchParams } from "react-router-dom";
 
-export default function TodayRecordBtn() {
+export default function TodayRecordBtn({ insetInlineEnd = 234 }: { insetInlineEnd?: number }) {
     const [modalShow, setModalShow] = useState(false);
     const [urlParams, setUrlParams] = useSearchParams();
     const [list, setList] = useState<RecordDTO[]>([]);
@@ -39,7 +39,7 @@ export default function TodayRecordBtn() {
             shape="square"
             type="primary"
             style={{
-                insetInlineEnd: 234,
+                insetInlineEnd,
             }}
             description="日报"
             icon={<MenuUnfoldOutlined />}
