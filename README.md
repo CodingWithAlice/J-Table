@@ -78,6 +78,8 @@ sudo /usr/local/bin/docker-compose up -d
 sudo /usr/local/bin/docker-compose ps
 ```
 
+> MySQL 账号写在仓库上一级的 `config.env`（`DB_HOST` / `DB_USER` / `DB_PASSWORD` / `DB_DATABASE`），不要提交到 Git。容器会挂载该文件。`localhost` 在容器内是容器自己，线上 `DB_HOST` 用服务器可达地址（与 Next_Pro 相同，不要写 `localhost`）。
+
 - step3: 停止服务 - 会停止并移除所有由 docker-compose up 启动的容器
 ```js
 sudo /usr/local/bin/docker-compose down

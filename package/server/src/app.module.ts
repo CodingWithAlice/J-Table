@@ -23,7 +23,10 @@ import { CoinModule } from './coin/coin.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
+      envFilePath: [
+        `.env.${process.env.NODE_ENV || 'development'}`,
+        '/config.env',
+      ],
       isGlobal: true, // 使 ConfigModule 在整个应用中可用
     }),
     SequelizeModule.forRootAsync({
@@ -31,11 +34,12 @@ import { CoinModule } from './coin/coin.module';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         dialect: 'mysql',
-        host: configService.get<string>('DB_HOST'),
+        // 账号在仓库上一级 config.env（Docker 挂载为 /config.env）；本地 .env.development 可覆盖
+        host: configService.get<string>('DB_HOST') || '127.0.0.1',
         port: 3306,
-        username: 'root',
-        password: configService.get<string>('DB_PASSWORD'),
-        database: 'Daily',
+        username: configService.get<string>('DB_USER') || 'root',
+        password: configService.get<string>('DB_PASSWORD') || 'localhost',
+        database: configService.get<string>('DB_DATABASE') || 'Daily',
         models: [Ltn, Routine, Time, Level, Serial, BooksRecord, Coin],
       }),
       inject: [ConfigService],

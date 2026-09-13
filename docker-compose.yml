@@ -7,6 +7,8 @@ services:
     ports:
       - "4002:4002"
     restart: always
+    environment:
+      - NODE_ENV=production
     volumes:
       - ../config.env:/config.env
   react-client:
