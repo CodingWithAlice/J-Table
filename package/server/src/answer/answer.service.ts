@@ -39,6 +39,7 @@ export class AnswersService {
       .lean() as any; // 使用 any 类型，因为 timestamps 字段是自动添加的
 
     let coinAdded = false;
+    let coinsAdded = 0;
     const today = dayjs().format('YYYY-MM-DD');
 
     // 判断是否当天第一次修改
@@ -49,13 +50,13 @@ export class AnswersService {
 
       // 如果上次更新日期与今天不同，则给金币
       if (lastUpdatedDate !== today) {
-        await this.coinService.addCoins(today, 1);
-        coinAdded = true;
+        coinsAdded = await this.coinService.addCoins(today, 1);
+        coinAdded = coinsAdded > 0;
       }
     } else {
       // 不存在记录，说明是新建，给金币
-      await this.coinService.addCoins(today, 1);
-      coinAdded = true;
+      coinsAdded = await this.coinService.addCoins(today, 1);
+      coinAdded = coinsAdded > 0;
     }
 
     const result = await this.answerModel
@@ -85,6 +86,7 @@ export class AnswersService {
     const responseData = {
       ...resultObj,
       coinAdded,
+      coinsAdded,
     };
     return { data: responseData };
   }

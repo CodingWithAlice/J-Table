@@ -32,7 +32,7 @@ export default function AddLtnBtn({ fresh, insetInlineEnd = 164 }: { fresh: () =
         }
         LtnApi.add(data).then((res) => {
             if (res?.coinAdded) {
-                message.success('金币 +1 👏🏻');
+                message.success(`金币 +${res?.coinsAdded ?? 1} 👏🏻`);
                 // 触发金币变更事件
                 coinEventEmitter.emit(COIN_CHANGED_EVENT);
             }

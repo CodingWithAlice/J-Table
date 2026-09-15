@@ -192,11 +192,14 @@ export class RecordsService {
           baseCoins = 1;
         }
 
-        coinsAdded = applyDurationBonus(baseCoins, dto.durationSec);
+        const baseWithDuration = applyDurationBonus(baseCoins, dto.durationSec);
 
-        if (coinsAdded > 0) {
-          await this.coinService.addCoins(dto.submitTime, coinsAdded);
-          coinAdded = true;
+        if (baseWithDuration > 0) {
+          coinsAdded = await this.coinService.addCoins(
+            dto.submitTime,
+            baseWithDuration,
+          );
+          coinAdded = coinsAdded > 0;
         }
       }
     }

@@ -24,7 +24,8 @@ export default function RightAnswer({ placeholder, topicId, title, closeModal, o
         AnswerApi.update(data).then(res => {
             // 合并提示信息
             if (res?.coinAdded) {
-                message.success(isNew ? '添加成功，金币 +1 👏🏻' : '修改成功，金币 +1 👏🏻');
+                const coins = res?.coinsAdded ?? 1;
+                message.success(isNew ? `添加成功，金币 +${coins} 👏🏻` : `修改成功，金币 +${coins} 👏🏻`);
                 // 触发金币变更事件
                 coinEventEmitter.emit(COIN_CHANGED_EVENT);
             } else {

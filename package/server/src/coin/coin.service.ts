@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Coin } from '../models/coin.model';
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
+import { getStreakStatusForDate } from './coin-streak.util';
 
 @Injectable()
 export class CoinService {
@@ -11,9 +12,14 @@ export class CoinService {
     private coinModel: typeof Coin,
   ) {}
 
-  // 添加金币（按日期累加）
-  async addCoins(date: string, coins: number): Promise<void> {
+  // 添加金币（按日期累加，入账时乘连续学习倍率）
+  async addCoins(date: string, coins: number): Promise<number> {
+    if (!coins || coins <= 0) {
+      return 0;
+    }
+
     const normalizedDate = dayjs(date).format('YYYY-MM-DD');
+    const awarded = coins * (await this.getStreakMultiplier(normalizedDate));
     
     const [coin, created] = await this.coinModel.findOrCreate({
       where: { date: normalizedDate },
@@ -21,10 +27,23 @@ export class CoinService {
     });
 
     if (!created) {
-      await coin.increment('coins', { by: coins });
+      await coin.increment('coins', { by: awarded });
     } else {
-      await coin.update({ coins });
+      await coin.update({ coins: awarded });
     }
+
+    return awarded;
+  }
+
+  private async getStreakMultiplier(date: string): Promise<number> {
+    const yesterday = dayjs(date).subtract(1, 'day').format('YYYY-MM-DD');
+    const dayBefore = dayjs(date).subtract(2, 'day').format('YYYY-MM-DD');
+    const rows = await this.coinModel.findAll({
+      where: { date: { [Op.in]: [yesterday, dayBefore] } },
+      attributes: ['date', 'coins'],
+      raw: true,
+    });
+    return getStreakStatusForDate(rows, date).multiplier;
   }
 
   // 获取总金币数

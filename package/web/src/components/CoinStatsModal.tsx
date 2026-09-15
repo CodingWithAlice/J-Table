@@ -8,6 +8,7 @@ import {
     Tooltip,
     ResponsiveContainer,
 } from "recharts";
+import { getCoinStreakStatus } from "../utils/getCoinStreakStatus";
 
 export interface CoinTrendItem {
     date: string;
@@ -31,6 +32,7 @@ export default function CoinStatsModal({
     const chartData = [...trendData].sort(
         (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
+    const streak = getCoinStreakStatus(trendData);
 
     return (
         <Modal
@@ -40,15 +42,25 @@ export default function CoinStatsModal({
             onCancel={onCancel}
             width={600}
         >
-            <Statistic
-                title="总金币数"
-                value={totalCoins}
-                valueStyle={{
-                    fontSize: "32px",
-                    fontWeight: "bold",
-                    color: "#1890ff",
-                }}
-            />
+            <div className="coin-stats-summary">
+                <Statistic
+                    title="总金币数"
+                    value={totalCoins}
+                    valueStyle={{
+                        fontSize: "32px",
+                        fontWeight: "bold",
+                        color: "#1890ff",
+                    }}
+                />
+                {streak.fires > 0 && (
+                    <div className="coin-streak-hint">
+                        <div className="coin-streak-hint__fires" aria-label={`连续 ${streak.fires} 天`}>
+                            {"🔥".repeat(streak.fires)}
+                        </div>
+                        <div className="coin-streak-hint__text">今日金币 ×{streak.multiplier}</div>
+                    </div>
+                )}
+            </div>
             <div style={{ marginTop: 24 }}>
                 <h3 style={{ marginBottom: 16 }}>最近30天趋势</h3>
                 <ResponsiveContainer width="100%" height={280}>
