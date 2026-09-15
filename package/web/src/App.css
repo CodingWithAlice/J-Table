@@ -152,6 +152,16 @@
     display: flex;
     align-items: center;
 }
+.record-date-title {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.record-date-empty {
+    color: #999;
+    text-align: center;
+    padding: 16px 0;
+}
 .show-all {
     color: #ccc;
     margin-left: 8px;
