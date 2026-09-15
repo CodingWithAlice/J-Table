@@ -2,7 +2,9 @@ import { Button, Card, Space, message } from "antd";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Answer from "../components/Answer";
+import QuestionStem from "../components/QuestionStem";
 import { LtnApi } from "../apis/ltn";
+import { parseQuestionTitle } from "../utils/formatQuestionTitle";
 import { buildAnswerPath, flattenLtns, sortLtnsForPractice } from "../utils/practiceQueue";
 
 function buildReturnUrl(opts: { modal?: string | null; refresh?: string }) {
@@ -20,13 +22,16 @@ export default function AnswerPage() {
     const [searchParams] = useSearchParams();
     const [hasNext, setHasNext] = useState(true);
     const [nextLoading, setNextLoading] = useState(false);
+    const [loadedTitle, setLoadedTitle] = useState('');
 
     const id = useMemo(() => {
         const n = Number(topicId);
         return Number.isFinite(n) ? n : 0;
     }, [topicId]);
 
-    const title = searchParams.get('title') || '';
+    const queryTitle = searchParams.get('title') || '';
+    const title = queryTitle || loadedTitle;
+    const shortTitle = useMemo(() => parseQuestionTitle(title).shortTitle, [title]);
     const placeholder = searchParams.get('placeholder') || '请输入正确答案';
     const lastStatus = searchParams.get('lastStatus') === '1';
     const returnModal = searchParams.get('returnModal'); // e.g. redoNextDay | minDateFilter
@@ -40,8 +45,14 @@ export default function AnswerPage() {
             setHasNext(false);
             return;
         }
+        setLoadedTitle('');
         LtnApi.list().then((data) => {
-            const sorted = sortLtnsForPractice(flattenLtns(data));
+            const items = flattenLtns(data);
+            const current = items.find((it) => it.id === id);
+            if (current) {
+                setLoadedTitle(`【BOX${current.boxId}】${current.title}`);
+            }
+            const sorted = sortLtnsForPractice(items);
             const idx = sorted.findIndex((it) => it.id === id);
             setHasNext(idx >= 0 && idx < sorted.length - 1);
         }).catch(() => {
@@ -84,17 +95,18 @@ export default function AnswerPage() {
     }
 
     return (
-        <div style={{ padding: 12, maxWidth: 980, margin: '0 auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+        <div className="answer-page">
+            <div className="answer-page-nav">
                 <Button onClick={navigateBack}>返回列表</Button>
-                <div style={{ fontWeight: 600, flex: 1, minWidth: 0, wordBreak: 'break-word' }}>
-                    {title || `题目 ${id}`}
+                <div className="answer-page-nav-title" title={title || `题目 ${id}`}>
+                    {shortTitle || `题目 ${id}`}
                 </div>
                 <Button onClick={goNext} loading={nextLoading} disabled={!hasNext}>
                     下一题
                 </Button>
             </div>
             <Card>
+                <QuestionStem title={title || `题目 ${id}`} />
                 <Answer
                     topicId={id}
                     title={title || `题目 ${id}`}

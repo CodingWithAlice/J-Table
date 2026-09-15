@@ -2,6 +2,7 @@ import { Modal, Tooltip } from "antd";
 import React, { useState } from "react";
 import { EditTwoTone, FormOutlined } from "@ant-design/icons";
 import RightAnswer from "./RightAnswer";
+import QuestionStem from "./QuestionStem";
 import { useNavigate } from "react-router-dom";
 
 const ModalContent = {
@@ -59,11 +60,7 @@ export default function AnswerModal({
             {children ?? <Tooltip title={ModalContent[type].toolTip}>{ModalContent[type].icon}</Tooltip>}
         </span>
         {type !== 'answer' && <Modal
-            title={
-                <div style={{ whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: 1.4 }}>
-                    {title}
-                </div>
-            }
+            title={<QuestionStem title={title} compact />}
             width={'75%'}
             open={isAnswerModalOpen}
             footer={null}
