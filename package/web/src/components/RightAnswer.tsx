@@ -6,7 +6,7 @@ import { coinEventEmitter, COIN_CHANGED_EVENT } from "../utils/coinEvent";
 
 const { TextArea } = Input;
 
-export default function RightAnswer({ placeholder, topicId, title, closeModal }: { placeholder: string, topicId: number, title: string, closeModal: () => void }) {
+export default function RightAnswer({ placeholder, topicId, title, closeModal, onSaved }: { placeholder: string, topicId: number, title: string, closeModal: () => void, onSaved?: (rightAnswer: string) => void }) {
     const [answer, setAnswer] = useState<string>('');
     const [isNew, setIsNew] = useState<boolean>(false);
 
@@ -31,6 +31,7 @@ export default function RightAnswer({ placeholder, topicId, title, closeModal }:
                 message.success(isNew ? '添加成功' : '修改成功');
             }
             isNew && setIsNew(false);
+            onSaved?.(answer);
             closeModal();
         }).catch(e => {
             if (e instanceof Error) {

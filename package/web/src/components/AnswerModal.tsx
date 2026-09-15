@@ -24,6 +24,8 @@ export default function AnswerModal({
     lastStatus,
     fresh,
     returnModal,
+    children,
+    onSaved,
 }: {
     title: string;
     type: Type;
@@ -31,6 +33,8 @@ export default function AnswerModal({
     lastStatus?: boolean;
     fresh?: () => void;
     returnModal?: ReturnModalType;
+    children?: React.ReactNode;
+    onSaved?: (rightAnswer: string) => void;
 }) {
     const [isAnswerModalOpen, setIsAnswerModalOpen] = useState(false);
     const navigate = useNavigate();
@@ -51,8 +55,8 @@ export default function AnswerModal({
     };
 
     return <>
-        <span onClick={showModal}>
-            <Tooltip title={ModalContent[type].toolTip}>{ModalContent[type].icon}</Tooltip>
+        <span onClick={showModal} style={children ? { cursor: 'pointer' } : undefined}>
+            {children ?? <Tooltip title={ModalContent[type].toolTip}>{ModalContent[type].icon}</Tooltip>}
         </span>
         {type !== 'answer' && <Modal
             title={
@@ -67,7 +71,7 @@ export default function AnswerModal({
             destroyOnClose
             maskClosable={false}
         >
-            {type === 'rightAnswer' && <RightAnswer placeholder="修改答案" topicId={topicId} title={title} closeModal={handleCancel} />}
+            {type === 'rightAnswer' && <RightAnswer placeholder="修改答案" topicId={topicId} title={title} closeModal={handleCancel} onSaved={onSaved} />}
         </Modal>}
     </>
 }

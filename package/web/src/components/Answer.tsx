@@ -1,4 +1,4 @@
-import { CheckSquareOutlined, FontColorsOutlined, LoadingOutlined } from "@ant-design/icons";
+import { CheckSquareOutlined, FontColorsOutlined, FormOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Radio, Flex, Tag, Switch, Tooltip } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { RecordApi, type RecordDTO } from "../apis/record";
@@ -8,6 +8,7 @@ import { coinEventEmitter, COIN_CHANGED_EVENT } from "../utils/coinEvent";
 import { renderTextWithLinks } from "../utils/utils";
 import React from "react";
 import DurationTimer, { type DurationTimerHandle } from "./DurationTimer";
+import AnswerModal from "./AnswerModal";
 
 const { TextArea } = Input;
 interface AnswerProps {
@@ -201,6 +202,23 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
         };
     }, [topicId, form])
 
+    const rightAnswerLabel = (
+        <AnswerModal
+            key={topicId}
+            title={title}
+            type="rightAnswer"
+            topicId={topicId}
+            onSaved={(rightAnswer) => form.setFieldsValue({ rightAnswer })}
+        >
+            <Tooltip title="修改题目答案">
+                <span>
+                    正确答案
+                    <FormOutlined style={{ marginLeft: 6 }} />
+                </span>
+            </Tooltip>
+        </AnswerModal>
+    );
+
     return <Form form={form}>
         {showRightAnswer && (
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
@@ -238,7 +256,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                     </Form.Item>
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                    <Form.Item name="rightAnswer" label="正确答案">
+                    <Form.Item name="rightAnswer" label={rightAnswerLabel}>
                         <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues?.rightAnswer !== currentValues?.rightAnswer}>
                             {({ getFieldValue }) => {
                                 const rightAnswer = getFieldValue('rightAnswer');
@@ -268,7 +286,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                     />
                 </Form.Item>
                 {showRightAnswer && (
-                    <Form.Item name="rightAnswer" label="正确答案">
+                    <Form.Item name="rightAnswer" label={rightAnswerLabel}>
                         <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues?.rightAnswer !== currentValues?.rightAnswer}>
                             {({ getFieldValue }) => {
                                 const rightAnswer = getFieldValue('rightAnswer');
