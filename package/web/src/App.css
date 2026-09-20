@@ -157,6 +157,44 @@
     align-items: center;
     gap: 4px;
 }
+.record-date-summary {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: #f6ffed;
+    border-radius: 8px;
+}
+.record-date-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.record-date-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    line-height: 1.6;
+}
+.record-date-item__index {
+    flex-shrink: 0;
+    color: #8c8c8c;
+}
+.record-date-item__title-wrap {
+    flex: 1;
+    min-width: 0;
+}
+.record-date-item__title {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.record-date-item__meta {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
 .record-date-empty {
     color: #999;
     text-align: center;

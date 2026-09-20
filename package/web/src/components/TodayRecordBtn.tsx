@@ -1,8 +1,9 @@
 import { LeftOutlined, MenuUnfoldOutlined, RightOutlined } from "@ant-design/icons";
-import { Button, FloatButton, Modal } from "antd";
+import { Button, FloatButton, Modal, Statistic, Tooltip } from "antd";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { RecordApi, RecordDTO } from "../apis/record";
+import { parseQuestionTitle } from "../utils/formatQuestionTitle";
 
 const DATE_FMT = 'YYYY-MM-DD';
 
@@ -15,6 +16,26 @@ function getRecordTitle(date: string) {
     if (date === today) return '今日做题记录';
     if (date === yesterday) return '昨日做题记录';
     return `${dayjs(date).format('M月D日')}做题记录`;
+}
+
+function toMinutes(value: unknown): number {
+    const n = Number(value);
+    return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+/** durationSec 实际单位是分钟 */
+function formatDuration(minutes: number): string {
+    if (minutes <= 0) return '0 分钟';
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    if (h <= 0) return `${m} 分钟`;
+    if (m <= 0) return `${h} 小时`;
+    return `${h} 小时 ${m} 分钟`;
+}
+
+function getRecordLabel(item: RecordDTO): string {
+    const raw = String(item?.topicTitle || item?.topicId || '');
+    return parseQuestionTitle(raw).shortTitle || raw;
 }
 
 export default function TodayRecordBtn({ insetInlineEnd = 234 }: { insetInlineEnd?: number }) {
@@ -37,6 +58,14 @@ export default function TodayRecordBtn({ insetInlineEnd = 234 }: { insetInlineEn
     }, [modalShow, currentDate]);
 
     const isToday = currentDate === getToday();
+    const totalDuration = useMemo(
+        () => list.reduce((sum, item) => sum + toMinutes(item.durationSec), 0),
+        [list],
+    );
+    const correctCount = useMemo(
+        () => list.filter((item) => item.isCorrect === true).length,
+        [list],
+    );
 
     const titleNode = (
         <div className="record-date-title">
@@ -78,11 +107,47 @@ export default function TodayRecordBtn({ insetInlineEnd = 234 }: { insetInlineEn
             onCancel={() => changeModalShow(false)}
         >
             {list.length > 0
-                ? list.map((item, index) => (
-                    <div key={item.topicId}>
-                        {index + 1}、{item?.topicTitle || item?.topicId} {item?.isCorrect ? '✅' : '❌'} 耗时{item?.durationSec}m
+                ? <>
+                    <div className="record-date-summary">
+                        <Statistic
+                            title="数量"
+                            value={list.length}
+                            suffix="题"
+                            valueStyle={{ fontSize: 22, fontWeight: 600 }}
+                        />
+                        <Statistic
+                            title="总时长"
+                            value={formatDuration(totalDuration)}
+                            valueStyle={{ fontSize: 22, fontWeight: 600 }}
+                        />
+                        <Statistic
+                            title="正确"
+                            value={correctCount}
+                            suffix={`/ ${list.length}`}
+                            valueStyle={{ fontSize: 22, fontWeight: 600 }}
+                        />
                     </div>
-                ))
+                    <div className="record-date-list">
+                        {list.map((item, index) => {
+                            const label = getRecordLabel(item);
+                            const fullTitle = String(item?.topicTitle || item?.topicId || '');
+                            const minutes = toMinutes(item.durationSec);
+                            return (
+                                <div key={item.topicId} className="record-date-item">
+                                    <span className="record-date-item__index">{index + 1}.</span>
+                                    <div className="record-date-item__title-wrap">
+                                        <Tooltip title={fullTitle} placement="topLeft">
+                                            <span className="record-date-item__title">{label}</span>
+                                        </Tooltip>
+                                    </div>
+                                    <span className="record-date-item__meta">
+                                        {item?.isCorrect ? '✅' : '❌'} {minutes}m
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </>
                 : <div className="record-date-empty">暂无做题记录</div>}
         </Modal>
     </>
