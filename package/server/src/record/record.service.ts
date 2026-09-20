@@ -8,6 +8,7 @@ import { AnswersService } from 'src/answer/answer.service';
 import { CoinService } from 'src/coin/coin.service';
 import { applyDurationBonus } from 'src/coin/coin-duration.util';
 import { getRedoWindowStart } from './redo-window.util';
+import { isRealSubmitRecord } from './record-coin.util';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
@@ -138,6 +139,16 @@ export class RecordsService {
 
   // 修改记录信息
   async updateRecord(dto: RecordDTO) {
+    // 入账前先看当天这题是否已经真实提交过，避免覆盖记录时重复加金币
+    const existingRecord = await this.recordModel
+      .findOne({
+        topicId: dto.topicId,
+        submitTime: dto.submitTime,
+      })
+      .select('isCorrect durationSec')
+      .lean();
+    const alreadyAwarded = isRealSubmitRecord(existingRecord);
+
     // 1、更新/创建 做题记录
     const result = await this.recordModel
       .findOneAndUpdate(
@@ -159,11 +170,12 @@ export class RecordsService {
     await this.answersService.updateAnswer(dto);
 
     // 判断是否是真实做完题（有 durationSec 和 isCorrect）
-    const isRealSubmit = dto?.isCorrect !== undefined && dto?.durationSec !== undefined;
+    const isRealSubmit = isRealSubmitRecord(dto);
+    const shouldAwardSubmit = isRealSubmit && !alreadyAwarded;
 
     // 3、操作做题后的升降(隔天重做时不操作、修改做题记录时不操作-避免重复操作)
     // 只有在真实做完题时才操作升降
-    if (isRealSubmit && dto?.solveTime !== dto.submitTime && !dto?.lastStatus) {
+    if (shouldAwardSubmit && dto?.solveTime !== dto.submitTime && !dto?.lastStatus) {
       await this.ltnService.updateBoxId({
         id: dto.topicId,
         type: dto?.isCorrect ? 'update' : 'degrade', // boxId 的升降
@@ -171,10 +183,10 @@ export class RecordsService {
       });
     }
 
-    // 4、计算并添加金币（只有在真实做完题时才给金币）
+    // 4、计算并添加金币（同一 topicId + 当天只入账一次）
     let coinAdded = false;
     let coinsAdded = 0;
-    if (isRealSubmit) {
+    if (shouldAwardSubmit) {
       const ltn = await this.ltnService.findOne(dto.topicId);
       if (ltn) {
         const boxId = ltn.boxId;
