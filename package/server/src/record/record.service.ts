@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import { AnswersService } from 'src/answer/answer.service';
 import { CoinService } from 'src/coin/coin.service';
 import { applyDurationBonus } from 'src/coin/coin-duration.util';
+import { getRedoWindowStart } from './redo-window.util';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
@@ -95,9 +96,10 @@ export class RecordsService {
     return { data };
   }
 
-  // 查询隔天重做的记录
+  // 查询隔天重做的记录（仅保留最近 7 天仍是错题的最新记录，历史数据不删）
   async findLastWrong() {
-    // 1、聚合查询：先找到每个topicId的最新记录，再筛选出错误记录
+    const redoWindowStart = getRedoWindowStart();
+    // 1、聚合查询：先找到每个topicId的最新记录，再筛选出窗口内的错误记录
     const incorrectRecords = await this.recordModel.aggregate([
       {
         $sort: { submitTime: -1 }, // 按提交时间倒序
@@ -112,7 +114,10 @@ export class RecordsService {
         $replaceRoot: { newRoot: '$latestRecord' }, // 展开为完整文档
       },
       {
-        $match: { isCorrect: false }, // 筛选出最新记录中仍然是错误的题目
+        $match: {
+          isCorrect: false, // 最新记录仍是错题
+          submitTime: { $gte: redoWindowStart }, // 超过 7 天窗口则从列表摘掉
+        },
       },
       {
         $project: { _id: 0 }, // 排除MongoDB默认_id

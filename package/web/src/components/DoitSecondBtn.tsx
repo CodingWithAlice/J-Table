@@ -60,6 +60,7 @@ export default function DoitSecondBtn({
             onOk={() => changeModalShow(false)}
             onCancel={() => changeModalShow(false)}
         >
+            <p className="redo-window-hint">仅显示最近 7 天仍需重做的题目，更早的错题会从列表中摘掉。</p>
             <LtnList list={list} boxId={0} lastStatus={true} fresh={initTodayRecord} returnModal="redoNextDay" />
         </Modal>
     </>
