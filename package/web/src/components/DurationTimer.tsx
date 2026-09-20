@@ -6,12 +6,23 @@ import {
   useImperativeHandle,
   useRef,
   useState,
+  type Ref,
 } from 'react';
 
 /** 未满 1 分钟按 1 分钟计；0 保持 0 */
 export function ceilMinutesFromMs(elapsedMs: number): number {
   if (elapsedMs <= 0) return 0;
   return Math.max(1, Math.ceil(elapsedMs / 60000));
+}
+
+/** 停表时把当前这一段累加到已确认分钟；未在计时则原样返回 */
+export function accumulateTimerMinutes(
+  savedMinutes: number,
+  runningSince: number | null,
+  now: number,
+): number {
+  if (runningSince == null) return savedMinutes;
+  return savedMinutes + ceilMinutesFromMs(now - runningSince);
 }
 
 function formatElapsed(ms: number): string {
@@ -41,23 +52,33 @@ type DurationTimerProps = {
   onChange?: (v: number | undefined) => void;
   /** 校验后强制展示输入框（便于提交时手填） */
   forceShowInput?: boolean;
+  /**
+   * 普通 prop 暴露 flush。Form.Item 的 cloneElement 可能拿不到 forwardRef，
+   * 提交时就会跳过停表，把「当前这一段」丢掉。
+   */
+  timerRef?: Ref<DurationTimerHandle>;
 };
 
 const DurationTimer = forwardRef<DurationTimerHandle, DurationTimerProps>(
-  function DurationTimer({ value, onChange, forceShowInput = false }, ref) {
+  function DurationTimer(
+    { value, onChange, forceShowInput = false, timerRef },
+    ref,
+  ) {
     const [isRunning, setIsRunning] = useState(false);
     const [tick, setTick] = useState(0);
     const [hasAccumulated, setHasAccumulated] = useState(() => parseMinutes(value) > 0);
     const runningSinceRef = useRef<number | null>(null);
     const savedMinutesRef = useRef(parseMinutes(value));
+    const onChangeRef = useRef(onChange);
+    onChangeRef.current = onChange;
 
     // 外部表单值变化（初始化 / 手改）时同步基准
     useEffect(() => {
-      if (isRunning) return;
+      if (runningSinceRef.current != null) return;
       const mins = parseMinutes(value);
       savedMinutesRef.current = mins;
       if (mins > 0) setHasAccumulated(true);
-    }, [value, isRunning]);
+    }, [value]);
 
     useEffect(() => {
       if (!isRunning) return undefined;
@@ -75,25 +96,43 @@ const DurationTimer = forwardRef<DurationTimerHandle, DurationTimerProps>(
     const commitMinutes = (mins: number) => {
       savedMinutesRef.current = mins;
       if (mins > 0) setHasAccumulated(true);
-      onChange?.(mins > 0 ? mins : undefined);
+      onChangeRef.current?.(mins > 0 ? mins : undefined);
     };
 
     const stopAndAccumulate = (): number | undefined => {
-      if (!isRunning || runningSinceRef.current == null) {
+      // 只看 runningSinceRef：flush 可能拿着过期闭包里的 isRunning=false，
+      // 那样会直接返回上一次已确认的分钟，漏掉当前这一段。
+      const runningSince = runningSinceRef.current;
+      if (runningSince == null) {
         const current = savedMinutesRef.current;
         return current > 0 ? current : undefined;
       }
-      const added = ceilMinutesFromMs(Date.now() - runningSinceRef.current);
-      const total = savedMinutesRef.current + added;
+      const total = accumulateTimerMinutes(
+        savedMinutesRef.current,
+        runningSince,
+        Date.now(),
+      );
       runningSinceRef.current = null;
       setIsRunning(false);
       commitMinutes(total);
       return total > 0 ? total : undefined;
     };
 
-    useImperativeHandle(ref, () => ({
-      flush: () => stopAndAccumulate(),
-    }));
+    const stopAndAccumulateRef = useRef(stopAndAccumulate);
+    stopAndAccumulateRef.current = stopAndAccumulate;
+
+    // 空依赖：handle 只绑一次，内部始终走 ref，避免每秒 tick 把 ref 清掉。
+    // timerRef 是普通 prop，避免被 Form.Item cloneElement 吃掉 forwardRef。
+    useImperativeHandle(
+      ref,
+      () => ({ flush: () => stopAndAccumulateRef.current() }),
+      [],
+    );
+    useImperativeHandle(
+      timerRef,
+      () => ({ flush: () => stopAndAccumulateRef.current() }),
+      [],
+    );
 
     const handleStart = () => {
       // 手改后的值作为新基准

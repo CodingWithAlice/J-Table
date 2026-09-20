@@ -110,13 +110,16 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
     const colors = ["magenta", "red", "volcano", "orange", "gold", "lime", "green", "cyan", "blue", "purple"];
     // 检验、提交
     const handleCheck = (needAI: boolean) => {
+        // 计时中点保存必须立刻停表累加。timeout 里读到的表单仍是上一次已确认的分钟，
+        // 当前这一段还没 onChange，会把最后一次计时漏掉。
+        const flushedMinutes = durationTimerRef.current?.flush();
+        if (flushedMinutes !== undefined) {
+            form.setFieldsValue({ durationSec: flushedMinutes });
+        }
         setTimeout(() => {
-            // 校验 / 提交前先结束计时并累加到表单
-            const flushedMinutes = durationTimerRef.current?.flush();
             const newData = form.getFieldsValue();
             if (flushedMinutes !== undefined) {
                 newData.durationSec = flushedMinutes;
-                form.setFieldsValue({ durationSec: flushedMinutes });
             }
             const data = {
                 ...record,
@@ -344,7 +347,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
         >
             <DurationTimer
                 key={topicId}
-                ref={durationTimerRef}
+                timerRef={durationTimerRef}
                 forceShowInput={showRightAnswer}
             />
         </Form.Item>
