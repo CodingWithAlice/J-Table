@@ -126,7 +126,8 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                 ...newData,
                 submitTime: dayjs().format('YYYY-MM-DD'),
                 topicTitle: title,
-                lastStatus
+                lastStatus,
+                isCheck: needAI,
             }
             // 二次校验：仅拉 AI，同时仍把当前草稿（含时长）存档
             const onlyAiAfterReveal = needAI && showRightAnswer;

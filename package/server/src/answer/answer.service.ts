@@ -26,37 +26,39 @@ export class AnswersService {
   }
 
   // 修改答案
-  async updateAnswer(dto: {
-    rightAnswer?: string;
-    wrongNotes?: string;
-    topicId: number;
-    topicTitle?: string;
-  }) {
-    // 先查询现有的答案记录
-    const existingAnswer = await this.answerModel
-      .findOne({ topicId: dto.topicId })
-      .select('updatedAt')
-      .lean() as any; // 使用 any 类型，因为 timestamps 字段是自动添加的
-
+  async updateAnswer(
+    dto: {
+      rightAnswer?: string;
+      wrongNotes?: string;
+      topicId: number;
+      topicTitle?: string;
+    },
+    options?: { awardCoins?: boolean },
+  ) {
     let coinAdded = false;
     let coinsAdded = 0;
     const today = dayjs().format('YYYY-MM-DD');
 
-    // 判断是否当天第一次修改
-    if (existingAnswer && existingAnswer.updatedAt) {
-      const lastUpdatedDate = dayjs(existingAnswer.updatedAt).format(
-        'YYYY-MM-DD',
-      );
+    // 做题保存会顺带更新 wrongNotes，只有显式「修改题目答案」才入账
+    if (options?.awardCoins !== false) {
+      const existingAnswer = (await this.answerModel
+        .findOne({ topicId: dto.topicId })
+        .select('updatedAt')
+        .lean()) as any; // timestamps 由 mongoose 自动添加
 
-      // 如果上次更新日期与今天不同，则给金币
-      if (lastUpdatedDate !== today) {
+      if (existingAnswer && existingAnswer.updatedAt) {
+        const lastUpdatedDate = dayjs(existingAnswer.updatedAt).format(
+          'YYYY-MM-DD',
+        );
+
+        if (lastUpdatedDate !== today) {
+          coinsAdded = await this.coinService.addCoins(today, 1);
+          coinAdded = coinsAdded > 0;
+        }
+      } else {
         coinsAdded = await this.coinService.addCoins(today, 1);
         coinAdded = coinsAdded > 0;
       }
-    } else {
-      // 不存在记录，说明是新建，给金币
-      coinsAdded = await this.coinService.addCoins(today, 1);
-      coinAdded = coinsAdded > 0;
     }
 
     const result = await this.answerModel

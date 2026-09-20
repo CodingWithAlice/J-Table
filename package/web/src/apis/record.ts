@@ -9,6 +9,7 @@ export interface RecordDTO {
 	solveTime?: string
 	isCorrect?: boolean
 	lastStatus?: boolean // 隔天重做状态
+	isCheck?: boolean // 校验只存草稿，不入账
 }
 
 // 列表查询 - 所有

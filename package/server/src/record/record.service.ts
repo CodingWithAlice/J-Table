@@ -8,7 +8,7 @@ import { AnswersService } from 'src/answer/answer.service';
 import { CoinService } from 'src/coin/coin.service';
 import { applyDurationBonus } from 'src/coin/coin-duration.util';
 import { getRedoWindowStart } from './redo-window.util';
-import { isRealSubmitRecord } from './record-coin.util';
+import { shouldAwardRecordCoins, wasAlreadyAwarded } from './record-coin.util';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
@@ -21,6 +21,7 @@ interface RecordDTO {
   solveTime?: string;
   isCorrect?: boolean;
   lastStatus?: boolean;
+  isCheck?: boolean;
 }
 
 @Injectable()
@@ -145,11 +146,11 @@ export class RecordsService {
         topicId: dto.topicId,
         submitTime: dto.submitTime,
       })
-      .select('isCorrect durationSec')
+      .select('isCorrect durationSec coinAwarded')
       .lean();
-    const alreadyAwarded = isRealSubmitRecord(existingRecord);
+    const shouldAwardSubmit = shouldAwardRecordCoins(dto, existingRecord);
 
-    // 1、更新/创建 做题记录
+    // 1、更新/创建 做题记录。校验只存草稿，不能把草稿当成已入账。
     const result = await this.recordModel
       .findOneAndUpdate(
         {
@@ -157,7 +158,15 @@ export class RecordsService {
           submitTime: dto.submitTime,
         },
         {
-          $set: dto,
+          $set: {
+            topicId: dto.topicId,
+            topicTitle: dto.topicTitle,
+            recentAnswer: dto.recentAnswer,
+            durationSec: dto.durationSec,
+            submitTime: dto.submitTime,
+            isCorrect: dto.isCorrect,
+            coinAwarded: shouldAwardSubmit || wasAlreadyAwarded(existingRecord),
+          },
         },
         {
           new: true, // 返回更新后的文档
@@ -166,12 +175,8 @@ export class RecordsService {
         },
       )
       .exec();
-    // 2、存储错误记录 wrongNotes
-    await this.answersService.updateAnswer(dto);
-
-    // 判断是否是真实做完题（有 durationSec 和 isCorrect）
-    const isRealSubmit = isRealSubmitRecord(dto);
-    const shouldAwardSubmit = isRealSubmit && !alreadyAwarded;
+    // 2、存储错误记录 wrongNotes。做题保存不算「修改题目答案」，不走改答案金币。
+    await this.answersService.updateAnswer(dto, { awardCoins: false });
 
     // 3、操作做题后的升降(隔天重做时不操作、修改做题记录时不操作-避免重复操作)
     // 只有在真实做完题时才操作升降
