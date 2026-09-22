@@ -1,12 +1,14 @@
-import { CheckSquareOutlined, FontColorsOutlined, LoadingOutlined } from "@ant-design/icons";
+import { CheckSquareOutlined, FontColorsOutlined, FormOutlined, LoadingOutlined } from "@ant-design/icons";
 import { Button, Form, Input, message, Radio, Flex, Tag, Switch, Tooltip } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { RecordApi, type RecordDTO } from "../apis/record";
 import dayjs from "dayjs";
 import { AIApi } from "../apis/ai";
 import { coinEventEmitter, COIN_CHANGED_EVENT } from "../utils/coinEvent";
 import { renderTextWithLinks } from "../utils/utils";
 import React from "react";
+import DurationTimer, { type DurationTimerHandle } from "./DurationTimer";
+import AnswerModal from "./AnswerModal";
 
 const { TextArea } = Input;
 interface AnswerProps {
@@ -104,32 +106,40 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
     const [showAILoading, setShowAILoading] = useState(true);
     const [compareLayout, setCompareLayout] = useState<CompareLayout>(() => safeReadLayout());
     const [useAiPro, setUseAiPro] = useState(false);
+    const durationTimerRef = useRef<DurationTimerHandle>(null);
     const colors = ["magenta", "red", "volcano", "orange", "gold", "lime", "green", "cyan", "blue", "purple"];
     // 检验、提交
     const handleCheck = (needAI: boolean) => {
+        // 计时中点保存必须立刻停表累加。timeout 里读到的表单仍是上一次已确认的分钟，
+        // 当前这一段还没 onChange，会把最后一次计时漏掉。
+        const flushedMinutes = durationTimerRef.current?.flush();
+        if (flushedMinutes !== undefined) {
+            form.setFieldsValue({ durationSec: flushedMinutes });
+        }
         setTimeout(() => {
             const newData = form.getFieldsValue();
+            if (flushedMinutes !== undefined) {
+                newData.durationSec = flushedMinutes;
+            }
             const data = {
                 ...record,
                 ...newData,
                 submitTime: dayjs().format('YYYY-MM-DD'),
                 topicTitle: title,
-                lastStatus
+                lastStatus,
+                isCheck: needAI,
             }
-            // AI 查询
-            if (needAI && showRightAnswer) {
-                handleAISuggest(data?.topicTitle, data?.recentAnswer, data?.rightAnswer);
-                return;
-            }
-            // 校验答案 - 做题时长 + 是否正确
-            if (showRightAnswer && (data?.isCorrect === undefined || data?.durationSec === undefined)) {
+            // 二次校验：仅拉 AI，同时仍把当前草稿（含时长）存档
+            const onlyAiAfterReveal = needAI && showRightAnswer;
+            // 提交时必须填时长 + 是否正确；校验不强制
+            if (!needAI && (data?.isCorrect === undefined || data?.durationSec === undefined || data?.durationSec === '')) {
                 message.error('请填写必填项');
                 return;
             }
-            
+
             // 判断是否是真实做完题（有 durationSec 和 isCorrect）
-            const isRealSubmit = data?.isCorrect !== undefined && data?.durationSec !== undefined;
-            
+            const isRealSubmit = !needAI && data?.isCorrect !== undefined && data?.durationSec !== undefined && data?.durationSec !== '';
+
             RecordApi.update(data).then(res => {
                 // 合并提示信息
                 if (res?.coinAdded) {
@@ -145,6 +155,9 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                 // 只有在真实做完题时才刷新 api/ltn 更新界面数据
                 if (isRealSubmit) {
                     fresh?.();
+                }
+                if (onlyAiAfterReveal) {
+                    handleAISuggest(data?.topicTitle, data?.recentAnswer, data?.rightAnswer);
                 }
                 // 保存完成后再返回，避免过滤弹窗等列表读到旧数据
                 if (!needAI) {
@@ -169,7 +182,14 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
 
     // 初始化
     useEffect(() => {
+        let cancelled = false;
+        form.resetFields();
+        setShowRightAnswer(false);
+        setShowAILoading(true);
+        setHistoryRecords([]);
+        setRecord(undefined);
         RecordApi.list(topicId).then((res) => {
+            if (cancelled) return;
             // 如果已经有 recentAnswer，应该显示正确答案区域
             const hasRecentAnswer = res?.record?.recentAnswer && res.record.recentAnswer.trim() !== '';
             const shouldShowRightAnswer = res?.showRightAnswer || hasRecentAnswer;
@@ -181,7 +201,27 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                 setRecord({ ...res.record, topicId });
             }
         })
+        return () => {
+            cancelled = true;
+        };
     }, [topicId, form])
+
+    const rightAnswerLabel = (
+        <AnswerModal
+            key={topicId}
+            title={title}
+            type="rightAnswer"
+            topicId={topicId}
+            onSaved={(rightAnswer) => form.setFieldsValue({ rightAnswer })}
+        >
+            <Tooltip title="修改题目答案">
+                <span>
+                    正确答案
+                    <FormOutlined style={{ marginLeft: 6 }} />
+                </span>
+            </Tooltip>
+        </AnswerModal>
+    );
 
     return <Form form={form}>
         {showRightAnswer && (
@@ -220,7 +260,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                     </Form.Item>
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                    <Form.Item name="rightAnswer" label="正确答案">
+                    <Form.Item name="rightAnswer" label={rightAnswerLabel}>
                         <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues?.rightAnswer !== currentValues?.rightAnswer}>
                             {({ getFieldValue }) => {
                                 const rightAnswer = getFieldValue('rightAnswer');
@@ -250,7 +290,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                     />
                 </Form.Item>
                 {showRightAnswer && (
-                    <Form.Item name="rightAnswer" label="正确答案">
+                    <Form.Item name="rightAnswer" label={rightAnswerLabel}>
                         <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues?.rightAnswer !== currentValues?.rightAnswer}>
                             {({ getFieldValue }) => {
                                 const rightAnswer = getFieldValue('rightAnswer');
@@ -299,9 +339,20 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                     autoSize={{ minRows: 1, maxRows: 12 }}
                 ></TextArea>
             </Form.Item>
-            <Form.Item name="durationSec" label="做题时长" rules={[{ required: true }]}>
-                <Input placeholder="单位：分钟"></Input>
-            </Form.Item>
+        </>)}
+        {/* 做题时长：初次只显示开始计时；校验后 / 已有累积值才显示输入框 */}
+        <Form.Item
+            name="durationSec"
+            label="做题时长"
+            rules={showRightAnswer ? [{ required: true, message: '请填写做题时长' }] : undefined}
+        >
+            <DurationTimer
+                key={topicId}
+                timerRef={durationTimerRef}
+                forceShowInput={showRightAnswer}
+            />
+        </Form.Item>
+        {showRightAnswer && (
             <Form.Item name="isCorrect" label="是否正确" rules={[{ required: true }]}>
                 <Radio.Group
                     options={[
@@ -310,7 +361,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                     ]}
                 />
             </Form.Item>
-        </>)}
+        )}
         {/* 按钮 */}
         <Form.Item label={null} className='check-btn-wrap'>
             <Flex align="center" justify="flex-end" gap={8} style={{ width: '100%' }}>

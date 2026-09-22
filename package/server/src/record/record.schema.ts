@@ -20,6 +20,9 @@ export class Record extends Document {
 
   @Prop({ required: true })
   recentAnswer: string; // 最近一次的答案
+
+  @Prop()
+  coinAwarded: boolean; // 当天该题是否已为真实提交入过账
 }
 
 export const RecordSchema = SchemaFactory.createForClass(Record);

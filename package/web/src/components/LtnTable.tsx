@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useMediaQuery } from "@mui/material";
 import { LtnApi } from "../apis/ltn";
 import LtnList from "./LtnList";
 import FilterBtn from "./FilterBtn";
@@ -8,6 +9,8 @@ import { useSearchParams } from "react-router-dom";
 import TodayRecordBtn from "./TodayRecordBtn";
 import DoitSecondBtn from "./DoitSecondBtn";
 import CoinStatsBtn from "./CoinStatsBtn";
+import StartPracticeBtn from "./StartPracticeBtn";
+import { getFloatBtnOffsets } from "../utils/floatBtnLayout";
 
 export interface TimeProps {
     start?: string,
@@ -37,6 +40,8 @@ export default function LtnTable() {
     let [ltns, setLtns] = useState<LtnsProps>({});
     const modal = params.get('modal'); // redoNextDay | minDateFilter
     const refreshKey = params.get('refresh') || '';
+    const isMobile = useMediaQuery('(max-width: 767px)');
+    const floatOffsets = getFloatBtnOffsets(isMobile);
 
     const init = useCallback((params?: TimeProps) => {
         LtnApi.list(params).then((data) => {
@@ -78,23 +83,28 @@ export default function LtnTable() {
         </div>)}
         {/* 过滤 */}
         <FilterBtn
+            insetInlineEnd={floatOffsets.filter}
             open={modal === 'minDateFilter'}
             refreshKey={refreshKey}
             onOpenChange={(open) => open ? openModal('minDateFilter') : closeModal()}
         />
-        {/* 线轴 */}
-        <TimeModalBtn />
+        {/* 线轴：手机端隐藏 */}
+        <TimeModalBtn insetInlineEnd={floatOffsets.timeline} hidden={isMobile} />
          {/* 添加 */}
-        <AddLtnBtn fresh={init} />
+        <AddLtnBtn insetInlineEnd={floatOffsets.add} fresh={init} />
         {/* 今日做题记录 */}
-        <TodayRecordBtn />
-        {/* 隔天重做 */}
+        <TodayRecordBtn insetInlineEnd={floatOffsets.today} />
+        {/* 隔天重做：手机端隐藏入口，保留弹窗以便桌面跳转回来 */}
         <DoitSecondBtn
+            insetInlineEnd={floatOffsets.redo}
+            hidden={isMobile}
             open={modal === 'redoNextDay'}
             refreshKey={refreshKey}
             onOpenChange={(open) => open ? openModal('redoNextDay') : closeModal()}
         />
         {/* 金币统计 */}
-        <CoinStatsBtn />
+        <CoinStatsBtn insetInlineEnd={floatOffsets.coin} />
+        {/* 开始：按推荐做题时间 + LTN 顺序跳转第一题 */}
+        <StartPracticeBtn insetInlineEnd={floatOffsets.start ?? 374} />
     </div>
 }

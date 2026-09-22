@@ -189,11 +189,11 @@ export class LtnService {
 
     // 添加题目成功后，给金币
     const today = dayjs().format('YYYY-MM-DD');
-    await this.coinService.addCoins(today, 1);
-    const coinAdded = true;
+    const coinsAdded = await this.coinService.addCoins(today, 1);
+    const coinAdded = coinsAdded > 0;
 
-    // 将 coinAdded 放在 data 内部，确保前端能正确获取
-    return { data: { ...newLtn, levels, levelId, coinAdded } };
+    // 将 coinAdded / coinsAdded 放在 data 内部，确保前端能正确获取
+    return { data: { ...newLtn, levels, levelId, coinAdded, coinsAdded } };
   }
 
   findOne(id: number): Promise<Ltn> {

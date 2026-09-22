@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import Time from "./Time";
 import { TimeApi } from "../apis/time";
 
-export default function TimeModalBtn() {
+export default function TimeModalBtn({
+    insetInlineEnd = 94,
+    hidden,
+}: {
+    insetInlineEnd?: number;
+    hidden?: boolean;
+}) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [timeLineType, setTimeLineType] = useState<'LTN' | 'all'>('LTN');
     const [timeData, setTimeData] = useState([]);
@@ -43,16 +49,18 @@ export default function TimeModalBtn() {
     }, []);
 
     return <>
+        {!hidden && (
         <FloatButton
             shape="square"
             type="primary"
             style={{
-                insetInlineEnd: 94,
+                insetInlineEnd,
             }}
             description="线轴"
             icon={<FieldTimeOutlined />}
             onClick={showModal}
         />
+        )}
         <Modal 
             title={titleNode} 
             open={isModalOpen} 

@@ -7,6 +7,8 @@ import dayjs from 'dayjs';
 import { AnswersService } from 'src/answer/answer.service';
 import { CoinService } from 'src/coin/coin.service';
 import { applyDurationBonus } from 'src/coin/coin-duration.util';
+import { getRedoWindowStart } from './redo-window.util';
+import { shouldAwardRecordCoins, wasAlreadyAwarded } from './record-coin.util';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
@@ -19,6 +21,7 @@ interface RecordDTO {
   solveTime?: string;
   isCorrect?: boolean;
   lastStatus?: boolean;
+  isCheck?: boolean;
 }
 
 @Injectable()
@@ -95,9 +98,10 @@ export class RecordsService {
     return { data };
   }
 
-  // 查询隔天重做的记录
+  // 查询隔天重做的记录（仅保留最近 7 天仍是错题的最新记录，历史数据不删）
   async findLastWrong() {
-    // 1、聚合查询：先找到每个topicId的最新记录，再筛选出错误记录
+    const redoWindowStart = getRedoWindowStart();
+    // 1、聚合查询：先找到每个topicId的最新记录，再筛选出窗口内的错误记录
     const incorrectRecords = await this.recordModel.aggregate([
       {
         $sort: { submitTime: -1 }, // 按提交时间倒序
@@ -112,7 +116,10 @@ export class RecordsService {
         $replaceRoot: { newRoot: '$latestRecord' }, // 展开为完整文档
       },
       {
-        $match: { isCorrect: false }, // 筛选出最新记录中仍然是错误的题目
+        $match: {
+          isCorrect: false, // 最新记录仍是错题
+          submitTime: { $gte: redoWindowStart }, // 超过 7 天窗口则从列表摘掉
+        },
       },
       {
         $project: { _id: 0 }, // 排除MongoDB默认_id
@@ -133,7 +140,17 @@ export class RecordsService {
 
   // 修改记录信息
   async updateRecord(dto: RecordDTO) {
-    // 1、更新/创建 做题记录
+    // 入账前先看当天这题是否已经真实提交过，避免覆盖记录时重复加金币
+    const existingRecord = await this.recordModel
+      .findOne({
+        topicId: dto.topicId,
+        submitTime: dto.submitTime,
+      })
+      .select('isCorrect durationSec coinAwarded')
+      .lean();
+    const shouldAwardSubmit = shouldAwardRecordCoins(dto, existingRecord);
+
+    // 1、更新/创建 做题记录。校验只存草稿，不能把草稿当成已入账。
     const result = await this.recordModel
       .findOneAndUpdate(
         {
@@ -141,7 +158,15 @@ export class RecordsService {
           submitTime: dto.submitTime,
         },
         {
-          $set: dto,
+          $set: {
+            topicId: dto.topicId,
+            topicTitle: dto.topicTitle,
+            recentAnswer: dto.recentAnswer,
+            durationSec: dto.durationSec,
+            submitTime: dto.submitTime,
+            isCorrect: dto.isCorrect,
+            coinAwarded: shouldAwardSubmit || wasAlreadyAwarded(existingRecord),
+          },
         },
         {
           new: true, // 返回更新后的文档
@@ -150,15 +175,12 @@ export class RecordsService {
         },
       )
       .exec();
-    // 2、存储错误记录 wrongNotes
-    await this.answersService.updateAnswer(dto);
-
-    // 判断是否是真实做完题（有 durationSec 和 isCorrect）
-    const isRealSubmit = dto?.isCorrect !== undefined && dto?.durationSec !== undefined;
+    // 2、存储错误记录 wrongNotes。做题保存不算「修改题目答案」，不走改答案金币。
+    await this.answersService.updateAnswer(dto, { awardCoins: false });
 
     // 3、操作做题后的升降(隔天重做时不操作、修改做题记录时不操作-避免重复操作)
     // 只有在真实做完题时才操作升降
-    if (isRealSubmit && dto?.solveTime !== dto.submitTime && !dto?.lastStatus) {
+    if (shouldAwardSubmit && dto?.solveTime !== dto.submitTime && !dto?.lastStatus) {
       await this.ltnService.updateBoxId({
         id: dto.topicId,
         type: dto?.isCorrect ? 'update' : 'degrade', // boxId 的升降
@@ -166,10 +188,10 @@ export class RecordsService {
       });
     }
 
-    // 4、计算并添加金币（只有在真实做完题时才给金币）
+    // 4、计算并添加金币（同一 topicId + 当天只入账一次）
     let coinAdded = false;
     let coinsAdded = 0;
-    if (isRealSubmit) {
+    if (shouldAwardSubmit) {
       const ltn = await this.ltnService.findOne(dto.topicId);
       if (ltn) {
         const boxId = ltn.boxId;
@@ -192,11 +214,14 @@ export class RecordsService {
           baseCoins = 1;
         }
 
-        coinsAdded = applyDurationBonus(baseCoins, dto.durationSec);
+        const baseWithDuration = applyDurationBonus(baseCoins, dto.durationSec);
 
-        if (coinsAdded > 0) {
-          await this.coinService.addCoins(dto.submitTime, coinsAdded);
-          coinAdded = true;
+        if (baseWithDuration > 0) {
+          coinsAdded = await this.coinService.addCoins(
+            dto.submitTime,
+            baseWithDuration,
+          );
+          coinAdded = coinsAdded > 0;
         }
       }
     }

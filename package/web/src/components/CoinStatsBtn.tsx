@@ -5,7 +5,7 @@ import { CoinApi } from "../apis/coin";
 import { coinEventEmitter, COIN_CHANGED_EVENT } from "../utils/coinEvent";
 import CoinStatsModal from "./CoinStatsModal";
 
-export default function CoinStatsBtn() {
+export default function CoinStatsBtn({ insetInlineEnd = 374 }: { insetInlineEnd?: number }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [totalCoins, setTotalCoins] = useState<number>(0);
     const [trendData, setTrendData] = useState<Array<{ date: string; coins: number }>>([]);
@@ -65,7 +65,7 @@ export default function CoinStatsBtn() {
             shape="square"
             type="primary"
             style={{
-                insetInlineEnd: 374,
+                insetInlineEnd,
             }}
             description={<span className="coin-stats-float-btn__desc">💰 {totalCoins}</span>}
             icon={<DollarOutlined />}

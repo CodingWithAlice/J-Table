@@ -78,3 +78,35 @@ code {
   white-space: nowrap;
   word-break: keep-all;
 }
+
+.coin-stats-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.coin-streak-hint {
+  text-align: right;
+  padding-top: 4px;
+}
+
+.coin-streak-hint__fires {
+  font-size: 22px;
+  letter-spacing: 2px;
+  line-height: 1.2;
+}
+
+.coin-streak-hint__text {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fa541c;
+}
+
+.redo-window-hint {
+  margin: 0 0 12px;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 13px;
+}
+

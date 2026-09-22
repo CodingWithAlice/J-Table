@@ -8,7 +8,7 @@ import { coinEventEmitter, COIN_CHANGED_EVENT } from "../utils/coinEvent";
 
 const { Title } = Typography;
 
-export default function AddLtnBtn({ fresh }: { fresh: () => void }) {
+export default function AddLtnBtn({ fresh, insetInlineEnd = 164 }: { fresh: () => void; insetInlineEnd?: number }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [title, setTitle] = useState('');
     const [source, setSource] = useState(0);
@@ -32,7 +32,7 @@ export default function AddLtnBtn({ fresh }: { fresh: () => void }) {
         }
         LtnApi.add(data).then((res) => {
             if (res?.coinAdded) {
-                message.success('金币 +1 👏🏻');
+                message.success(`金币 +${res?.coinsAdded ?? 1} 👏🏻`);
                 // 触发金币变更事件
                 coinEventEmitter.emit(COIN_CHANGED_EVENT);
             }
@@ -60,7 +60,7 @@ export default function AddLtnBtn({ fresh }: { fresh: () => void }) {
             shape="square"
             type="primary"
             style={{
-                insetInlineEnd: 164,
+                insetInlineEnd,
             }}
             description="添加"
             icon={<AppstoreAddOutlined />}

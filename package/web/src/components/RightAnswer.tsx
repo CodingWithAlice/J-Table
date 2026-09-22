@@ -6,7 +6,7 @@ import { coinEventEmitter, COIN_CHANGED_EVENT } from "../utils/coinEvent";
 
 const { TextArea } = Input;
 
-export default function RightAnswer({ placeholder, topicId, title, closeModal }: { placeholder: string, topicId: number, title: string, closeModal: () => void }) {
+export default function RightAnswer({ placeholder, topicId, title, closeModal, onSaved }: { placeholder: string, topicId: number, title: string, closeModal: () => void, onSaved?: (rightAnswer: string) => void }) {
     const [answer, setAnswer] = useState<string>('');
     const [isNew, setIsNew] = useState<boolean>(false);
 
@@ -24,13 +24,15 @@ export default function RightAnswer({ placeholder, topicId, title, closeModal }:
         AnswerApi.update(data).then(res => {
             // 合并提示信息
             if (res?.coinAdded) {
-                message.success(isNew ? '添加成功，金币 +1 👏🏻' : '修改成功，金币 +1 👏🏻');
+                const coins = res?.coinsAdded ?? 1;
+                message.success(isNew ? `添加成功，金币 +${coins} 👏🏻` : `修改成功，金币 +${coins} 👏🏻`);
                 // 触发金币变更事件
                 coinEventEmitter.emit(COIN_CHANGED_EVENT);
             } else {
                 message.success(isNew ? '添加成功' : '修改成功');
             }
             isNew && setIsNew(false);
+            onSaved?.(answer);
             closeModal();
         }).catch(e => {
             if (e instanceof Error) {
