@@ -38,6 +38,13 @@ function getRecordLabel(item: RecordDTO): string {
     return parseQuestionTitle(raw).shortTitle || raw;
 }
 
+function formatItemDuration(value: unknown): string {
+    if (value === undefined || value === null || value === '') return '—';
+    const n = Number(value);
+    if (!Number.isFinite(n) || n < 0) return '—';
+    return `${n}m`;
+}
+
 export default function TodayRecordBtn({ insetInlineEnd = 234 }: { insetInlineEnd?: number }) {
     const [modalShow, setModalShow] = useState(false);
     const [list, setList] = useState<RecordDTO[]>([]);
@@ -131,7 +138,6 @@ export default function TodayRecordBtn({ insetInlineEnd = 234 }: { insetInlineEn
                         {list.map((item, index) => {
                             const label = getRecordLabel(item);
                             const fullTitle = String(item?.topicTitle || item?.topicId || '');
-                            const minutes = toMinutes(item.durationSec);
                             return (
                                 <div key={item.topicId} className="record-date-item">
                                     <span className="record-date-item__index">{index + 1}.</span>
@@ -141,7 +147,7 @@ export default function TodayRecordBtn({ insetInlineEnd = 234 }: { insetInlineEn
                                         </Tooltip>
                                     </div>
                                     <span className="record-date-item__meta">
-                                        {item?.isCorrect ? '✅' : '❌'} {minutes}m
+                                        {item?.isCorrect ? '✅' : '❌'} {formatItemDuration(item.durationSec)}
                                     </span>
                                 </div>
                             );
