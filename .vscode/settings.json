@@ -1,5 +1,13 @@
 {
 	"git.ignoreLimitWarning": true,
 	"editor.tabSize": 4,
-    "cSpell.userWords": ["ltns", "Popconfirm", "Appstore", "codingwithalice", "iterm", "deepseek"]
+    "cSpell.userWords": [
+        "ltns",
+        "Popconfirm",
+        "Appstore",
+        "codingwithalice",
+        "iterm",
+        "deepseek"
+    ],
+    "svn.ignoreMissingSvnWarning": true
 }

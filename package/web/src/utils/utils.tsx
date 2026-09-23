@@ -15,44 +15,38 @@ export const CategoryColor = {
     Health: 'volcano'
 }
 
-// URL 检测正则表达式
-const URL_REGEX = /(https?:\/\/[^\s]+)/g;
+// 每次调用新建，避免 /g 正则的 lastIndex 在多次 exec 之间串状态。
+const markdownLink = () => /\[([^\]\n]+)\]\((https?:\/\/[^)\s]+)\)/g;
 
 /**
- * 检测文本是否为 URL
+ * 只把 [文章标题](url) 渲染成链接，其余文本保持原样。
  */
-export function isUrl(text: string): boolean {
-    return URL_REGEX.test(text.trim());
-}
-
-/**
- * 将文本中的 URL 转换为可点击的链接元素（使用 Ant Design Typography.Link）
- * @param text 要处理的文本
- * @param linkTitle 链接的显示标题，如果提供则使用此标题替代 URL 作为显示文本
- */
-export function renderTextWithLinks(text: string | undefined | null, linkTitle?: string): React.ReactNode {
+export function renderTextWithLinks(text: string | undefined | null): React.ReactNode {
     if (!text) return text;
-    
-    // 如果整个文本就是一个 URL，直接返回链接
-    const trimmedText = text.trim();
-    if (isUrl(trimmedText)) {
-        return (
-            <Link href={trimmedText} target="_blank" rel="noopener noreferrer">
-                {linkTitle || trimmedText}
+
+    const re = markdownLink();
+    const nodes: React.ReactNode[] = [];
+    let last = 0;
+    let index = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = re.exec(text)) !== null) {
+        const start = match.index;
+        if (start > last) {
+            nodes.push(<span key={`t-${index}`}>{text.slice(last, start)}</span>);
+        }
+        nodes.push(
+            <Link key={`l-${index}`} href={match[2]} target="_blank" rel="noopener noreferrer">
+                {match[1]}
             </Link>
         );
+        last = start + match[0].length;
+        index += 1;
     }
-    
-    // 如果文本中包含 URL，将 URL 部分转换为链接
-    const parts = text.split(URL_REGEX);
-    return parts.map((part, index) => {
-        if (isUrl(part)) {
-            return (
-                <Link key={index} href={part} target="_blank" rel="noopener noreferrer">
-                    {linkTitle || part}
-                </Link>
-            );
-        }
-        return <span key={index}>{part}</span>;
-    });
+
+    if (index === 0) return text;
+    if (last < text.length) {
+        nodes.push(<span key="t-end">{text.slice(last)}</span>);
+    }
+    return nodes;
 }

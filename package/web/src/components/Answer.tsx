@@ -268,7 +268,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                                     <CollapsibleBlock
                                         value={rightAnswer}
                                         placeholder={<span style={{ color: '#bfbfbf' }}>{placeholder}</span>}
-                                        render={(t) => renderTextWithLinks(t, title)}
+                                        render={(t) => renderTextWithLinks(t)}
                                         maxPreviewLines={6}
                                     />
                                 );
@@ -298,7 +298,7 @@ export default function Answer({ placeholder, topicId, closeModal, title, lastSt
                                     <CollapsibleBlock
                                         value={rightAnswer}
                                         placeholder={<span style={{ color: '#bfbfbf' }}>{placeholder}</span>}
-                                        render={(t) => renderTextWithLinks(t, title)}
+                                        render={(t) => renderTextWithLinks(t)}
                                         maxPreviewLines={6}
                                     />
                                 );
