@@ -178,7 +178,46 @@ export class RecordsService {
     // 2、存储错误记录 wrongNotes。做题保存不算「修改题目答案」，不走改答案金币。
     await this.answersService.updateAnswer(dto, { awardCoins: false });
 
-    // 3、操作做题后的升降(隔天重做时不操作、修改做题记录时不操作-避免重复操作)
+    // 3、用做题前的 boxId 算金币（同一 topicId + 当天只入账一次）。
+    // 必须在升降箱之前取 boxId，否则做对升箱后会按新箱位给 1 分，做错却仍按 box1 给 2 分。
+    let coinAdded = false;
+    let coinsAdded = 0;
+    const ltn = shouldAwardSubmit
+      ? await this.ltnService.findOne(dto.topicId)
+      : null;
+    if (shouldAwardSubmit && ltn) {
+      const boxId = ltn.boxId;
+      let baseCoins = 0;
+
+      // box1 初次做题：2 金币
+      if (
+        dto?.solveTime !== dto.submitTime &&
+        !dto?.lastStatus &&
+        boxId === 1
+      ) {
+        baseCoins = 2;
+      }
+      // box1 隔天重做：1 金币
+      else if (dto?.lastStatus === true && boxId === 1) {
+        baseCoins = 1;
+      }
+      // 其他 box 做题：1 金币
+      else if (boxId >= 2 && boxId <= 6) {
+        baseCoins = 1;
+      }
+
+      const baseWithDuration = applyDurationBonus(baseCoins, dto.durationSec);
+
+      if (baseWithDuration > 0) {
+        coinsAdded = await this.coinService.addCoins(
+          dto.submitTime,
+          baseWithDuration,
+        );
+        coinAdded = coinsAdded > 0;
+      }
+    }
+
+    // 4、操作做题后的升降(隔天重做时不操作、修改做题记录时不操作-避免重复操作)
     // 只有在真实做完题时才操作升降
     if (shouldAwardSubmit && dto?.solveTime !== dto.submitTime && !dto?.lastStatus) {
       await this.ltnService.updateBoxId({
@@ -186,44 +225,6 @@ export class RecordsService {
         type: dto?.isCorrect ? 'update' : 'degrade', // boxId 的升降
         time: dto.submitTime,
       });
-    }
-
-    // 4、计算并添加金币（同一 topicId + 当天只入账一次）
-    let coinAdded = false;
-    let coinsAdded = 0;
-    if (shouldAwardSubmit) {
-      const ltn = await this.ltnService.findOne(dto.topicId);
-      if (ltn) {
-        const boxId = ltn.boxId;
-        let baseCoins = 0;
-
-        // box1 初次做题：2 金币
-        if (
-          dto?.solveTime !== dto.submitTime &&
-          !dto?.lastStatus &&
-          boxId === 1
-        ) {
-          baseCoins = 2;
-        }
-        // box1 隔天重做：1 金币
-        else if (dto?.lastStatus === true && boxId === 1) {
-          baseCoins = 1;
-        }
-        // 其他 box 做题：1 金币
-        else if (boxId >= 2 && boxId <= 6) {
-          baseCoins = 1;
-        }
-
-        const baseWithDuration = applyDurationBonus(baseCoins, dto.durationSec);
-
-        if (baseWithDuration > 0) {
-          coinsAdded = await this.coinService.addCoins(
-            dto.submitTime,
-            baseWithDuration,
-          );
-          coinAdded = coinsAdded > 0;
-        }
-      }
     }
 
     // 返回更新后的文档（兼容原有逻辑）

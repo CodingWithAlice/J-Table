@@ -39,39 +39,37 @@ export class AnswersService {
     let coinsAdded = 0;
     const today = dayjs().format('YYYY-MM-DD');
 
-    // 做题保存会顺带更新 wrongNotes，只有显式「修改题目答案」才入账
+    // 做题保存会顺带更新 wrongNotes（awardCoins: false），只有显式「修改题目答案」才入账。
+    // 用 lastAnswerCoinDate 判断，不能用 updatedAt：做题触碰文档也会刷新 updatedAt。
     if (options?.awardCoins !== false) {
-      const existingAnswer = (await this.answerModel
+      const existingAnswer = await this.answerModel
         .findOne({ topicId: dto.topicId })
-        .select('updatedAt')
-        .lean()) as any; // timestamps 由 mongoose 自动添加
+        .select('lastAnswerCoinDate')
+        .lean();
 
-      if (existingAnswer && existingAnswer.updatedAt) {
-        const lastUpdatedDate = dayjs(existingAnswer.updatedAt).format(
-          'YYYY-MM-DD',
-        );
+      const alreadyAwardedToday =
+        existingAnswer?.lastAnswerCoinDate === today;
 
-        if (lastUpdatedDate !== today) {
-          coinsAdded = await this.coinService.addCoins(today, 1);
-          coinAdded = coinsAdded > 0;
-        }
-      } else {
+      if (!alreadyAwardedToday) {
         coinsAdded = await this.coinService.addCoins(today, 1);
         coinAdded = coinsAdded > 0;
       }
     }
 
+    const $set: Record<string, unknown> = {
+      rightAnswer: dto.rightAnswer,
+      wrongNotes: dto.wrongNotes,
+      topicTitle: dto.topicTitle, // 可选更新字段
+      topicId: dto.topicId,
+    };
+    if (coinAdded) {
+      $set.lastAnswerCoinDate = today;
+    }
+
     const result = await this.answerModel
       .findOneAndUpdate(
         { topicId: dto.topicId },
-        {
-          $set: {
-            rightAnswer: dto.rightAnswer,
-            wrongNotes: dto.wrongNotes,
-            topicTitle: dto.topicTitle, // 可选更新字段
-            topicId: dto.topicId,
-          },
-        },
+        { $set },
         {
           new: true, // 返回更新后的文档
           upsert: true, // 如果不存在则创建
