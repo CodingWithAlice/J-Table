@@ -9,6 +9,10 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { getCoinStreakStatus } from "../utils/getCoinStreakStatus";
+import {
+    getWeeklyCoinGoal,
+    WEEKLY_COIN_GOAL,
+} from "../utils/getWeeklyCoinGoal";
 
 export interface CoinTrendItem {
     date: string;
@@ -33,6 +37,7 @@ export default function CoinStatsModal({
         (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
     const streak = getCoinStreakStatus(trendData);
+    const weekly = getWeeklyCoinGoal(trendData, streak.fires);
 
     return (
         <Modal
@@ -43,15 +48,24 @@ export default function CoinStatsModal({
             width={600}
         >
             <div className="coin-stats-summary">
-                <Statistic
-                    title="总金币数"
-                    value={totalCoins}
-                    valueStyle={{
-                        fontSize: "32px",
-                        fontWeight: "bold",
-                        color: "#1890ff",
-                    }}
-                />
+                <div className="coin-stats-summary__main">
+                    <Statistic
+                        title="最近6天"
+                        value={weekly.pastSixSum}
+                        suffix={`/ ${WEEKLY_COIN_GOAL}`}
+                        valueStyle={{
+                            fontSize: "32px",
+                            fontWeight: "bold",
+                            color: weekly.met ? "#52c41a" : "#1890ff",
+                        }}
+                    />
+                    <div
+                        className={`coin-weekly-tip${weekly.met ? " coin-weekly-tip--met" : ""}`}
+                    >
+                        {weekly.tip}
+                    </div>
+                    <div className="coin-stats-total">累计 {totalCoins}</div>
+                </div>
                 {streak.fires > 0 && (
                     <div className="coin-streak-hint">
                         <div className="coin-streak-hint__fires" aria-label={`连续 ${streak.fires} 天`}>

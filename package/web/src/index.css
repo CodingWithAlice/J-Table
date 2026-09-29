@@ -86,9 +86,32 @@ code {
   gap: 16px;
 }
 
+.coin-stats-summary__main {
+  min-width: 0;
+}
+
+.coin-weekly-tip {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1677ff;
+}
+
+.coin-weekly-tip--met {
+  color: #389e0d;
+}
+
+.coin-stats-total {
+  margin-top: 6px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
 .coin-streak-hint {
   text-align: right;
   padding-top: 4px;
+  flex-shrink: 0;
 }
 
 .coin-streak-hint__fires {
