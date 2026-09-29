@@ -1,15 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/sequelize';
 import { Coin } from '../models/coin.model';
+import { YearPlanItem } from '../models/year-plan-item.model';
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
 import { getStreakStatusForDate } from './coin-streak.util';
+
+const LTN_COINS_KIND = 'ltn_coins';
+const DEFAULT_USER_ID = 9301;
 
 @Injectable()
 export class CoinService {
   constructor(
     @InjectModel(Coin)
     private coinModel: typeof Coin,
+    @InjectModel(YearPlanItem)
+    private yearPlanItemModel: typeof YearPlanItem,
+    private readonly configService: ConfigService,
   ) {}
 
   // 添加金币（按日期累加，入账时乘连续学习倍率）
@@ -50,6 +58,35 @@ export class CoinService {
   async getTotalCoins(): Promise<number> {
     const result = await this.coinModel.sum('coins');
     return result || 0;
+  }
+
+  private getMainUserId(): number {
+    const raw = this.configService.get<string>('MAIN_USER_ID');
+    if (raw == null || String(raw).trim() === '') {
+      return DEFAULT_USER_ID;
+    }
+    return parseInt(String(raw).trim(), 10) || DEFAULT_USER_ID;
+  }
+
+  /** 当年 year_plan_item.kind=ltn_coins 的目标金币，作为总金币分母 */
+  async getYearCoinTarget(year: number = dayjs().year()): Promise<number | null> {
+    const row = await this.yearPlanItemModel.findOne({
+      where: {
+        userId: this.getMainUserId(),
+        planYear: year,
+        kind: LTN_COINS_KIND,
+      },
+      attributes: ['targetValue'],
+      order: [
+        ['sortOrder', 'ASC'],
+        ['id', 'ASC'],
+      ],
+    });
+    if (!row) {
+      return null;
+    }
+    const target = Number(row.targetValue);
+    return Number.isFinite(target) && target > 0 ? target : null;
   }
 
   // 获取每日金币列表

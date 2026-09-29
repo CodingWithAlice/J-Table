@@ -23,6 +23,7 @@ interface CoinStatsModalProps {
     open: boolean;
     onCancel: () => void;
     totalCoins: number;
+    yearTarget: number | null;
     trendData: CoinTrendItem[];
 }
 
@@ -30,6 +31,7 @@ export default function CoinStatsModal({
     open,
     onCancel,
     totalCoins,
+    yearTarget,
     trendData,
 }: CoinStatsModalProps) {
     // 折线图需要按时间正序（从左到右为时间递增）
@@ -50,21 +52,29 @@ export default function CoinStatsModal({
             <div className="coin-stats-summary">
                 <div className="coin-stats-summary__main">
                     <Statistic
-                        title="最近6天"
-                        value={weekly.pastSixSum}
-                        suffix={`/ ${WEEKLY_COIN_GOAL}`}
+                        title="总金币数"
+                        value={totalCoins}
+                        suffix={
+                            yearTarget != null ? (
+                                <span className="coin-year-goal">/ {yearTarget}</span>
+                            ) : undefined
+                        }
                         valueStyle={{
                             fontSize: "32px",
                             fontWeight: "bold",
-                            color: weekly.met ? "#52c41a" : "#1890ff",
+                            color: "#1890ff",
                         }}
                     />
-                    <div
-                        className={`coin-weekly-tip${weekly.met ? " coin-weekly-tip--met" : ""}`}
-                    >
-                        {weekly.tip}
+                    <div className="coin-stats-weekly">
+                        <span className="coin-stats-weekly__label">
+                            最近6天 {weekly.pastSixSum}/{WEEKLY_COIN_GOAL}
+                        </span>
+                        <div
+                            className={`coin-weekly-tip${weekly.met ? " coin-weekly-tip--met" : ""}`}
+                        >
+                            {weekly.tip}
+                        </div>
                     </div>
-                    <div className="coin-stats-total">累计 {totalCoins}</div>
                 </div>
                 {streak.fires > 0 && (
                     <div className="coin-streak-hint">

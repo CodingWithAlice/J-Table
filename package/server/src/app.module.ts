@@ -18,6 +18,7 @@ import { BooksRecord } from './models/books-record.model';
 import { BooksRecordModule } from './books-record/books-record.module';
 import { DeepSeekModule } from './deepseek/deepseek.module';
 import { Coin } from './models/coin.model';
+import { YearPlanItem } from './models/year-plan-item.model';
 import { CoinModule } from './coin/coin.module';
 
 @Module({
@@ -40,7 +41,7 @@ import { CoinModule } from './coin/coin.module';
         username: configService.get<string>('DB_USER') || 'root',
         password: configService.get<string>('DB_PASSWORD') || 'localhost',
         database: configService.get<string>('DB_DATABASE') || 'Daily',
-        models: [Ltn, Routine, Time, Level, Serial, BooksRecord, Coin],
+        models: [Ltn, Routine, Time, Level, Serial, BooksRecord, Coin, YearPlanItem],
       }),
       inject: [ConfigService],
     }),

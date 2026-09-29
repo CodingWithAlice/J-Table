@@ -90,8 +90,24 @@ code {
   min-width: 0;
 }
 
+.coin-year-goal {
+  margin-left: 4px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #f5222d;
+}
+
+.coin-stats-weekly {
+  margin-top: 12px;
+}
+
+.coin-stats-weekly__label {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
 .coin-weekly-tip {
-  margin-top: 8px;
+  margin-top: 4px;
   font-size: 15px;
   font-weight: 600;
   line-height: 1.4;
@@ -100,12 +116,6 @@ code {
 
 .coin-weekly-tip--met {
   color: #389e0d;
-}
-
-.coin-stats-total {
-  margin-top: 6px;
-  font-size: 13px;
-  color: rgba(0, 0, 0, 0.45);
 }
 
 .coin-streak-hint {

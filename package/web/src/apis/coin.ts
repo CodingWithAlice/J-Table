@@ -1,7 +1,7 @@
 import { request } from '../utils/request'
 
-// 获取总金币数
-function getTotal() {
+// 获取总金币数与当年年计划目标
+function getTotal(): Promise<{ total: number; yearTarget: number | null }> {
 	return request({
 		url: '/api/coin/total',
 	})

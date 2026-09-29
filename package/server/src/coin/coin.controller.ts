@@ -7,8 +7,11 @@ export class CoinController {
 
   @Get('total')
   async getTotal() {
-    const total = await this.coinService.getTotalCoins();
-    return { data: total };
+    const [total, yearTarget] = await Promise.all([
+      this.coinService.getTotalCoins(),
+      this.coinService.getYearCoinTarget(),
+    ]);
+    return { data: { total, yearTarget } };
   }
 
   @Get('daily')
