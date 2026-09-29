@@ -59,6 +59,21 @@ export default function DoitSecondBtn({
             open={realOpen}
             onOk={() => changeModalShow(false)}
             onCancel={() => changeModalShow(false)}
+            styles={{
+                content: {
+                    maxHeight: "80vh",
+                    display: "flex",
+                    flexDirection: "column",
+                    overflow: "hidden",
+                },
+                header: { flexShrink: 0 },
+                body: {
+                    overflowY: "auto",
+                    flex: "1 1 auto",
+                    minHeight: 0,
+                },
+                footer: { flexShrink: 0 },
+            }}
         >
             <p className="redo-window-hint">仅显示最近 7 天仍需重做的题目，更早的错题会从列表中摘掉。</p>
             <LtnList list={list} boxId={0} lastStatus={true} fresh={initTodayRecord} returnModal="redoNextDay" />

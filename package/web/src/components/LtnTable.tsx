@@ -25,6 +25,9 @@ export interface LtnDTO {
     solveTime: string;
     customDuration: number;
     levelId: number;
+    submitTime?: string;
+    updatedAt?: string;
+    recordUpdatedAt?: string;
 }
 
 export interface LtnsProps {

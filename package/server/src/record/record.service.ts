@@ -122,11 +122,14 @@ export class RecordsService {
         },
       },
       {
+        $sort: { updatedAt: 1, submitTime: 1 }, // 按上次修改时间从早到晚，最旧错题在前
+      },
+      {
         $project: { _id: 0 }, // 排除MongoDB默认_id
       },
     ]);
 
-    // 2. 关联题目详情
+    // 2. 关联题目详情。题目自身也有 updatedAt，单独保留错题记录的修改时间
     const topics = await Promise.all(
       incorrectRecords.map((record) => this.ltnService.findOne(record.topicId)),
     );
@@ -134,6 +137,7 @@ export class RecordsService {
       data: incorrectRecords.map((record, index) => ({
         ...record,
         ...topics[index]?.dataValues, // 附加题目详情
+        recordUpdatedAt: record.updatedAt,
       })),
     };
   }

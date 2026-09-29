@@ -19,7 +19,12 @@ export default function LtnList({ list, boxId, lastStatus, fresh, returnModal }:
         const date = dayjs(solveTime || '2025-01-20').add(customDuration, 'day').format('YYYY-MM-DD');
         return isMobile ? date.slice(5) : date;
     }
-    const sortList = list.sort((a, b) => {
+    const sortList = [...list].sort((a, b) => {
+        if (lastStatus) {
+            const aTime = dayjs(a.recordUpdatedAt || a.updatedAt || a.submitTime).valueOf();
+            const bTime = dayjs(b.recordUpdatedAt || b.updatedAt || b.submitTime).valueOf();
+            return aTime - bTime;
+        }
         return dayjs(a.solveTime).isBefore(dayjs(b.solveTime)) ? -1 : 1;
     })
     return <div className="ltn-list">
